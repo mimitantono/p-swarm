@@ -2,3 +2,9 @@
 /Release/
 .idea
 *.o
+.settings/
+.project
+.cproject
+
+
+
