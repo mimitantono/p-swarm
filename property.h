@@ -15,16 +15,17 @@
 #define DEFAULT_GAPEXTEND 4
 #define DEFAULT_MATCHSCORE 5
 #define DEFAULT_MISMATCHSCORE (-4)
-#define DEFAULT_THREADS 1
+#define DEFAULT_THREADS 2
 #define DEFAULT_RESOLUTION 1
 #define DEFAULT_ALTERNATIVE_ALGORITHM 0
+#define MAX_THREADS 10
 
 class Property {
 public:
 	static void init();
 	static void print();
-	static char * queryname;
-	static char * matrixname;
+	static char * databasename;
+	static char * outfilename;
 	static long gapopen;
 	static long gapextend;
 	static long penalty_gapopen;
@@ -35,11 +36,16 @@ public:
 	static long matchscore;
 	static long mismatchscore;
 	static long threads;
-	static char * databasename;
 	static long resolution;
 	static FILE* outfile;
+	static void set_resolution(long value);
+	static void set_outfile(char* value);
+	static void set_threads(long value);
+	static void set_matchscore(long value);
+	static void set_mismatchscore(long value);
+	static void set_gapopen(long value);
+	static void set_gapextend(long value);
+	static void calculate_penalty();
 };
-
-
 
 #endif /* PROPERTY_H_ */

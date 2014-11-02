@@ -169,7 +169,8 @@ void search_do(unsigned long query_no, unsigned long listlength,
 			thr = (master_length + 7) / 8;
 	}
 
-	remainingchunks = thr;
+	//TODO Thread assumed 1 here, need refactoring
+	remainingchunks = 1;
 
 	search_worker_core(0);
 }

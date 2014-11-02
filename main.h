@@ -11,10 +11,13 @@
 #include "db.h"
 #include "matrix.h"
 #include "property.h"
-#include <iostream>
 #include "cluster.h"
+#include <getopt.h>
+#include "parallel.h"
 
-void init();
 void destroy();
+void run();
+void args_init(int argc, char** argv);
+void args_usage();
 
 #endif /* MAIN_H_ */

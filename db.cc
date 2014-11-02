@@ -3,37 +3,23 @@
 #define MEMCHUNK 1048576
 #define LINEALLOC LINE_MAX
 
-char map_nt[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 2, -1,
-		-1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1 };
+char map_nt[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2,
-		3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		-1, -1, -1, -1, -1 };
+char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
+		-1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
 unsigned long sequences = 0;
 unsigned long nucleotides = 0;
@@ -179,9 +165,7 @@ void db_read(const char * filename) {
 					datalen++;
 				} else if (c != '\n') {
 					char msg[100];
-					snprintf(msg, 100,
-							"Illegal character '%c' in sequence on line %ld", c,
-							lineno);
+					snprintf(msg, 100, "Illegal character '%c' in sequence on line %ld", c, lineno);
 					fatal(msg);
 				}
 			line[0] = 0;
@@ -217,8 +201,7 @@ void db_read(const char * filename) {
 
 	unsigned long hdrhashsize = 2 * sequences;
 
-	seqinfo_t * * hdrhashtable = (seqinfo_t **) xmalloc(
-			hdrhashsize * sizeof(seqinfo_t *));
+	seqinfo_t * * hdrhashtable = (seqinfo_t **) xmalloc(hdrhashsize * sizeof(seqinfo_t *));
 	memset(hdrhashtable, 0, hdrhashsize * sizeof(seqinfo_t *));
 
 	unsigned long duplicatedidentifiers = 0;
@@ -267,26 +250,22 @@ void db_read(const char * filename) {
 		lastabundance = seqindex_p->abundance;
 
 		/* check hash, fatal error if found, otherwize insert new */
-		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header,
-				seqindex_p->headeridlen);
+		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
 		seqindex_p->hdrhash = hdrhash;
 		unsigned long hashindex = hdrhash % hdrhashsize;
 
 		seqinfo_t * found;
 
 		while ((found = hdrhashtable[hashindex])) {
-			if ((found->hdrhash == hdrhash)
-					&& (found->headeridlen == seqindex_p->headeridlen)
-					&& (strncmp(found->header, seqindex_p->header,
-							found->headeridlen) == 0))
+			if ((found->hdrhash == hdrhash) && (found->headeridlen == seqindex_p->headeridlen)
+					&& (strncmp(found->header, seqindex_p->header, found->headeridlen) == 0))
 				break;
 			hashindex = (hashindex + 1) % hdrhashsize;
 		}
 
 		if (found) {
 			duplicatedidentifiers++;
-			fprintf(stderr, "Duplicated sequence identifier: %s\n",
-					seqindex_p->header);
+			fprintf(stderr, "Duplicated sequence identifier: %s\n", seqindex_p->header);
 		}
 
 		hdrhashtable[hashindex] = seqindex_p;
@@ -300,8 +279,7 @@ void db_read(const char * filename) {
 
 	if (missingabundance) {
 		char * msg;
-		asprintf(&msg, "Abundance annotation not found for %d sequences",
-				missingabundance);
+		asprintf(&msg, "Abundance annotation not found for %d sequences", missingabundance);
 		fatal(msg);
 	}
 
@@ -321,8 +299,7 @@ void db_qgrams_init() {
 	seqinfo_t * seqindex_p = seqindex;
 	for (int i = 0; i < sequences; i++) {
 		/* find qgrams */
-		findqgrams((unsigned char*) seqindex_p->seq, seqindex_p->seqlen,
-				qgrams[i]);
+		findqgrams((unsigned char*) seqindex_p->seq, seqindex_p->seqlen, qgrams[i]);
 		seqindex_p++;
 	}
 }
@@ -355,8 +332,7 @@ char * db_getsequence(unsigned long seqno) {
 	return seqindex[seqno].seq;
 }
 
-void db_getsequenceandlength(unsigned long seqno, char ** address,
-		long * length) {
+void db_getsequenceandlength(unsigned long seqno, char ** address, long * length) {
 	*address = seqindex[seqno].seq;
 	*length = (long) (seqindex[seqno].seqlen);
 }

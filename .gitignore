@@ -5,6 +5,9 @@
 .settings/
 .project
 .cproject
-
-
+*.gcov
+*.gcno
+*.gcda
+*.log
+*.fas
 

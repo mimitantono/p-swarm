@@ -50,7 +50,7 @@ static struct ampliconinfo_s {
 static unsigned long swarmed;
 static unsigned long seeded;
 
-void algo_run() {
+void algo_run(partition_info partition) {
 	count_comparisons_8 = 0;
 	count_comparisons_16 = 0;
 
@@ -62,17 +62,12 @@ void algo_run() {
 
 	unsigned long maxgenerations = 0;
 
-	unsigned long amplicons = db_getsequencecount();
+	unsigned long amplicons = partition.end - partition.start;
 
-	db_qgrams_init();
+	amps = (ampliconinfo_s *) xmalloc(amplicons * sizeof(struct ampliconinfo_s));
 
-	amps = (ampliconinfo_s *) xmalloc(
-			amplicons * sizeof(struct ampliconinfo_s));
-
-	targetampliconids = (unsigned long *) xmalloc(
-			amplicons * sizeof(unsigned long));
-	targetindices = (unsigned long *) xmalloc(
-			amplicons * sizeof(unsigned long));
+	targetampliconids = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	targetindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 	scores = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 	diffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 	alignlengths = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
@@ -81,14 +76,12 @@ void algo_run() {
 	qgramdiffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 	qgramindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 
-	unsigned long * hits = (unsigned long *) xmalloc(
-			amplicons * sizeof(unsigned long));
+	unsigned long * hits = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 
-	unsigned long diff_saturation = MIN(255 / Property::penalty_mismatch,
-			255 / (Property::penalty_gapopen + Property::penalty_gapextend));
+	unsigned long diff_saturation = MIN(255 / Property::penalty_mismatch, 255 / (Property::penalty_gapopen + Property::penalty_gapextend));
 
 	/* set ampliconid for all */
-	for (unsigned long i = 0; i < amplicons; i++) {
+	for (unsigned long i = partition.start; i < partition.end; i++) {
 		amps[i].ampliconid = i;
 	}
 
@@ -112,7 +105,6 @@ void algo_run() {
 		/* process each initial seed */
 
 		swarmid++;
-		fprintf(stderr, "swarmid %ld\n", swarmid);
 
 		unsigned long amplicons_copies = 0;
 		unsigned long singletons = 0;
@@ -165,8 +157,7 @@ void algo_run() {
 		}
 
 		if (targetcount > 0) {
-			search_do(seedampliconid, targetcount, targetampliconids, scores,
-					diffs, alignlengths, bits);
+			search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
 			searches++;
 
 			if (bits == 8)
@@ -237,16 +228,14 @@ void algo_run() {
 				unsigned long listlen = 0;
 				for (unsigned long i = swarmed; i < amplicons; i++) {
 					unsigned long targetampliconid = amps[i].ampliconid;
-					if (amps[i].diffestimate
-							<= subseedradius + Property::resolution) {
+					if (amps[i].diffestimate <= subseedradius + Property::resolution) {
 						qgramamps[listlen] = targetampliconid;
 						qgramindices[listlen] = i;
 						listlen++;
 					}
 				}
 
-				qgram_work_diff(subseedampliconid, listlen, qgramamps,
-						qgramdiffs);
+				qgram_work_diff(subseedampliconid, listlen, qgramamps, qgramdiffs);
 
 				estimates += listlen;
 
@@ -258,8 +247,7 @@ void algo_run() {
 					}
 
 				if (targetcount > 0) {
-					search_do(subseedampliconid, targetcount, targetampliconids,
-							scores, diffs, alignlengths, bits);
+					search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
 					searches++;
 
 					if (bits == 8)
@@ -284,11 +272,8 @@ void algo_run() {
 							unsigned long targetampliconid = amps[i].ampliconid;
 							unsigned pos = swarmed;
 
-							while ((pos > seeded)
-									&& (amps[pos - 1].ampliconid
-											> targetampliconid)
-									&& (amps[pos - 1].generation
-											> subseedgeneration))
+							while ((pos > seeded) && (amps[pos - 1].ampliconid > targetampliconid)
+									&& (amps[pos - 1].generation > subseedgeneration))
 								pos--;
 
 							if (pos < i) {
@@ -372,10 +357,6 @@ void algo_run() {
 	free(targetampliconids);
 	free(amps);
 
-	db_qgrams_done();
-
-//	qgram_diff_done();
-
 	fprintf(stderr, "\n");
 
 	fprintf(stderr, "Number of swarms:  %lu\n", swarmid);
@@ -392,16 +373,13 @@ void algo_run() {
 
 	fprintf(stderr, "\n");
 
-	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8,
-			(200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
+	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
 
 	fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparisons_16,
 			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
 
-	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n",
-			count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons
-					/ (amplicons + 1)));
+	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
+			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
 
 }
 

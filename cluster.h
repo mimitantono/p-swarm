@@ -12,6 +12,12 @@
 #include "qgram.h"
 #include "scan.h"
 
-void algo_run();
+typedef struct partition_info {
+	unsigned long start;
+	unsigned long end;
+	unsigned long threadid;
+} partition;
+
+void algo_run(partition_info partition);
 
 #endif /* CLUSTER_H_ */
