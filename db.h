@@ -21,6 +21,9 @@
 #include <stdio.h>
 #include <limits.h>
 #include <regex.h>
+#include <string>
+
+using namespace std;
 
 struct seqinfo_s
 {
@@ -46,7 +49,7 @@ inline unsigned char * db_getqgramvector(unsigned long seqno) {
 	return (unsigned char*) (qgrams + seqno);
 }
 
-void db_read(const char * filename);
+void db_read(string filename);
 
 unsigned long db_getsequencecount();
 unsigned long db_getnucleotidecount();
@@ -70,6 +73,7 @@ unsigned long db_getabundance(unsigned long seqno);
 
 void db_showsequence(unsigned long seqno);
 void db_showall();
+void db_print_info();
 void db_free();
 
 void db_putseq(long seqno);

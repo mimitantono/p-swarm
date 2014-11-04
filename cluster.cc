@@ -26,19 +26,6 @@
 #define SEPCHAR ' '
 #define BITS 8
 
-static unsigned long count_comparisons_8;
-static unsigned long count_comparisons_16;
-
-static unsigned long targetcount;
-static unsigned long * targetindices;
-static unsigned long * targetampliconids;
-static unsigned long * scores;
-static unsigned long * diffs;
-static unsigned long * alignlengths;
-static unsigned long * qgramamps;
-static unsigned long * qgramdiffs;
-static unsigned long * qgramindices;
-
 static struct ampliconinfo_s {
 	unsigned ampliconid;
 	unsigned diffestimate; /* lower bound estimate of dist from initial seed */
@@ -51,8 +38,20 @@ static unsigned long swarmed;
 static unsigned long seeded;
 
 void algo_run(partition_info partition) {
-	count_comparisons_8 = 0;
-	count_comparisons_16 = 0;
+	unsigned long count_comparisons_8 = 0;
+	unsigned long count_comparisons_16 = 0;
+	unsigned long amplicons = partition.end - partition.start;
+
+	unsigned long targetcount;
+	unsigned long * targetindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * targetampliconids = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * scores = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * diffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * alignlengths = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * qgramamps = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * qgramdiffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * qgramindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * hits = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 
 	unsigned long searches = 0;
 	unsigned long estimates = 0;
@@ -62,21 +61,7 @@ void algo_run(partition_info partition) {
 
 	unsigned long maxgenerations = 0;
 
-	unsigned long amplicons = partition.end - partition.start;
-
 	amps = (ampliconinfo_s *) xmalloc(amplicons * sizeof(struct ampliconinfo_s));
-
-	targetampliconids = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	targetindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	scores = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	diffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	alignlengths = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-
-	qgramamps = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	qgramdiffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	qgramindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-
-	unsigned long * hits = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
 
 	unsigned long diff_saturation = MIN(255 / Property::penalty_mismatch, 255 / (Property::penalty_gapopen + Property::penalty_gapextend));
 
@@ -346,6 +331,35 @@ void algo_run(partition_info partition) {
 		fputc('\n', Property::outfile);
 	}
 
+	fprintf(stderr, "\n\n");
+	fprintf(stderr, "===========================================\n");
+	fprintf(stderr, "Thread #%ld\n", partition.threadid);
+	fprintf(stderr, "===========================================\n");
+
+	fprintf(stderr, "Total sequences    : %ld\n", amplicons);
+
+	fprintf(stderr, "Number of swarms   : %lu\n", swarmid);
+
+	fprintf(stderr, "Largest swarm      : %lu\n", largestswarm);
+
+	fprintf(stderr, "Max generations    : %lu\n", maxgenerations);
+
+	fprintf(stderr, "\n");
+
+	fprintf(stderr, "Estimates          : %lu\n", estimates);
+
+	fprintf(stderr, "Searches           : %lu\n", searches);
+
+	fprintf(stderr, "\n");
+
+	fprintf(stderr, "Comparisons (8b)   : %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
+
+	fprintf(stderr, "Comparisons (16b)  : %lu (%.2lf%%)\n", count_comparisons_16,
+			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
+
+	fprintf(stderr, "Comparisons (tot)  : %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
+			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
+
 	free(qgramdiffs);
 	free(qgramamps);
 	free(qgramindices);
@@ -356,30 +370,5 @@ void algo_run(partition_info partition) {
 	free(targetindices);
 	free(targetampliconids);
 	free(amps);
-
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "Number of swarms:  %lu\n", swarmid);
-
-	fprintf(stderr, "Largest swarm:     %lu\n", largestswarm);
-
-	fprintf(stderr, "Max generations:   %lu\n", maxgenerations);
-
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "Estimates:         %lu\n", estimates);
-
-	fprintf(stderr, "Searches:          %lu\n", searches);
-
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
-
-	fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparisons_16,
-			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
-
-	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
-
 }
 

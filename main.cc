@@ -75,12 +75,13 @@ void args_init(int argc, char **argv) {
 		Property::databasename = argv[optind];
 
 	if (!Property::outfile)
-		Property::outfile = stdout;
+		Property::set_outfile("result.log");
 	Property::print();
 }
 
 void run() {
 	db_read(Property::databasename);
+	db_print_info();
 	search_begin();
 	db_qgrams_init();
 	Parallel parallel;
@@ -89,8 +90,8 @@ void run() {
 }
 
 void args_show() {
-	fprintf(stderr, "Database file:     %s\n", Property::databasename);
-	fprintf(stderr, "Output file:       %s\n", Property::outfilename);
+	fprintf(stderr, "Database file:     %s\n", Property::databasename.c_str());
+	fprintf(stderr, "Output file:       %s\n", Property::outfilename.c_str());
 	fprintf(stderr, "Resolution (d):    %ld\n", Property::resolution);
 	fprintf(stderr, "Threads:           %ld\n", Property::threads);
 	fprintf(stderr, "Scores:            match: %ld, mismatch: %ld\n", Property::matchscore, Property::mismatchscore);

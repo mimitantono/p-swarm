@@ -74,7 +74,7 @@ int db_compare_abundance(const void * a, const void * b) {
 #endif
 }
 
-void db_read(const char * filename) {
+void db_read(string filename) {
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
@@ -88,19 +88,19 @@ void db_read(const char * filename) {
 	headerchars = 0;
 
 	FILE * fp = NULL;
-	if (filename) {
-		fp = fopen(filename, "r");
+	if (filename.c_str()) {
+		fp = fopen(filename.c_str(), "r");
 		if (!fp)
-			fatal("Error: Unable to open input data file (%s).", filename);
+			fatal("Error: Unable to open input data file (%s).", filename.c_str());
 	} else
 		fp = stdin;
 
 	/* get file size */
 
 	long filesize = 0;
-	if (filename) {
+	if (filename.c_str()) {
 		if (fseek(fp, 0, SEEK_END))
-			fatal("Error: Unable to seek in database file (%s)", filename);
+			fatal("Error: Unable to seek in database file (%s)", filename.c_str());
 		filesize = ftell(fp);
 		rewind(fp);
 	}
@@ -190,7 +190,7 @@ void db_read(const char * filename) {
 
 		sequences++;
 
-		if (filename)
+		if (filename.c_str())
 			progress_update(ftell(fp));
 	}
 	progress_done();
@@ -291,6 +291,10 @@ void db_read(const char * filename) {
 
 	if (duplicatedidentifiers)
 		exit(1);
+}
+
+void db_print_info() {
+	fprintf(stderr, "Total sequences    : %ld", db_getsequencecount());
 }
 
 void db_qgrams_init() {

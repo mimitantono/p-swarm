@@ -11,7 +11,6 @@ Parallel::Parallel() {
 }
 
 Parallel::~Parallel() {
-	// TODO Auto-generated destructor stub
 }
 
 long get_start(unsigned long threadid) {

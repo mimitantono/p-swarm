@@ -19,8 +19,8 @@ long Property::threads;
 long Property::penalty_factor;
 long Property::resolution;
 FILE * Property::outfile;
-char * Property::databasename;
-char * Property::outfilename;
+string Property::databasename;
+string Property::outfilename;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -48,8 +48,8 @@ void Property::calculate_penalty() {
 }
 
 void Property::print() {
-	fprintf(stderr, "databasename       : %s\n", databasename);
-	fprintf(stderr, "outfilename        : %s\n", outfilename);
+	fprintf(stderr, "databasename       : %s\n", databasename.c_str());
+	fprintf(stderr, "outfilename        : %s\n", outfilename.c_str());
 	fprintf(stderr, "gapopen            : %ld\n", gapopen);
 	fprintf(stderr, "gapextend          : %ld\n", gapextend);
 	fprintf(stderr, "gapopenextend      : %ld\n", gapopenextend);
@@ -69,9 +69,9 @@ void Property::set_resolution(long value) {
 		fatal("Illegal resolution specified");
 }
 
-void Property::set_outfile(char* value) {
+void Property::set_outfile(string value) {
 	outfilename = value;
-	outfile = fopen(outfilename, "w");
+	outfile = fopen(outfilename.c_str(), "w");
 	if (!outfile)
 		fatal("Unable to open output file for writing");
 

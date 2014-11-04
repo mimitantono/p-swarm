@@ -9,7 +9,10 @@
 #define PROPERTY_H_
 
 #include <stdio.h>
+#include <string>
 #include "util.h"
+
+using namespace std;
 
 #define DEFAULT_GAPOPEN 12
 #define DEFAULT_GAPEXTEND 4
@@ -24,8 +27,8 @@ class Property {
 public:
 	static void init();
 	static void print();
-	static char * databasename;
-	static char * outfilename;
+	static string databasename;
+	static string outfilename;
 	static long gapopen;
 	static long gapextend;
 	static long penalty_gapopen;
@@ -39,7 +42,7 @@ public:
 	static long resolution;
 	static FILE* outfile;
 	static void set_resolution(long value);
-	static void set_outfile(char* value);
+	static void set_outfile(string value);
 	static void set_threads(long value);
 	static void set_matchscore(long value);
 	static void set_mismatchscore(long value);
