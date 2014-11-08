@@ -7,6 +7,8 @@
 
 #include "parallel.h"
 
+vector<cluster_result*> Parallel::results;
+
 Parallel::Parallel() {
 }
 
@@ -30,7 +32,7 @@ void *run_cluster(void *threadid) {
 	partition.threadid = (long) threadid;
 	partition.start = get_start((long) threadid);
 	partition.end = get_end((long) threadid);
-	algo_run(partition);
+	Parallel::results.push_back(algo_run(partition));
 	pthread_exit(NULL);
 }
 
@@ -44,6 +46,5 @@ void Parallel::run() {
 			exit(-1);
 		}
 	}
-	pthread_exit(NULL);
 }
 

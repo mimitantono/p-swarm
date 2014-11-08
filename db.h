@@ -41,6 +41,8 @@ struct seqinfo_s
 
 typedef struct seqinfo_s seqinfo_t;
 
+extern seqinfo_t * seqindex;
+
 typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
 extern qgramvector_t * qgrams;
 extern unsigned long sequences;

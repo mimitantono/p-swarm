@@ -12,12 +12,15 @@
 #include <pthread.h>
 #include "cluster.h"
 #include "property.h"
+#include "clusterresult.h"
 
 class Parallel {
 public:
 	Parallel();
 	virtual ~Parallel();
 	void run();
+	cluster_result result;
+	static vector<cluster_result*> results;
 };
 
 #endif /* PARALLEL_H_ */

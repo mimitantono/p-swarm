@@ -27,8 +27,9 @@ unsigned long headerchars = 0;
 int longest = 0;
 int longestheader = 0;
 
-seqinfo_t * seqindex = 0;
 char * datap = 0;
+
+seqinfo_t * seqindex = 0;
 
 void showseq(char * seq) {
 	char * p = seq;

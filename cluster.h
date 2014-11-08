@@ -11,13 +11,23 @@
 #include <stdio.h>
 #include "qgram.h"
 #include "scan.h"
+#include "clusterresult.h"
+#include "db.h"
 
-typedef struct partition_info {
+struct partition_info {
 	unsigned long start;
 	unsigned long end;
 	unsigned long threadid;
-} partition;
+};
 
-void algo_run(partition_info partition);
+struct ampliconinfo_s {
+	unsigned ampliconid;
+	unsigned diffestimate; /* lower bound estimate of dist from initial seed */
+	unsigned swarmid;
+	unsigned generation;
+	unsigned radius; /* actual diff from initial seed */
+};
+
+cluster_result * algo_run(partition_info partition);
 
 #endif /* CLUSTER_H_ */

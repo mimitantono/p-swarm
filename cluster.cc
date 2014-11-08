@@ -26,18 +26,10 @@
 #define SEPCHAR ' '
 #define BITS 8
 
-static struct ampliconinfo_s {
-	unsigned ampliconid;
-	unsigned diffestimate; /* lower bound estimate of dist from initial seed */
-	unsigned swarmid;
-	unsigned generation;
-	unsigned radius; /* actual diff from initial seed */
-}* amps;
-
 static unsigned long swarmed;
 static unsigned long seeded;
 
-void algo_run(partition_info partition) {
+cluster_result * algo_run(partition_info partition) {
 	unsigned long count_comparisons_8 = 0;
 	unsigned long count_comparisons_16 = 0;
 	unsigned long amplicons = partition.end - partition.start;
@@ -61,7 +53,7 @@ void algo_run(partition_info partition) {
 
 	unsigned long maxgenerations = 0;
 
-	amps = (ampliconinfo_s *) xmalloc(amplicons * sizeof(struct ampliconinfo_s));
+	ampliconinfo_s * amps = new ampliconinfo_s[amplicons];
 
 	unsigned long diff_saturation = MIN(255 / Property::penalty_mismatch, 255 / (Property::penalty_gapopen + Property::penalty_gapextend));
 
@@ -307,6 +299,9 @@ void algo_run(partition_info partition) {
 
 	/* output results */
 
+	cluster_result * result = new cluster_result;
+	result->partition_id = partition.threadid;
+
 	if (amplicons > 0) {
 		char sep_amplicons;
 		char sep_swarms;
@@ -315,50 +310,53 @@ void algo_run(partition_info partition) {
 		sep_amplicons = SEPCHAR; /* usually a space */
 		sep_swarms = '\n';
 
-		fprint_id(Property::outfile, amps[0].ampliconid);
-		long previd = amps[0].swarmid;
+		cluster_info * cluster;
+		long previd = -1;
 
-		for (unsigned long i = 1; i < amplicons; i++) {
+		for (unsigned long i = 0; i < amplicons; i++) {
 			long id = amps[i].swarmid;
-			if (id == previd)
-				fputc(sep_amplicons, Property::outfile);
-			else
-				fputc(sep_swarms, Property::outfile);
-			fprint_id(Property::outfile, amps[i].ampliconid);
+			if (id != previd) {
+				cluster = result->new_cluster();
+				cluster->cluster_id = amps[i].swarmid;
+			}
+			member_info * member = new member_info;
+			member->sequence = seqindex[amps[i].ampliconid];
+			member->generation = amps[i].generation;
+			member->radius = amps[i].radius;
+			member->qgram_diff = amps[i].diffestimate;
+			cluster->cluster_members.push_back(member);
 			previd = id;
 		}
-
-		fputc('\n', Property::outfile);
 	}
 
-	fprintf(stderr, "\n\n");
-	fprintf(stderr, "===========================================\n");
-	fprintf(stderr, "Thread #%ld\n", partition.threadid);
-	fprintf(stderr, "===========================================\n");
-
-	fprintf(stderr, "Total sequences    : %ld\n", amplicons);
-
-	fprintf(stderr, "Number of swarms   : %lu\n", swarmid);
-
-	fprintf(stderr, "Largest swarm      : %lu\n", largestswarm);
-
-	fprintf(stderr, "Max generations    : %lu\n", maxgenerations);
-
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "Estimates          : %lu\n", estimates);
-
-	fprintf(stderr, "Searches           : %lu\n", searches);
-
-	fprintf(stderr, "\n");
-
-	fprintf(stderr, "Comparisons (8b)   : %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
-
-	fprintf(stderr, "Comparisons (16b)  : %lu (%.2lf%%)\n", count_comparisons_16,
-			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
-
-	fprintf(stderr, "Comparisons (tot)  : %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
+//	fprintf(stderr, "\n\n");
+//	fprintf(stderr, "===========================================\n");
+//	fprintf(stderr, "Thread #%ld\n", partition.threadid);
+//	fprintf(stderr, "===========================================\n");
+//
+//	fprintf(stderr, "Total sequences    : %ld\n", amplicons);
+//
+//	fprintf(stderr, "Number of swarms   : %lu\n", swarmid);
+//
+//	fprintf(stderr, "Largest swarm      : %lu\n", largestswarm);
+//
+//	fprintf(stderr, "Max generations    : %lu\n", maxgenerations);
+//
+//	fprintf(stderr, "\n");
+//
+//	fprintf(stderr, "Estimates          : %lu\n", estimates);
+//
+//	fprintf(stderr, "Searches           : %lu\n", searches);
+//
+//	fprintf(stderr, "\n");
+//
+//	fprintf(stderr, "Comparisons (8b)   : %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
+//
+//	fprintf(stderr, "Comparisons (16b)  : %lu (%.2lf%%)\n", count_comparisons_16,
+//			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
+//
+//	fprintf(stderr, "Comparisons (tot)  : %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
+//			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
 
 	free(qgramdiffs);
 	free(qgramamps);
@@ -369,6 +367,8 @@ void algo_run(partition_info partition) {
 	free(scores);
 	free(targetindices);
 	free(targetampliconids);
-	free(amps);
+	delete amps;
+
+	return result;
 }
 
