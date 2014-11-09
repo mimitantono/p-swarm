@@ -57,9 +57,9 @@ void Matrix::score_matrix_read() {
 	int a, b;
 	long sc, lo, hi;
 
-	score_matrix_8 = (unsigned char *) xmalloc(32 * 32 * sizeof(char));
-	score_matrix_16 = (unsigned short *) xmalloc(32 * 32 * sizeof(short));
-	score_matrix_63 = (long *) xmalloc(32 * 32 * sizeof(long));
+	score_matrix_8 = new unsigned char[32 * 32];
+	score_matrix_16 = new unsigned short[32 * 32];
+	score_matrix_63 = new long[32 * 32];
 
 	hi = -1000;
 	lo = 1000;
@@ -92,11 +92,8 @@ void Matrix::score_matrix_init() {
 }
 
 void Matrix::score_matrix_free() {
-	free(Matrix::score_matrix_8);
-	Matrix::score_matrix_8 = NULL;
-	free(Matrix::score_matrix_16);
-	Matrix::score_matrix_16 = NULL;
-	free(Matrix::score_matrix_63);
-	Matrix::score_matrix_63 = NULL;
+	delete Matrix::score_matrix_8;
+	delete Matrix::score_matrix_16;
+	delete Matrix::score_matrix_63;
 }
 

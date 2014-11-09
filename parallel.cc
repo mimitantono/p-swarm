@@ -38,13 +38,28 @@ void *run_cluster(void *threadid) {
 
 void Parallel::run() {
 	pthread_t threads[Property::threads];
+	pthread_attr_t attr;
 	int rc;
+	long t;
+	void *status;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
 	for (long i = 0; i < Property::threads; i++) {
-		rc = pthread_create(&threads[i], NULL, run_cluster, (void *) (unsigned long) i);
+		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) (unsigned long) i);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
 			exit(-1);
 		}
+	}
+	pthread_attr_destroy(&attr);
+	for (t = 0; t < Property::threads; t++) {
+		rc = pthread_join(threads[t], &status);
+		if (rc) {
+			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
+			exit(-1);
+		}
+		printf("\nMain: completed join with thread %ld having a status of %ld\n", t + 1, (long) status);
 	}
 }
 

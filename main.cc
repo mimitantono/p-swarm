@@ -86,6 +86,9 @@ void run() {
 	db_qgrams_init();
 	Parallel parallel;
 	parallel.run();
+	for (int i = 0; i < Parallel::results.size(); i++) {
+		Parallel::results[i]->print();
+	}
 	parallel.~Parallel();
 }
 

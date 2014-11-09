@@ -18,7 +18,7 @@ using namespace std;
 #define DEFAULT_GAPEXTEND 4
 #define DEFAULT_MATCHSCORE 5
 #define DEFAULT_MISMATCHSCORE (-4)
-#define DEFAULT_THREADS 2
+#define DEFAULT_THREADS 1
 #define DEFAULT_RESOLUTION 1
 #define DEFAULT_ALTERNATIVE_ALGORITHM 0
 #define MAX_THREADS 10
@@ -40,6 +40,7 @@ public:
 	static long mismatchscore;
 	static long threads;
 	static long resolution;
+	static unsigned long diff_saturation();
 	static FILE* outfile;
 	static void set_resolution(long value);
 	static void set_outfile(string value);

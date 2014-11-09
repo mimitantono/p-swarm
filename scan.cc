@@ -3,9 +3,9 @@
 
  Copyright (C) 2012-2013 Torbjorn Rognes and Frederic Mahe
 
- This program is free software: you can redistribute it and/or modify
+ This program is delete software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
+ published by the delete Software Foundation, either version 3 of the
  License, or (at your option) any later version.
 
  This program is distributed in the hope that it will be useful,
@@ -58,24 +58,24 @@ unsigned long dirbufferbytes;
 
 void search_alloc(struct search_data * sdp) {
 	dirbufferbytes = 8 * longestdbsequence * ((longestdbsequence + 3) / 4) * 4;
-	sdp->qtable = (BYTE**) xmalloc(longestdbsequence * sizeof(BYTE*));
-	sdp->qtable_w = (WORD**) xmalloc(longestdbsequence * sizeof(WORD*));
-	sdp->dprofile = (BYTE*) xmalloc(4 * 16 * 32);
-	sdp->dprofile_w = (WORD*) xmalloc(4 * 2 * 8 * 32);
-	sdp->hearray = (BYTE*) xmalloc(longestdbsequence * 32);
-	sdp->dir_array = (unsigned long *) xmalloc(dirbufferbytes);
+	sdp->qtable = new BYTE*[longestdbsequence];
+	sdp->qtable_w = new WORD*[longestdbsequence];
+	sdp->dprofile = new BYTE[4 * 16 * 32];
+	sdp->dprofile_w = new WORD[4 * 2 * 8 * 32];
+	sdp->hearray = new BYTE[longestdbsequence * 32];
+	sdp->dir_array = new unsigned long[dirbufferbytes];
 
 	memset(sdp->hearray, 0, longestdbsequence * 32);
 	memset(sdp->dir_array, 0, dirbufferbytes);
 }
 
-void search_free(struct search_data * sdp) {
-	free(sdp->qtable);
-	free(sdp->qtable_w);
-	free(sdp->dprofile);
-	free(sdp->dprofile_w);
-	free(sdp->hearray);
-	free(sdp->dir_array);
+void search_delete(struct search_data * sdp) {
+	delete(sdp->qtable);
+	delete(sdp->qtable_w);
+	delete(sdp->dprofile);
+	delete(sdp->dprofile_w);
+	delete(sdp->hearray);
+	delete(sdp->dir_array);
 }
 
 void search_init(struct search_data * sdp) {
@@ -90,23 +90,13 @@ void search_chunk(struct search_data * sdp, long bits) {
 		return;
 
 	if (bits == 16)
-		search16(sdp->qtable_w, Property::penalty_gapopen,
-				Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
-				sdp->dprofile_w, (WORD*) sdp->hearray, sdp->target_count,
-				master_targets + sdp->target_index,
-				master_scores + sdp->target_index,
-				master_diffs + sdp->target_index,
-				master_alignlengths + sdp->target_index, query.len,
-				dirbufferbytes / 8, sdp->dir_array);
+		search16(sdp->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16, sdp->dprofile_w,
+				(WORD*) sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array);
 	else
-		search8(sdp->qtable, Property::penalty_gapopen,
-				Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8,
-				sdp->dprofile, sdp->hearray, sdp->target_count,
-				master_targets + sdp->target_index,
-				master_scores + sdp->target_index,
-				master_diffs + sdp->target_index,
-				master_alignlengths + sdp->target_index, query.len,
-				dirbufferbytes / 8, sdp->dir_array);
+		search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
+				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array);
 }
 
 int search_getwork(unsigned long * countref, unsigned long * firstref) {
@@ -116,8 +106,7 @@ int search_getwork(unsigned long * countref, unsigned long * firstref) {
 	unsigned long status = 0;
 
 	if (master_next < master_length) {
-		unsigned long chunksize = ((master_length - master_next
-				+ remainingchunks - 1) / remainingchunks);
+		unsigned long chunksize = ((master_length - master_next + remainingchunks - 1) / remainingchunks);
 
 		*countref = chunksize;
 		*firstref = master_next;
@@ -134,8 +123,7 @@ void master_dump() {
 	printf("master_dump\n");
 	printf("   i    t    s    d\n");
 	for (unsigned long i = 0; i < 1403; i++) {
-		printf("%4lu %4lu %4lu %4lu\n", i, master_targets[i], master_scores[i],
-				master_diffs[i]);
+		printf("%4lu %4lu %4lu %4lu\n", i, master_targets[i], master_scores[i], master_diffs[i]);
 	}
 }
 
@@ -145,8 +133,7 @@ void search_worker_core(int t) {
 		search_chunk(sd + t, master_bits);
 }
 
-void search_do(unsigned long query_no, unsigned long listlength,
-		unsigned long * targets, unsigned long * scores, unsigned long * diffs,
+void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores, unsigned long * diffs,
 		unsigned long * alignlengths, long bits) {
 	query.qno = query_no;
 	db_getsequenceandlength(query_no, &query.seq, &query.len);
@@ -177,10 +164,10 @@ void search_do(unsigned long query_no, unsigned long listlength,
 
 void search_begin() {
 	longestdbsequence = db_getlongestsequence();
-	sd = (struct search_data *) xmalloc(sizeof(search_data));
+	sd = new struct search_data;
 	search_alloc(sd);
 }
 
 void search_end() {
-	free(sd);
+	delete(sd);
 }

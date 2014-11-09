@@ -40,8 +40,7 @@ void Property::calculate_penalty() {
 	penalty_gapopen = 2 * gapopen;
 	penalty_gapextend = 2 * matchscore + gapextend;
 
-	penalty_factor = gcd(gcd(penalty_mismatch, penalty_gapopen),
-			penalty_gapextend);
+	penalty_factor = gcd(gcd(penalty_mismatch, penalty_gapopen), penalty_gapextend);
 
 	penalty_mismatch /= penalty_factor;
 	penalty_gapopen /= penalty_factor;
@@ -100,3 +99,6 @@ void Property::set_gapextend(long value) {
 		fatal("Illegal gap extend specified.");
 }
 
+unsigned long Property::diff_saturation() {
+	return MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
+}

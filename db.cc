@@ -29,7 +29,7 @@ int longestheader = 0;
 
 char * datap = 0;
 
-seqinfo_t * seqindex = 0;
+seqinfo_t * seqindex;
 
 void showseq(char * seq) {
 	char * p = seq;
@@ -202,14 +202,14 @@ void db_read(string filename) {
 
 	unsigned long hdrhashsize = 2 * sequences;
 
-	seqinfo_t * * hdrhashtable = (seqinfo_t **) xmalloc(hdrhashsize * sizeof(seqinfo_t *));
+	seqinfo_t * * hdrhashtable = new seqinfo_t*[hdrhashsize];
 	memset(hdrhashtable, 0, hdrhashsize * sizeof(seqinfo_t *));
 
 	unsigned long duplicatedidentifiers = 0;
 
 	/* create indices */
 
-	seqindex = (seqinfo_t *) xmalloc(sequences * sizeof(seqinfo_t));
+	seqindex = new seqinfo_t[sequences];
 	seqinfo_t * seqindex_p = seqindex;
 
 	regex_t db_regexp;
@@ -288,7 +288,7 @@ void db_read(string filename) {
 		qsort(seqindex, sequences, sizeof(seqinfo_t), db_compare_abundance);
 	}
 
-	free(hdrhashtable);
+	delete(hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);
@@ -299,7 +299,7 @@ void db_print_info() {
 }
 
 void db_qgrams_init() {
-	qgrams = (qgramvector_t *) xmalloc(sequences * sizeof(qgramvector_t));
+	qgrams = new qgramvector_t[sequences];
 
 	seqinfo_t * seqindex_p = seqindex;
 	for (int i = 0; i < sequences; i++) {
@@ -310,7 +310,7 @@ void db_qgrams_init() {
 }
 
 void db_qgrams_done() {
-	free(qgrams);
+	delete(qgrams);
 }
 
 unsigned long db_getsequencecount() {
@@ -370,6 +370,6 @@ void db_free() {
 	if (datap)
 		free(datap);
 	if (seqindex)
-		free(seqindex);
+		delete (seqindex);
 }
 

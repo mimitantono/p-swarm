@@ -1,26 +1,3 @@
-/*
- SWARM
-
- Copyright (C) 2012-2014 Torbjorn Rognes and Frederic Mahe
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- Contact: Torbjorn Rognes <torognes@ifi.uio.no>,
- Department of Informatics, University of Oslo,
- PO Box 1080 Blindern, NO-0316 Oslo, Norway
- */
-
 #include "cluster.h"
 
 #define SEPCHAR ' '
@@ -35,15 +12,15 @@ cluster_result * algo_run(partition_info partition) {
 	unsigned long amplicons = partition.end - partition.start;
 
 	unsigned long targetcount;
-	unsigned long * targetindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * targetampliconids = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * scores = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * diffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * alignlengths = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * qgramamps = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * qgramdiffs = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * qgramindices = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
-	unsigned long * hits = (unsigned long *) xmalloc(amplicons * sizeof(unsigned long));
+	unsigned long * targetindices = new unsigned long[amplicons];
+	unsigned long * targetampliconids = new unsigned long[amplicons];
+	unsigned long * scores = new unsigned long[amplicons];
+	unsigned long * diffs = new unsigned long[amplicons];
+	unsigned long * alignlengths = new unsigned long[amplicons];
+	unsigned long * qgramamps = new unsigned long[amplicons];
+	unsigned long * qgramdiffs = new unsigned long[amplicons];
+	unsigned long * qgramindices = new unsigned long[amplicons];
+	unsigned long * hits = new unsigned long[amplicons];
 
 	unsigned long searches = 0;
 	unsigned long estimates = 0;
@@ -55,8 +32,6 @@ cluster_result * algo_run(partition_info partition) {
 
 	ampliconinfo_s * amps = new ampliconinfo_s[amplicons];
 
-	unsigned long diff_saturation = MIN(255 / Property::penalty_mismatch, 255 / (Property::penalty_gapopen + Property::penalty_gapextend));
-
 	/* set ampliconid for all */
 	for (unsigned long i = partition.start; i < partition.end; i++) {
 		amps[i].ampliconid = i;
@@ -66,7 +41,7 @@ cluster_result * algo_run(partition_info partition) {
 
 	unsigned long bits;
 
-	if ((unsigned long) Property::resolution <= diff_saturation)
+	if ((unsigned long) Property::resolution <= Property::diff_saturation())
 		bits = 8;
 	else
 		bits = 16;
@@ -300,7 +275,7 @@ cluster_result * algo_run(partition_info partition) {
 	/* output results */
 
 	cluster_result * result = new cluster_result;
-	result->partition_id = partition.threadid;
+	result->partition_id = partition.threadid + 1;
 
 	if (amplicons > 0) {
 		char sep_amplicons;
@@ -310,64 +285,32 @@ cluster_result * algo_run(partition_info partition) {
 		sep_amplicons = SEPCHAR; /* usually a space */
 		sep_swarms = '\n';
 
-		cluster_info * cluster;
 		long previd = -1;
 
 		for (unsigned long i = 0; i < amplicons; i++) {
-			long id = amps[i].swarmid;
-			if (id != previd) {
-				cluster = result->new_cluster();
-				cluster->cluster_id = amps[i].swarmid;
-			}
 			member_info * member = new member_info;
 			member->sequence = seqindex[amps[i].ampliconid];
 			member->generation = amps[i].generation;
 			member->radius = amps[i].radius;
 			member->qgram_diff = amps[i].diffestimate;
-			cluster->cluster_members.push_back(member);
-			previd = id;
+			if (amps[i].swarmid != previd) {
+				result->new_cluster(amps[i].swarmid);
+			}
+			result->clusters.back()->cluster_members.push_back(member);
+			previd = amps[i].swarmid;
 		}
 	}
 
-//	fprintf(stderr, "\n\n");
-//	fprintf(stderr, "===========================================\n");
-//	fprintf(stderr, "Thread #%ld\n", partition.threadid);
-//	fprintf(stderr, "===========================================\n");
-//
-//	fprintf(stderr, "Total sequences    : %ld\n", amplicons);
-//
-//	fprintf(stderr, "Number of swarms   : %lu\n", swarmid);
-//
-//	fprintf(stderr, "Largest swarm      : %lu\n", largestswarm);
-//
-//	fprintf(stderr, "Max generations    : %lu\n", maxgenerations);
-//
-//	fprintf(stderr, "\n");
-//
-//	fprintf(stderr, "Estimates          : %lu\n", estimates);
-//
-//	fprintf(stderr, "Searches           : %lu\n", searches);
-//
-//	fprintf(stderr, "\n");
-//
-//	fprintf(stderr, "Comparisons (8b)   : %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
-//
-//	fprintf(stderr, "Comparisons (16b)  : %lu (%.2lf%%)\n", count_comparisons_16,
-//			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
-//
-//	fprintf(stderr, "Comparisons (tot)  : %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
-//			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
-
-	free(qgramdiffs);
-	free(qgramamps);
-	free(qgramindices);
-	free(hits);
-	free(alignlengths);
-	free(diffs);
-	free(scores);
-	free(targetindices);
-	free(targetampliconids);
-	delete amps;
+	delete (qgramdiffs);
+	delete (qgramamps);
+	delete (qgramindices);
+	delete (hits);
+	delete (alignlengths);
+	delete (diffs);
+	delete (scores);
+	delete (targetindices);
+	delete (targetampliconids);
+	delete (amps);
 
 	return result;
 }
