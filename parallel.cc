@@ -41,7 +41,8 @@ void *run_cluster(void *threadargs) {
 	partition.start = get_start(partition.threadid, my_data->db);
 	partition.end = get_end(partition.threadid, my_data->db);
 	fprintf(stderr, "\nStarting thread #%lu from %lu to %lu", partition.threadid, partition.start, partition.end);
-	Parallel::results.push_back(algo_run(partition, my_data->db));
+	cluster_job cluster_job(my_data->db);
+	Parallel::results.push_back(cluster_job.algo_run(partition));
 	pthread_exit(NULL);
 }
 

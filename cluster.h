@@ -28,6 +28,14 @@ struct ampliconinfo_s {
 	unsigned radius; /* actual diff from initial seed */
 };
 
-cluster_result * algo_run(partition_info partition, Db_data * db);
+class cluster_job {
+private:
+	Db_data * db;
+	scanner scanner;
+public:
+	cluster_job(Db_data * db);
+	virtual ~cluster_job();
+	cluster_result * algo_run(partition_info partition);
+};
 
 #endif /* CLUSTER_H_ */

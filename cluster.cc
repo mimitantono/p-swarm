@@ -3,7 +3,16 @@
 #define SEPCHAR ' '
 #define BITS 8
 
-cluster_result * algo_run(partition_info partition, Db_data * db) {
+cluster_job::cluster_job(Db_data * db) {
+	this->db = db;
+	scanner.set_db(db);
+	scanner.search_begin();
+}
+
+cluster_job::~cluster_job() {
+}
+
+cluster_result * cluster_job::algo_run(partition_info partition) {
 	unsigned long swarmed;
 	unsigned long seeded;
 	unsigned long count_comparisons_8 = 0;
@@ -108,7 +117,7 @@ cluster_result * algo_run(partition_info partition, Db_data * db) {
 		}
 
 		if (targetcount > 0) {
-			search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits, db);
+			scanner.search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
 			searches++;
 
 			if (bits == 8)
@@ -198,7 +207,7 @@ cluster_result * algo_run(partition_info partition, Db_data * db) {
 					}
 
 				if (targetcount > 0) {
-					search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits, db);
+					scanner.search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
 					searches++;
 
 					if (bits == 8)

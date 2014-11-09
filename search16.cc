@@ -1,26 +1,3 @@
-/*
- SWARM
-
- Copyright (C) 2012-2014 Torbjorn Rognes and Frederic Mahe
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- Contact: Torbjorn Rognes <torognes@ifi.uio.no>,
- Department of Informatics, University of Oslo,
- PO Box 1080 Blindern, NO-0316 Oslo, Norway
- */
-
 #include "search.h"
 
 #define CHANNELS 8
@@ -401,7 +378,7 @@ inline void domasked16(__m128i * Sm, __m128i * hep, __m128i ** qp, __m128i * Qm,
 }
 
 unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned long dlen, unsigned long * dirbuffer, unsigned long offset,
-		unsigned long dirbuffersize, unsigned long channel, unsigned long * alignmentlengthp) {
+		unsigned long dirbuffersize, unsigned long channel, unsigned long * alignmentlengthp,Db_data *db) {
 	unsigned long maskup = 3UL << (2 * channel + 0);
 	unsigned long maskleft = 3UL << (2 * channel + 16);
 	unsigned long maskextup = 3UL << (2 * channel + 32);
@@ -474,7 +451,7 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	while ((i >= 0) && (j >= 0)) {
 		aligned++;
 
-		unsigned long d = dirbuffer[(offset + longestdbsequence * 4 * (j / 4) + 4 * i + (j & 3)) % dirbuffersize];
+		unsigned long d = dirbuffer[(offset + db->longest * 4 * (j / 4) + 4 * i + (j & 3)) % dirbuffersize];
 
 		if ((op == 'I') && (d & maskextleft)) {
 			j--;
@@ -499,7 +476,7 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	return aligned - matches;
 }
 
-void search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile, WORD * hearray,
+void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile, WORD * hearray,
 		unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs, unsigned long * alignmentlengths,
 		unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data*db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
@@ -611,8 +588,8 @@ void search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, 
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
-									alignmentlengths + cand_id);
+							diff = backtrack16(query->seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+									alignmentlengths + cand_id, db);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),
 									(65535 - Property::penalty_gapopen) / Property::penalty_gapextend);
@@ -687,7 +664,7 @@ void search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, 
 		H0 = F0;
 		F0 = _mm_adds_epu16(F0, R);
 
-		dir += 4 * longestdbsequence;
+		dir += 4 * db->longest;
 
 		if (dir >= dirbuffer + dirbuffersize) {
 			dir -= dirbuffersize;

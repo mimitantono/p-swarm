@@ -83,7 +83,6 @@ void args_init(int argc, char **argv) {
 void run(Db_data * db) {
 	db->read_file(Property::databasename);
 	db->print_info();
-	search_begin(db);
 	Parallel parallel(db);
 	parallel.run();
 	for (int i = 0; i < Parallel::results.size(); i++) {
@@ -121,5 +120,4 @@ void args_usage() {
 
 void destroy() {
 	Matrix::score_matrix_free();
-	search_end();
 }

@@ -15,6 +15,17 @@
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
+typedef unsigned int UINT32;
+typedef unsigned short WORD;
+typedef unsigned char BYTE;
+typedef BYTE VECTOR[16];
+
+struct queryinfo_t {
+	unsigned long qno;
+	long len;
+	char * seq;
+};
+
 long gcd(long a, long b);
 void fatal(const char * msg);
 void fatal(const char * format, const char * message);
