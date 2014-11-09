@@ -21,11 +21,11 @@ cluster_info * cluster_result::new_cluster(long cluster_id) {
 }
 
 void cluster_result::print() {
-	fprintf(stderr, "\nThere are %lu clusters produced for thread #%du", clusters.size(), partition_id);
+	fprintf(stderr, "\nThere are %lu clusters produced for thread #%d", clusters.size(), partition_id);
 	for (int i = 0; i < clusters.size(); i++) {
 		fprintf(stderr, "\nCluster #%d.%u: %lu members", partition_id, clusters[i]->cluster_id, clusters[i]->cluster_members.size());
 		for (int j = 0; j < clusters[i]->cluster_members.size(); j++) {
-			fprintf(stderr, "\n%u. %s", j + 1, clusters[i]->cluster_members[j]->sequence.header);
+			fprintf(stderr, "\n%u. %s", j + 1, clusters[i]->cluster_members[j]->sequence->header);
 		}
 	}
 }

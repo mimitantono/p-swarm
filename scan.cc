@@ -70,12 +70,12 @@ void search_alloc(struct search_data * sdp) {
 }
 
 void search_delete(struct search_data * sdp) {
-	delete(sdp->qtable);
-	delete(sdp->qtable_w);
-	delete(sdp->dprofile);
-	delete(sdp->dprofile_w);
-	delete(sdp->hearray);
-	delete(sdp->dir_array);
+	delete (sdp->qtable);
+	delete (sdp->qtable_w);
+	delete (sdp->dprofile);
+	delete (sdp->dprofile_w);
+	delete (sdp->hearray);
+	delete (sdp->dir_array);
 }
 
 void search_init(struct search_data * sdp) {
@@ -85,18 +85,20 @@ void search_init(struct search_data * sdp) {
 	}
 }
 
-void search_chunk(struct search_data * sdp, long bits) {
+void search_chunk(struct search_data * sdp, long bits, Db_data * db) {
 	if (sdp->target_count == 0)
 		return;
 
 	if (bits == 16)
 		search16(sdp->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16, sdp->dprofile_w,
 				(WORD*) sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
-				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array);
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array,
+				db);
 	else
 		search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
 				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
-				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array);
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array,
+				db);
 }
 
 int search_getwork(unsigned long * countref, unsigned long * firstref) {
@@ -127,16 +129,16 @@ void master_dump() {
 	}
 }
 
-void search_worker_core(int t) {
-	search_init(sd + t);
-	while (search_getwork(&sd[t].target_count, &sd[t].target_index))
-		search_chunk(sd + t, master_bits);
+void search_worker_core(Db_data *db) {
+	search_init(sd);
+	while (search_getwork(&sd->target_count, &sd->target_index))
+		search_chunk(sd, master_bits, db);
 }
 
 void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignlengths, long bits) {
+		unsigned long * alignlengths, long bits, Db_data * db) {
 	query.qno = query_no;
-	db_getsequenceandlength(query_no, &query.seq, &query.len);
+	db->get_sequence_and_length(query_no, &query.seq, &query.len);
 
 	master_next = 0;
 	master_length = listlength;
@@ -146,28 +148,18 @@ void search_do(unsigned long query_no, unsigned long listlength, unsigned long *
 	master_alignlengths = alignlengths;
 	master_bits = bits;
 
-	long thr = Property::threads;
-
-	if (bits == 8) {
-		if (master_length <= (unsigned long) (15 * thr))
-			thr = (master_length + 15) / 16;
-	} else {
-		if (master_length <= (unsigned long) (7 * thr))
-			thr = (master_length + 7) / 8;
-	}
-
 	//TODO Thread assumed 1 here, need refactoring
 	remainingchunks = 1;
 
-	search_worker_core(0);
+	search_worker_core(db);
 }
 
-void search_begin() {
-	longestdbsequence = db_getlongestsequence();
+void search_begin(Db_data* db) {
+	longestdbsequence = db->longest;
 	sd = new struct search_data;
 	search_alloc(sd);
 }
 
 void search_end() {
-	delete(sd);
+	delete (sd);
 }

@@ -25,65 +25,45 @@
 
 using namespace std;
 
-struct seqinfo_s
-{
-  char * header;
-  char * seq;
-  unsigned int headerlen;
-  unsigned int headeridlen;
-  unsigned int seqlen;
-  unsigned int abundance;
-  unsigned int clusterid;
-  unsigned int hdrhash;
-  int abundance_start;
-  int abundance_end;
+struct seqinfo_s {
+	char * header;
+	char * seq;
+	unsigned int headerlen;
+	unsigned int headeridlen;
+	unsigned int seqlen;
+	unsigned int abundance;
+	unsigned int clusterid;
+	unsigned int hdrhash;
+	int abundance_start;
+	int abundance_end;
 };
 
 typedef struct seqinfo_s seqinfo_t;
-
-extern seqinfo_t * seqindex;
-
 typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
-extern qgramvector_t * qgrams;
-extern unsigned long sequences;
 
-inline unsigned char * db_getqgramvector(unsigned long seqno) {
-	return (unsigned char*) (qgrams + seqno);
-}
 
-void db_read(string filename);
-
-unsigned long db_getsequencecount();
-unsigned long db_getnucleotidecount();
-
-unsigned long db_getlongestheader();
-unsigned long db_getlongestsequence();
-
-seqinfo_t * db_getseqinfo(unsigned long seqno);
-
-char * db_getsequence(unsigned long seqno);
-unsigned long db_getsequencelen(unsigned long seqno);
-
-void db_getsequenceandlength(unsigned long seqno,
-                             char ** address,
-                             long * length);
-
-char * db_getheader(unsigned long seqno);
-unsigned long db_getheaderlen(unsigned long seqno);
-
-unsigned long db_getabundance(unsigned long seqno);
-
-void db_showsequence(unsigned long seqno);
-void db_showall();
-void db_print_info();
-void db_free();
-
-void db_putseq(long seqno);
-
-void db_qgrams_init();
-void db_qgrams_done();
-
-void fprint_id(FILE * stream, unsigned long x);
-void fprint_id_noabundance(FILE * stream, unsigned long x);
+class Db_data {
+private:
+	void showseq(char * seq);
+	seqinfo_t * seqindex;
+	void qgrams_init();
+public:
+	Db_data();
+	virtual ~Db_data();
+	void read_file(string filename);
+	qgramvector_t * qgrams;
+	unsigned long sequences;
+	unsigned long nucleotides;
+	unsigned long headerchars;
+	int longest;
+	int longestheader;
+	unsigned char * get_qgram_vector(unsigned long seq_no);
+	seqinfo_t * get_seqinfo(unsigned long seqno);
+	void get_sequence_and_length(unsigned long seqno, char ** address, long * length);
+	void show_sequence(unsigned long seqno);
+	void show_all();
+	void print_info();
+	void put_seq(long seqno);
+};
 
 #endif /* DB_H_ */

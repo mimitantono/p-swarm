@@ -15,7 +15,7 @@
 using namespace std;
 
 struct member_info {
-	seqinfo_t sequence;
+	seqinfo_t * sequence;
 	unsigned qgram_diff;
 	unsigned generation;
 	unsigned radius;

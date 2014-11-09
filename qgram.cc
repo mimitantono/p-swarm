@@ -1,7 +1,5 @@
 #include "qgram.h"
 
-qgramvector_t * qgrams = new qgramvector_t[sequences];
-
 void printqgrams(unsigned char * qgramvector) {
 	/* print qgramvector */
 	fprintf(stderr, "qgram vector:\n");
@@ -127,14 +125,14 @@ unsigned long compareqgramvectors(unsigned char * a, unsigned char * b) {
 		return compareqgramvectors_128(a, b);
 }
 
-inline unsigned long qgram_diff(unsigned long a, unsigned long b) {
-	unsigned long diffqgrams = compareqgramvectors(db_getqgramvector(a), db_getqgramvector(b));
+inline unsigned long qgram_diff(unsigned long a, unsigned long b, class Db_data * db) {
+	unsigned long diffqgrams = compareqgramvectors(db->get_qgram_vector(a), db->get_qgram_vector(b));
 	unsigned long mindiff = (diffqgrams + 2 * QGRAMLENGTH - 1) / (2 * QGRAMLENGTH);
 	return mindiff;
 }
 
-void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist) {
+void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist, class Db_data * db) {
 	for (unsigned long i = 0; i < listlen; i++)
-		difflist[i] = qgram_diff(seed, amplist[i]);
+		difflist[i] = qgram_diff(seed, amplist[i], db);
 }
 

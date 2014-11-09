@@ -28,6 +28,6 @@ struct ampliconinfo_s {
 	unsigned radius; /* actual diff from initial seed */
 };
 
-cluster_result * algo_run(partition_info partition);
+cluster_result * algo_run(partition_info partition, Db_data * db);
 
 #endif /* CLUSTER_H_ */

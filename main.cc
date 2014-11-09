@@ -14,7 +14,8 @@ int main(int argc, char** argv) {
 	CPU_Info::cpu_features_show();
 	Property::init();
 	args_init(argc, argv);
-	run();
+	Db_data db;
+	run(&db);
 	destroy();
 }
 
@@ -79,12 +80,11 @@ void args_init(int argc, char **argv) {
 	Property::print();
 }
 
-void run() {
-	db_read(Property::databasename);
-	db_print_info();
-	search_begin();
-	db_qgrams_init();
-	Parallel parallel;
+void run(Db_data * db) {
+	db->read_file(Property::databasename);
+	db->print_info();
+	search_begin(db);
+	Parallel parallel(db);
 	parallel.run();
 	for (int i = 0; i < Parallel::results.size(); i++) {
 		Parallel::results[i]->print();
@@ -121,7 +121,5 @@ void args_usage() {
 
 void destroy() {
 	Matrix::score_matrix_free();
-	db_free();
 	search_end();
-	db_qgrams_done();
 }

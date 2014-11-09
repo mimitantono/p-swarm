@@ -21,40 +21,28 @@ char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-unsigned long sequences = 0;
-unsigned long nucleotides = 0;
-unsigned long headerchars = 0;
-int longest = 0;
-int longestheader = 0;
+Db_data::Db_data() {
+	longestheader = 0;
+	qgrams = 0;
+	longest = 0;
+	sequences = 0;
+	headerchars = 0;
+	seqindex = 0;
+	nucleotides = 0;
+}
 
-char * datap = 0;
+unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
+	return (unsigned char*) (qgrams + seq_no);
+}
 
-seqinfo_t * seqindex;
-
-void showseq(char * seq) {
+void Db_data::showseq(char * seq) {
 	char * p = seq;
 	while (char c = *p++) {
 		putchar(sym_nt[(unsigned int) c]);
 	}
 }
 
-void fprint_id(FILE * stream, unsigned long x) {
-	fprintf(stream, "%.*s", seqindex[x].headeridlen, seqindex[x].header);
-}
-
-void fprint_id_noabundance(FILE * stream, unsigned long x) {
-	seqinfo_t * sp = seqindex + x;
-	char * h = sp->header;
-
-	if (sp->abundance_start < sp->abundance_end) {
-		/* print start of header */
-		fprintf(stream, "%.*s", sp->abundance_start, h);
-	} else {
-		fprintf(stream, "%s", h);
-	}
-}
-
-int db_compare_abundance(const void * a, const void * b) {
+int compare_abundance(const void * a, const void * b) {
 	seqinfo_t * x = (seqinfo_t *) a;
 	seqinfo_t * y = (seqinfo_t *) b;
 
@@ -62,24 +50,19 @@ int db_compare_abundance(const void * a, const void * b) {
 		return -1;
 	else if (x->abundance < y->abundance)
 		return +1;
-#if 1
 	else if (x < y)
 		return -1;
 	else if (x > y)
 		return +1;
 	else
 		return 0;
-#else
-	else
-	return strcmp(x->seq, y->seq);
-#endif
 }
 
-void db_read(string filename) {
+void Db_data::read_file(string filename) {
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
-	datap = (char *) xmalloc(dataalloc);
+	char * datap = (char *) xmalloc(dataalloc);
 	unsigned long datalen = 0;
 
 	longest = 0;
@@ -285,20 +268,23 @@ void db_read(string filename) {
 	}
 
 	if (!presorted) {
-		qsort(seqindex, sequences, sizeof(seqinfo_t), db_compare_abundance);
+		qsort(seqindex, sequences, sizeof(seqinfo_t), compare_abundance);
 	}
 
-	delete(hdrhashtable);
+	delete (hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);
+
+	qgrams_init();
+	free(datap);
 }
 
-void db_print_info() {
-	fprintf(stderr, "Total sequences    : %ld", db_getsequencecount());
+void Db_data::print_info() {
+	fprintf(stderr, "Total sequences    : %ld", sequences);
 }
 
-void db_qgrams_init() {
+void Db_data::qgrams_init() {
 	qgrams = new qgramvector_t[sequences];
 
 	seqinfo_t * seqindex_p = seqindex;
@@ -309,67 +295,27 @@ void db_qgrams_init() {
 	}
 }
 
-void db_qgrams_done() {
-	delete(qgrams);
-}
-
-unsigned long db_getsequencecount() {
-	return sequences;
-}
-
-unsigned long db_getnucleotidecount() {
-	return nucleotides;
-}
-
-unsigned long db_getlongestheader() {
-	return longestheader;
-}
-
-unsigned long db_getlongestsequence() {
-	return longest;
-}
-
-seqinfo_t * db_getseqinfo(unsigned long seqno) {
+seqinfo_t * Db_data::get_seqinfo(unsigned long seqno) {
 	return seqindex + seqno;
 }
 
-char * db_getsequence(unsigned long seqno) {
-	return seqindex[seqno].seq;
-}
-
-void db_getsequenceandlength(unsigned long seqno, char ** address, long * length) {
+void Db_data::get_sequence_and_length(unsigned long seqno, char ** address, long * length) {
 	*address = seqindex[seqno].seq;
 	*length = (long) (seqindex[seqno].seqlen);
 }
 
-unsigned long db_getsequencelen(unsigned long seqno) {
-	return seqindex[seqno].seqlen;
-}
-
-char * db_getheader(unsigned long seqno) {
-	return seqindex[seqno].header;
-}
-
-unsigned long db_getheaderlen(unsigned long seqno) {
-	return seqindex[seqno].headerlen;
-}
-
-unsigned long db_getabundance(unsigned long seqno) {
-	return seqindex[seqno].abundance;
-}
-
-void db_putseq(long seqno) {
+void Db_data::put_seq(long seqno) {
 	char * seq;
 	long len;
-	db_getsequenceandlength(seqno, &seq, &len);
+	get_sequence_and_length(seqno, &seq, &len);
 	for (int i = 0; i < len; i++)
 		putchar(sym_nt[(int) (seq[i])]);
 }
 
-void db_free() {
-	if (datap)
-		free(datap);
+Db_data::~Db_data() {
 	if (seqindex)
 		delete (seqindex);
+	if (qgrams)
+		delete[] (qgrams);
 }
 

@@ -16,14 +16,9 @@
 #include "db.h"
 
 void search_all(unsigned long query_no);
-void search_do(unsigned long query_no,
-               unsigned long listlength,
-               unsigned long * targets,
-               unsigned long * scores,
-               unsigned long * diffs,
-               unsigned long * alignlengths,
-               long bits);
-void search_begin();
+void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores, unsigned long * diffs,
+		unsigned long * alignlengths, long bits, Db_data * db);
+void search_begin(Db_data * db);
 void search_end();
 
 #endif /* SCAN_H_ */

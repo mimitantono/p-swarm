@@ -9,30 +9,39 @@
 
 vector<cluster_result*> Parallel::results;
 
-Parallel::Parallel() {
+Parallel::Parallel(class Db_data * db) {
+	this->db = db;
 }
 
 Parallel::~Parallel() {
 }
 
-long get_start(unsigned long threadid) {
-	return db_getsequencecount() / Property::threads * threadid;
+long get_start(unsigned long threadid, Db_data * db) {
+	return db->sequences / Property::threads * threadid;
 }
 
-long get_end(unsigned long threadid) {
+long get_end(unsigned long threadid, Db_data* db) {
 	if (threadid < Property::threads - 1) {
-		return db_getsequencecount() / Property::threads * (threadid + 1);
+		return db->sequences / Property::threads * (threadid + 1) - 1;
 	} else {
-		return db_getsequencecount();
+		return db->sequences - 1;
 	}
 }
 
-void *run_cluster(void *threadid) {
+typedef struct thread_data {
+	unsigned long thread_id;
+	Db_data * db;
+} thread_data;
+
+void *run_cluster(void *threadargs) {
+	thread_data *my_data = (thread_data*) threadargs;
+	fprintf(stderr, "\nMy Data: %lu", (unsigned long) my_data->thread_id);
 	partition_info partition;
-	partition.threadid = (long) threadid;
-	partition.start = get_start((long) threadid);
-	partition.end = get_end((long) threadid);
-	Parallel::results.push_back(algo_run(partition));
+	partition.threadid = my_data->thread_id;
+	partition.start = get_start(partition.threadid, my_data->db);
+	partition.end = get_end(partition.threadid, my_data->db);
+	fprintf(stderr, "\nStarting thread #%lu from %lu to %lu", partition.threadid, partition.start, partition.end);
+	Parallel::results.push_back(algo_run(partition, my_data->db));
 	pthread_exit(NULL);
 }
 
@@ -44,9 +53,12 @@ void Parallel::run() {
 	void *status;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	thread_data *thread_data_array = new thread_data[Property::threads];
 
 	for (long i = 0; i < Property::threads; i++) {
-		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) (unsigned long) i);
+		thread_data_array[i].thread_id = (unsigned long) i;
+		thread_data_array[i].db = db;
+		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
 			exit(-1);

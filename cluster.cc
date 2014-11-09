@@ -3,10 +3,9 @@
 #define SEPCHAR ' '
 #define BITS 8
 
-static unsigned long swarmed;
-static unsigned long seeded;
-
-cluster_result * algo_run(partition_info partition) {
+cluster_result * algo_run(partition_info partition, Db_data * db) {
+	unsigned long swarmed;
+	unsigned long seeded;
 	unsigned long count_comparisons_8 = 0;
 	unsigned long count_comparisons_16 = 0;
 	unsigned long amplicons = partition.end - partition.start;
@@ -76,7 +75,7 @@ cluster_result * algo_run(partition_info partition) {
 		unsigned long seedampliconid = amps[seedindex].ampliconid;
 		hits[hitcount++] = seedampliconid;
 
-		unsigned long abundance = db_getabundance(seedampliconid);
+		unsigned long abundance = db->get_seqinfo(seedampliconid)->abundance;
 		amplicons_copies += abundance;
 		if (abundance == 1)
 			singletons++;
@@ -93,7 +92,7 @@ cluster_result * algo_run(partition_info partition) {
 		for (unsigned long i = 0; i < listlen; i++)
 			qgramamps[i] = amps[swarmed + i].ampliconid;
 
-		qgram_work_diff(seedampliconid, listlen, qgramamps, qgramdiffs);
+		qgram_work_diff(seedampliconid, listlen, qgramamps, qgramdiffs, db);
 
 		estimates += listlen;
 
@@ -109,7 +108,7 @@ cluster_result * algo_run(partition_info partition) {
 		}
 
 		if (targetcount > 0) {
-			search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
+			search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits, db);
 			searches++;
 
 			if (bits == 8)
@@ -147,7 +146,7 @@ cluster_result * algo_run(partition_info partition) {
 
 					diffsum += diff;
 
-					abundance = db_getabundance(poolampliconid);
+					abundance = db->get_seqinfo(poolampliconid)->abundance;
 					amplicons_copies += abundance;
 					if (abundance == 1)
 						singletons++;
@@ -187,7 +186,7 @@ cluster_result * algo_run(partition_info partition) {
 					}
 				}
 
-				qgram_work_diff(subseedampliconid, listlen, qgramamps, qgramdiffs);
+				qgram_work_diff(subseedampliconid, listlen, qgramamps, qgramdiffs, db);
 
 				estimates += listlen;
 
@@ -199,7 +198,7 @@ cluster_result * algo_run(partition_info partition) {
 					}
 
 				if (targetcount > 0) {
-					search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
+					search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits, db);
 					searches++;
 
 					if (bits == 8)
@@ -248,7 +247,7 @@ cluster_result * algo_run(partition_info partition) {
 							hits[hitcount++] = poolampliconid;
 							diffsum += diff;
 
-							abundance = db_getabundance(poolampliconid);
+							abundance = db->get_seqinfo(poolampliconid)->abundance;
 							amplicons_copies += abundance;
 							if (abundance == 1)
 								singletons++;
@@ -289,7 +288,7 @@ cluster_result * algo_run(partition_info partition) {
 
 		for (unsigned long i = 0; i < amplicons; i++) {
 			member_info * member = new member_info;
-			member->sequence = seqindex[amps[i].ampliconid];
+			member->sequence = db->get_seqinfo(amps[i].ampliconid);
 			member->generation = amps[i].generation;
 			member->radius = amps[i].radius;
 			member->qgram_diff = amps[i].diffestimate;

@@ -13,10 +13,13 @@
 #include "cluster.h"
 #include "property.h"
 #include "clusterresult.h"
+#include "db.h"
 
 class Parallel {
+private:
+	Db_data * db;
 public:
-	Parallel();
+	Parallel(class Db_data * db);
 	virtual ~Parallel();
 	void run();
 	cluster_result result;
