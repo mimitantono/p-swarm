@@ -29,6 +29,7 @@ Db_data::Db_data() {
 	headerchars = 0;
 	seqindex = 0;
 	nucleotides = 0;
+	threadid = 0;
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -56,6 +57,15 @@ int compare_abundance(const void * a, const void * b) {
 		return +1;
 	else
 		return 0;
+}
+
+bool Db_data::process_line(long line) {
+	if ((line % (Property::threads * 2)) == threadid * 2)
+		return true;
+	else if ((line % (Property::threads * 2)) == threadid * 2 + 1)
+		return true;
+	else
+		return false;
 }
 
 void Db_data::read_file(string filename) {
@@ -141,8 +151,10 @@ void Db_data::read_file(string filename) {
 			while ((c = *p++))
 				if ((m = map_nt[(int) c]) >= 0) {
 					while (datalen >= dataalloc) {
-						dataalloc += MEMCHUNK;
-						datap = (char *) xrealloc(datap, dataalloc);
+						if (process_line(lineno)) {
+							dataalloc += MEMCHUNK;
+							datap = (char *) xrealloc(datap, dataalloc);
+						}
 					}
 
 					*(datap + datalen) = m;
@@ -158,8 +170,10 @@ void Db_data::read_file(string filename) {
 		}
 
 		while (datalen >= dataalloc) {
-			dataalloc += MEMCHUNK;
-			datap = (char *) xrealloc(datap, dataalloc);
+			if (process_line(lineno)) {
+				dataalloc += MEMCHUNK;
+				datap = (char *) xrealloc(datap, dataalloc);
+			}
 		}
 
 		long length = datalen - seqbegin;
@@ -281,14 +295,16 @@ void Db_data::read_file(string filename) {
 }
 
 void Db_data::print_info() {
-	fprintf(stderr, "Total sequences    : %ld", sequences);
+	fprintf(stderr, "Database info:     %ld nt", nucleotides);
+	fprintf(stderr, " in %ld sequences,", sequences);
+	fprintf(stderr, " longest %ld nt\n", longest);
 }
 
 void Db_data::qgrams_init() {
 	qgrams = new qgramvector_t[sequences];
 
 	seqinfo_t * seqindex_p = seqindex;
-	for (int i = 0; i < sequences; i++) {
+	for (long i = 0; i < sequences; i++) {
 		/* find qgrams */
 		findqgrams((unsigned char*) seqindex_p->seq, seqindex_p->seqlen, qgrams[i]);
 		seqindex_p++;
@@ -310,6 +326,13 @@ void Db_data::put_seq(long seqno) {
 	get_sequence_and_length(seqno, &seq, &len);
 	for (int i = 0; i < len; i++)
 		putchar(sym_nt[(int) (seq[i])]);
+}
+
+void Db_data::print_debug() {
+	fprintf(Property::debugfile, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
+	for (long i = 0; i < sequences; i++) {
+		fprintf(Property::debugfile, "\n%d: %s", i, seqindex[i].header);
+	}
 }
 
 Db_data::~Db_data() {

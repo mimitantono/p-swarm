@@ -2,4 +2,4 @@
 
 make clean
 make all
-./main test.fas
+./main -t 1 -o run.log test.fas

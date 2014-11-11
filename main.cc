@@ -14,8 +14,7 @@ int main(int argc, char** argv) {
 	CPU_Info::cpu_features_show();
 	Property::init();
 	args_init(argc, argv);
-	Db_data db;
-	run(&db);
+	run();
 	destroy();
 }
 
@@ -80,10 +79,8 @@ void args_init(int argc, char **argv) {
 	Property::print();
 }
 
-void run(Db_data * db) {
-	db->read_file(Property::databasename);
-	db->print_info();
-	Parallel parallel(db);
+void run() {
+	Parallel parallel;
 	parallel.run();
 	for (int i = 0; i < Parallel::results.size(); i++) {
 		Parallel::results[i]->print();

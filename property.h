@@ -42,6 +42,7 @@ public:
 	static long resolution;
 	static unsigned long diff_saturation();
 	static FILE* outfile;
+	static FILE* debugfile;
 	static void set_resolution(long value);
 	static void set_outfile(string value);
 	static void set_threads(long value);
