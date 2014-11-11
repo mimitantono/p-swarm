@@ -1,7 +1,8 @@
 #include "scan.h"
 
+queryinfo_t query;
+
 scanner::scanner() {
-	searcher.set_query(&query);
 	sd = new struct search_data;
 	master_alignlengths = 0;
 	master_bits = 0;

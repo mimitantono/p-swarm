@@ -5,6 +5,12 @@
 
 #define MATRIXWIDTH 16
 
+searcher::searcher() {
+}
+
+searcher::~searcher() {
+}
+
 void dprofile_dump8(BYTE * dprofile) {
 	char * ss = sym_nt;
 
@@ -835,7 +841,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 						if (score < 255) {
 							long offset = d_offset[c];
-							diff = backtrack(query->seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack(query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = 255;

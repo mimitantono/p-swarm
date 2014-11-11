@@ -25,6 +25,8 @@
 
 using namespace std;
 
+extern queryinfo_t query;
+
 struct seqinfo_s {
 	char * header;
 	char * seq;
@@ -49,6 +51,7 @@ private:
 	void qgrams_init();
 	bool process_line(long line);
 public:
+//	queryinfo_t query;
 	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;

@@ -1,8 +1,5 @@
 #include "cluster.h"
 
-#define SEPCHAR ' '
-#define BITS 8
-
 cluster_job::cluster_job(Db_data * db) {
 	this->db = db;
 	scanner.set_db(db);
@@ -287,36 +284,25 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 	cluster_result * result = new cluster_result;
 	result->partition_id = partition.threadid + 1;
 
-	char sep_amplicons = SEPCHAR; /* usually a space */
+	char sep_amplicons = ' '; /* usually a space */
 	char sep_swarms = '\n';
 
-	if (amplicons > 0) {
-		char sep_amplicons;
-		char sep_swarms;
-
-		/* native swarm output */
-		sep_amplicons = SEPCHAR; /* usually a space */
-		sep_swarms = '\n';
-
-		long previd = -1;
-
-		for (unsigned long i = 0; i < amplicons; i++) {
-			member_info * member = new member_info;
-			member->sequence = db->get_seqinfo(amps[i].ampliconid);
-			member->generation = amps[i].generation;
-			member->radius = amps[i].radius;
-			member->qgram_diff = amps[i].diffestimate;
-			if (amps[i].swarmid != previd) {
-				result->new_cluster(amps[i].swarmid);
-				fputc(sep_swarms, Property::debugfile);
-			} else {
-				fputc(sep_amplicons, Property::debugfile);
-			}
-			result->clusters.back()->cluster_members.push_back(member);
-			fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen,
-					db->get_seqinfo(amps[i].ampliconid)->header);
-			previd = amps[i].swarmid;
+	long previd = -1;
+	for (unsigned long i = 0; i < amplicons; i++) {
+		member_info * member = new member_info;
+		member->sequence = db->get_seqinfo(amps[i].ampliconid);
+		member->generation = amps[i].generation;
+		member->radius = amps[i].radius;
+		member->qgram_diff = amps[i].diffestimate;
+		if (amps[i].swarmid != previd) {
+			result->new_cluster(amps[i].swarmid);
+			fputc(sep_swarms, Property::debugfile);
+		} else {
+			fputc(sep_amplicons, Property::debugfile);
 		}
+		result->clusters.back()->cluster_members.push_back(member);
+		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);
+		previd = amps[i].swarmid;
 	}
 
 	fprintf(stderr, "\n");
@@ -327,15 +313,11 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 	fprintf(stderr, "Estimates:         %lu\n", estimates);
 	fprintf(stderr, "Searches:          %lu\n", searches);
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8,
-			(200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
+	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
 	fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparisons_16,
 			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
-	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n",
-			count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons
-					/ (amplicons + 1)));
-
+	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
+			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
 
 	delete (qgramdiffs);
 	delete (qgramamps);

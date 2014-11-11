@@ -21,6 +21,7 @@ char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
+
 Db_data::Db_data() {
 	longestheader = 0;
 	qgrams = 0;
@@ -295,9 +296,9 @@ void Db_data::read_file(string filename) {
 }
 
 void Db_data::print_info() {
-	fprintf(stderr, "Database info:     %ld nt", nucleotides);
+	fprintf(stderr, "Database info:     %lu nt", nucleotides);
 	fprintf(stderr, " in %ld sequences,", sequences);
-	fprintf(stderr, " longest %ld nt\n", longest);
+	fprintf(stderr, " longest %d nt\n", longest);
 }
 
 void Db_data::qgrams_init() {
@@ -331,7 +332,7 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::debugfile, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::debugfile, "\n%d: %s", i, seqindex[i].header);
+		fprintf(Property::debugfile, "\n%ld: %s", i, seqindex[i].header);
 	}
 }
 
