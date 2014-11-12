@@ -378,7 +378,7 @@ inline void domasked16(__m128i * Sm, __m128i * hep, __m128i ** qp, __m128i * Qm,
 }
 
 unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned long dlen, unsigned long * dirbuffer, unsigned long offset,
-		unsigned long dirbuffersize, unsigned long channel, unsigned long * alignmentlengthp, Db_data *db) {
+		unsigned long dirbuffersize, unsigned long channel, unsigned long * alignmentlengthp,Db_data *db) {
 	unsigned long maskup = 3UL << (2 * channel + 0);
 	unsigned long maskleft = 3UL << (2 * channel + 16);
 	unsigned long maskextup = 3UL << (2 * channel + 32);
@@ -476,9 +476,9 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	return aligned - matches;
 }
 
-void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile,
-		WORD * hearray, unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignmentlengths, unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data*db) {
+void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile, WORD * hearray,
+		unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs, unsigned long * alignmentlengths,
+		unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data*db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -588,7 +588,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack16(query->seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),

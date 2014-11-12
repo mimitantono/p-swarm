@@ -16,7 +16,7 @@
 #include "parallel.h"
 
 void destroy();
-void run();
+void run(Db_data * db);
 void args_init(int argc, char** argv);
 void args_usage();
 

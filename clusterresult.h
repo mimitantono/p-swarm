@@ -32,7 +32,7 @@ public:
 	virtual ~cluster_result();
 	vector<cluster_info*> clusters;
 	cluster_info * new_cluster(long cluster_id);
-	long partition_id;
+	int partition_id;
 	void print();
 };
 

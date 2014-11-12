@@ -14,9 +14,12 @@
 #include "db.h"
 
 class searcher {
+private:
+	queryinfo_t * query;
 public:
 	searcher();
 	virtual ~searcher();
+	void set_query(queryinfo_t * query);
 	void search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile, BYTE * hearray,
 			unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
 			unsigned long * alignmentlengths, unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data* db);

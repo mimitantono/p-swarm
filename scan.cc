@@ -1,8 +1,7 @@
 #include "scan.h"
 
-queryinfo_t query;
-
 scanner::scanner() {
+	searcher.set_query(&query);
 	sd = new struct search_data;
 	master_alignlengths = 0;
 	master_bits = 0;
@@ -59,8 +58,8 @@ void scanner::search_chunk(struct search_data * sdp, long bits) {
 				master_scores + sdp->target_index, master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len,
 				dirbufferbytes / 8, sdp->dir_array, db);
 	else
-		searcher.search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8,
-				sdp->dprofile, sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
+		searcher.search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
+				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
 				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array,
 				db);
 }
@@ -104,6 +103,7 @@ void scanner::search_do(unsigned long query_no, unsigned long listlength, unsign
 	query.qno = query_no;
 	db->get_sequence_and_length(query_no, &query.seq, &query.len);
 
+	master_next = 0;
 	master_length = listlength;
 	master_targets = targets;
 	master_scores = scores;
