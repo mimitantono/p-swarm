@@ -12,13 +12,13 @@ long Property::gapextend;
 long Property::penalty_gapopen;
 long Property::penalty_gapextend;
 long Property::penalty_mismatch = 18;
-long Property::gapopenextend;
 long Property::matchscore;
 long Property::mismatchscore;
 long Property::threads;
 long Property::penalty_factor;
 long Property::resolution;
 FILE * Property::outfile;
+FILE * Property::debugfile;
 string Property::databasename;
 string Property::outfilename;
 
@@ -30,20 +30,22 @@ void Property::init() {
 	resolution = DEFAULT_RESOLUTION;
 	threads = DEFAULT_THREADS;
 	calculate_penalty();
+	debugfile = fopen("debug.log", "w");
 }
 
 void Property::calculate_penalty() {
 	if ((gapopen + gapextend) < 1)
 		fatal("Illegal gap penalties specified");
-	penalty_gapextend /= penalty_factor;
 	penalty_mismatch = 2 * matchscore - 2 * mismatchscore;
 	penalty_gapopen = 2 * gapopen;
 	penalty_gapextend = 2 * matchscore + gapextend;
 
 	penalty_factor = gcd(gcd(penalty_mismatch, penalty_gapopen), penalty_gapextend);
 
+	penalty_gapextend /= penalty_factor;
 	penalty_mismatch /= penalty_factor;
 	penalty_gapopen /= penalty_factor;
+
 }
 
 void Property::print() {
@@ -51,12 +53,11 @@ void Property::print() {
 	fprintf(stderr, "outfilename        : %s\n", outfilename.c_str());
 	fprintf(stderr, "gapopen            : %ld\n", gapopen);
 	fprintf(stderr, "gapextend          : %ld\n", gapextend);
-	fprintf(stderr, "gapopenextend      : %ld\n", gapopenextend);
 	fprintf(stderr, "matchscore         : %ld\n", matchscore);
 	fprintf(stderr, "mismatchscore      : %ld\n", mismatchscore);
 	fprintf(stderr, "penalty_gapopen    : %ld\n", penalty_gapopen);
 	fprintf(stderr, "penalty_gapextend  : %ld\n", penalty_gapextend);
-	fprintf(stderr, "penalty_mismatch   : %ld\n", penalty_mismatch);
+	fprintf(stderr, "penalty_mismatch   : %ld\n", Property::penalty_mismatch);
 	fprintf(stderr, "penalty_factor     : %ld\n", penalty_factor);
 	fprintf(stderr, "threads            : %ld\n", threads);
 	fprintf(stderr, "resolution         : %ld\n", resolution);
@@ -99,6 +100,6 @@ void Property::set_gapextend(long value) {
 		fatal("Illegal gap extend specified.");
 }
 
-unsigned long Property::diff_saturation() {
+unsigned long int Property::diff_saturation() {
 	return MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
 }

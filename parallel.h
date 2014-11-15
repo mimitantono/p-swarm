@@ -19,7 +19,7 @@ class Parallel {
 private:
 	Db_data * db;
 public:
-	Parallel(class Db_data * db);
+	Parallel();
 	virtual ~Parallel();
 	void run();
 	cluster_result result;

@@ -39,7 +39,6 @@ public:
 			unsigned long * alignlengths, long bits);
 	void search_begin();
 private:
-	queryinfo_t query;
 	searcher searcher;
 	struct search_data * sd;
 	unsigned long master_next;

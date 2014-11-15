@@ -25,6 +25,8 @@
 
 using namespace std;
 
+extern queryinfo_t query;
+
 struct seqinfo_s {
 	char * header;
 	char * seq;
@@ -47,16 +49,21 @@ private:
 	void showseq(char * seq);
 	seqinfo_t * seqindex;
 	void qgrams_init();
+	bool process_line(long line);
 public:
-	Db_data();
-	virtual ~Db_data();
-	void read_file(string filename);
+//	queryinfo_t query;
 	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;
 	unsigned long headerchars;
 	int longest;
 	int longestheader;
+	int threadid;
+
+	Db_data();
+	virtual ~Db_data();
+	void read_file(string filename);
+	void print_debug();
 	unsigned char * get_qgram_vector(unsigned long seq_no);
 	seqinfo_t * get_seqinfo(unsigned long seqno);
 	void get_sequence_and_length(unsigned long seqno, char ** address, long * length);
@@ -67,3 +74,4 @@ public:
 };
 
 #endif /* DB_H_ */
+

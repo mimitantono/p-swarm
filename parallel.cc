@@ -9,8 +9,8 @@
 
 vector<cluster_result*> Parallel::results;
 
-Parallel::Parallel(class Db_data * db) {
-	this->db = db;
+Parallel::Parallel() {
+	db = new Db_data[Property::threads];
 }
 
 Parallel::~Parallel() {
@@ -40,7 +40,6 @@ void *run_cluster(void *threadargs) {
 	partition.threadid = my_data->thread_id;
 	partition.start = get_start(partition.threadid, my_data->db);
 	partition.end = get_end(partition.threadid, my_data->db);
-	fprintf(stderr, "\nStarting thread #%lu from %lu to %lu", partition.threadid, partition.start, partition.end);
 	cluster_job cluster_job(my_data->db);
 	Parallel::results.push_back(cluster_job.algo_run(partition));
 	pthread_exit(NULL);
@@ -58,7 +57,11 @@ void Parallel::run() {
 
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
-		thread_data_array[i].db = db;
+		db[i].threadid = i;
+		db[i].read_file(Property::databasename);
+		db[i].print_info();
+//		db[i].print();
+		thread_data_array[i].db = &db[i];
 		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);

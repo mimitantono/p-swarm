@@ -37,7 +37,7 @@ void CPU_Info::cpu_features_detect() {
 }
 
 void CPU_Info::cpu_features_show() {
-	fprintf(stderr, "CPU features       : ");
+	fprintf(stderr, "CPU features       :");
 	if (mmx_present)
 		fprintf(stderr, " mmx");
 	if (sse_present)

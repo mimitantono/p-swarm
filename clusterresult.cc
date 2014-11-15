@@ -21,11 +21,15 @@ cluster_info * cluster_result::new_cluster(long cluster_id) {
 }
 
 void cluster_result::print() {
-	fprintf(stderr, "\nThere are %lu clusters produced for thread #%d", clusters.size(), partition_id);
-	for (int i = 0; i < clusters.size(); i++) {
-		fprintf(stderr, "\nCluster #%d.%u: %lu members", partition_id, clusters[i]->cluster_id, clusters[i]->cluster_members.size());
-		for (int j = 0; j < clusters[i]->cluster_members.size(); j++) {
-			fprintf(stderr, "\n%u. %s", j + 1, clusters[i]->cluster_members[j]->sequence->header);
+	long total = 0;
+	fprintf(Property::outfile, "\n\nThere are %lu clusters produced for thread #%ld", clusters.size(), partition_id);
+	for (long i = 0; i < clusters.size(); i++) {
+		fprintf(Property::outfile, "\nCluster #%ld.%u: %lu members", partition_id, clusters[i]->cluster_id,
+				clusters[i]->cluster_members.size());
+		for (long j = 0; j < clusters[i]->cluster_members.size(); j++) {
+			fprintf(Property::outfile, "\n%ld. %s", j + 1, clusters[i]->cluster_members[j]->sequence->header);
+			total++;
 		}
 	}
+	fprintf(Property::outfile, "\n\n In total we have #%ld sequences", total);
 }
