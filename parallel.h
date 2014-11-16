@@ -17,13 +17,13 @@
 
 class Parallel {
 private:
-	Db_data * db;
+	Db_data ** db;
 public:
 	Parallel();
 	virtual ~Parallel();
 	void run();
 	cluster_result result;
-	static vector<cluster_result*> results;
+	static std::vector<cluster_result*> results;
 };
 
 #endif /* PARALLEL_H_ */

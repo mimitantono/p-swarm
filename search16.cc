@@ -3,8 +3,6 @@
 #define CHANNELS 8
 #define CDEPTH 4
 
-#define SHUFFLE 1
-
 void dprofile_dump16(WORD * dprofile) {
 	char * s = sym_nt;
 	printf("\ndprofile:\n");
@@ -588,7 +586,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack16(db->query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),

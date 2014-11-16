@@ -12,8 +12,6 @@
 #include<string>
 #include "db.h"
 
-using namespace std;
-
 struct member_info {
 	seqinfo_t * sequence;
 	unsigned qgram_diff;
@@ -23,14 +21,14 @@ struct member_info {
 
 struct cluster_info {
 	unsigned cluster_id;
-	vector<member_info*> cluster_members;
+	std::vector<member_info*> cluster_members;
 };
 
 class cluster_result {
 public:
 	cluster_result();
 	virtual ~cluster_result();
-	vector<cluster_info*> clusters;
+	std::vector<cluster_info*> clusters;
 	cluster_info * new_cluster(long cluster_id);
 	long partition_id;
 	void print();

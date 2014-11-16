@@ -3,8 +3,6 @@
 #define CHANNELS 16
 #define CDEPTH 4
 
-#define MATRIXWIDTH 16
-
 searcher::searcher() {
 }
 
@@ -841,7 +839,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 						if (score < 255) {
 							long offset = d_offset[c];
-							diff = backtrack(query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack(db->query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = 255;

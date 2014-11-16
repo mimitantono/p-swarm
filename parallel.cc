@@ -7,25 +7,18 @@
 
 #include "parallel.h"
 
-vector<cluster_result*> Parallel::results;
+std::vector<cluster_result*> Parallel::results;
 
 Parallel::Parallel() {
-	db = new Db_data[Property::threads];
+	db = new Db_data*[Property::threads];
+	for (int i = 0; i < Property::threads; i++) {
+		db[i] = new Db_data;
+	}
+	Db_data::read_file(db);
 }
 
 Parallel::~Parallel() {
-}
-
-long get_start(unsigned long threadid, Db_data * db) {
-	return db->sequences / Property::threads * threadid;
-}
-
-long get_end(unsigned long threadid, Db_data* db) {
-	if (threadid < Property::threads - 1) {
-		return db->sequences / Property::threads * (threadid + 1) - 1;
-	} else {
-		return db->sequences - 1;
-	}
+	//db will be deleted when destroying pthread
 }
 
 typedef struct thread_data {
@@ -36,12 +29,8 @@ typedef struct thread_data {
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
 	fprintf(stderr, "\nMy Data: %lu", (unsigned long) my_data->thread_id);
-	partition_info partition;
-	partition.threadid = my_data->thread_id;
-	partition.start = get_start(partition.threadid, my_data->db);
-	partition.end = get_end(partition.threadid, my_data->db);
 	cluster_job cluster_job(my_data->db);
-	Parallel::results.push_back(cluster_job.algo_run(partition));
+	Parallel::results.push_back(cluster_job.algo_run(my_data->thread_id));
 	pthread_exit(NULL);
 }
 
@@ -57,11 +46,8 @@ void Parallel::run() {
 
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
-		db[i].threadid = i;
-		db[i].read_file(Property::databasename);
-		db[i].print_info();
-//		db[i].print();
-		thread_data_array[i].db = &db[i];
+		thread_data_array[i].db = db[i];
+		db[i]->print_debug();
 		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);

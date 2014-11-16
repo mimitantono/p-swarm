@@ -9,25 +9,24 @@ cluster_job::cluster_job(Db_data * db) {
 cluster_job::~cluster_job() {
 }
 
-cluster_result * cluster_job::algo_run(partition_info partition) {
-	fprintf(stderr, "\nRunning thread #%lu from %lu to %lu", partition.threadid, partition.start, partition.end);
+cluster_result * cluster_job::algo_run(int threadid) {
+	fprintf(stderr, "\nRunning thread #%d for %lu sequences", threadid, db->sequences);
 
 	unsigned long swarmed;
 	unsigned long seeded;
 	unsigned long count_comparisons_8 = 0;
 	unsigned long count_comparisons_16 = 0;
-	unsigned long amplicons = partition.end - partition.start;
 
 	unsigned long targetcount;
-	unsigned long * targetindices = new unsigned long[amplicons];
-	unsigned long * targetampliconids = new unsigned long[amplicons];
-	unsigned long * scores = new unsigned long[amplicons];
-	unsigned long * diffs = new unsigned long[amplicons];
-	unsigned long * alignlengths = new unsigned long[amplicons];
-	unsigned long * qgramamps = new unsigned long[amplicons];
-	unsigned long * qgramdiffs = new unsigned long[amplicons];
-	unsigned long * qgramindices = new unsigned long[amplicons];
-	unsigned long * hits = new unsigned long[amplicons];
+	unsigned long * targetindices = new unsigned long[db->sequences];
+	unsigned long * targetampliconids = new unsigned long[db->sequences];
+	unsigned long * scores = new unsigned long[db->sequences];
+	unsigned long * diffs = new unsigned long[db->sequences];
+	unsigned long * alignlengths = new unsigned long[db->sequences];
+	unsigned long * qgramamps = new unsigned long[db->sequences];
+	unsigned long * qgramdiffs = new unsigned long[db->sequences];
+	unsigned long * qgramindices = new unsigned long[db->sequences];
+	unsigned long * hits = new unsigned long[db->sequences];
 
 	unsigned long searches = 0;
 	unsigned long estimates = 0;
@@ -37,10 +36,10 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 
 	unsigned long maxgenerations = 0;
 
-	ampliconinfo_s * amps = new ampliconinfo_s[amplicons];
+	ampliconinfo_s * amps = new ampliconinfo_s[db->sequences];
 
 	/* set ampliconid for all */
-	for (unsigned long i = partition.start; i < partition.end; i++) {
+	for (unsigned long i = 0; i < db->sequences; i++) {
 		amps[i].ampliconid = i;
 	}
 
@@ -58,8 +57,8 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 
 	unsigned long swarmid = 0;
 
-	progress_init("Clustering:       ", amplicons);
-	while (seeded < amplicons) {
+	progress_init("Clustering:       ", db->sequences);
+	while (seeded < db->sequences) {
 
 		/* process each initial seed */
 
@@ -95,7 +94,7 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 
 		targetcount = 0;
 
-		unsigned long listlen = amplicons - swarmed;
+		unsigned long listlen = db->sequences - swarmed;
 
 		for (unsigned long i = 0; i < listlen; i++)
 			qgramamps[i] = amps[swarmed + i].ampliconid;
@@ -185,7 +184,7 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 				targetcount = 0;
 
 				unsigned long listlen = 0;
-				for (unsigned long i = swarmed; i < amplicons; i++) {
+				for (unsigned long i = swarmed; i < db->sequences; i++) {
 					unsigned long targetampliconid = amps[i].ampliconid;
 					if (amps[i].diffestimate <= subseedradius + Property::resolution) {
 						qgramamps[listlen] = targetampliconid;
@@ -282,13 +281,13 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 	/* output results */
 
 	cluster_result * result = new cluster_result;
-	result->partition_id = partition.threadid + 1;
+	result->partition_id = threadid + 1;
 
-	char sep_amplicons = ' '; /* usually a space */
-	char sep_swarms = '\n';
+	char sep_amplicons = '\n'; /* usually a space */
+	char sep_swarms[] = "\n\n";
 
 	long previd = -1;
-	for (unsigned long i = 0; i < amplicons; i++) {
+	for (unsigned long i = 0; i < db->sequences; i++) {
 		member_info * member = new member_info;
 		member->sequence = db->get_seqinfo(amps[i].ampliconid);
 		member->generation = amps[i].generation;
@@ -296,7 +295,7 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 		member->qgram_diff = amps[i].diffestimate;
 		if (amps[i].swarmid != previd) {
 			result->new_cluster(amps[i].swarmid);
-			fputc(sep_swarms, Property::debugfile);
+			fputs(sep_swarms, Property::debugfile);
 		} else {
 			fputc(sep_amplicons, Property::debugfile);
 		}
@@ -304,6 +303,7 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);
 		previd = amps[i].swarmid;
 	}
+	fputc('\n', Property::debugfile);
 
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Number of swarms:  %lu\n", swarmid);
@@ -313,11 +313,12 @@ cluster_result * cluster_job::algo_run(partition_info partition) {
 	fprintf(stderr, "Estimates:         %lu\n", estimates);
 	fprintf(stderr, "Searches:          %lu\n", searches);
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8, (200.0 * count_comparisons_8 / amplicons / (amplicons + 1)));
+	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8,
+			(200.0 * count_comparisons_8 / db->sequences / (db->sequences + 1)));
 	fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparisons_16,
-			(200.0 * count_comparisons_16 / amplicons / (amplicons + 1)));
+			(200.0 * count_comparisons_16 / db->sequences / (db->sequences + 1)));
 	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / amplicons / (amplicons + 1)));
+			(200.0 * (count_comparisons_8 + count_comparisons_16) / db->sequences / (db->sequences + 1)));
 
 	delete (qgramdiffs);
 	delete (qgramamps);

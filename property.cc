@@ -19,8 +19,9 @@ long Property::penalty_factor;
 long Property::resolution;
 FILE * Property::outfile;
 FILE * Property::debugfile;
-string Property::databasename;
-string Property::outfilename;
+FILE * Property::dbdebug;
+std::string Property::databasename;
+std::string Property::outfilename;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -31,6 +32,7 @@ void Property::init() {
 	threads = DEFAULT_THREADS;
 	calculate_penalty();
 	debugfile = fopen("debug.log", "w");
+	dbdebug = fopen("db.log", "w");
 }
 
 void Property::calculate_penalty() {
@@ -69,7 +71,7 @@ void Property::set_resolution(long value) {
 		fatal("Illegal resolution specified");
 }
 
-void Property::set_outfile(string value) {
+void Property::set_outfile(std::string value) {
 	outfilename = value;
 	outfile = fopen(outfilename.c_str(), "w");
 	if (!outfile)

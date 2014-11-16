@@ -23,10 +23,6 @@
 #include <regex.h>
 #include <string>
 
-using namespace std;
-
-extern queryinfo_t query;
-
 struct seqinfo_s {
 	char * header;
 	char * seq;
@@ -43,7 +39,6 @@ struct seqinfo_s {
 typedef struct seqinfo_s seqinfo_t;
 typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
 
-
 class Db_data {
 private:
 	void showseq(char * seq);
@@ -51,18 +46,17 @@ private:
 	void qgrams_init();
 	bool process_line(long line);
 public:
-//	queryinfo_t query;
+	queryinfo_t query;
 	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;
-	unsigned long headerchars;
 	int longest;
-	int longestheader;
 	int threadid;
+
+	static void read_file(Db_data ** db);
 
 	Db_data();
 	virtual ~Db_data();
-	void read_file(string filename);
 	void print_debug();
 	unsigned char * get_qgram_vector(unsigned long seq_no);
 	seqinfo_t * get_seqinfo(unsigned long seqno);

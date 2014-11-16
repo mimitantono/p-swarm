@@ -1,7 +1,5 @@
 #include "scan.h"
 
-queryinfo_t query;
-
 scanner::scanner() {
 	sd = new struct search_data;
 	master_alignlengths = 0;
@@ -43,9 +41,9 @@ void scanner::search_delete(struct search_data * sdp) {
 }
 
 void scanner::search_init(struct search_data * sdp) {
-	for (long i = 0; i < query.len; i++) {
-		sdp->qtable[i] = sdp->dprofile + 64 * query.seq[i];
-		sdp->qtable_w[i] = sdp->dprofile_w + 32 * query.seq[i];
+	for (long i = 0; i < db->query.len; i++) {
+		sdp->qtable[i] = sdp->dprofile + 64 * db->query.seq[i];
+		sdp->qtable_w[i] = sdp->dprofile_w + 32 * db->query.seq[i];
 	}
 }
 
@@ -56,12 +54,12 @@ void scanner::search_chunk(struct search_data * sdp, long bits) {
 	if (bits == 16)
 		searcher.search16(sdp->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
 				sdp->dprofile_w, (WORD*) sdp->hearray, sdp->target_count, master_targets + sdp->target_index,
-				master_scores + sdp->target_index, master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len,
+				master_scores + sdp->target_index, master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len,
 				dirbufferbytes / 8, sdp->dir_array, db);
 	else
 		searcher.search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
 				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
-				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, query.len, dirbufferbytes / 8, sdp->dir_array,
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len, dirbufferbytes / 8, sdp->dir_array,
 				db);
 }
 
@@ -101,8 +99,8 @@ void scanner::search_worker_core() {
 
 void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores,
 		unsigned long * diffs, unsigned long * alignlengths, long bits) {
-	query.qno = query_no;
-	db->get_sequence_and_length(query_no, &query.seq, &query.len);
+	db->query.qno = query_no;
+	db->get_sequence_and_length(query_no, &db->query.seq, &db->query.len);
 
 	master_next = 0;
 	master_length = listlength;

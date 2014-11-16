@@ -21,16 +21,20 @@ char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
-
 Db_data::Db_data() {
-	longestheader = 0;
 	qgrams = 0;
+	seqindex = 0;
 	longest = 0;
 	sequences = 0;
-	headerchars = 0;
-	seqindex = 0;
 	nucleotides = 0;
 	threadid = 0;
+}
+
+Db_data::~Db_data() {
+	if (seqindex)
+		delete (seqindex);
+	if (qgrams)
+		delete[] (qgrams);
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -60,42 +64,29 @@ int compare_abundance(const void * a, const void * b) {
 		return 0;
 }
 
-bool Db_data::process_line(long line) {
-	if ((line % (Property::threads * 2)) == threadid * 2)
-		return true;
-	else if ((line % (Property::threads * 2)) == threadid * 2 + 1)
-		return true;
-	else
-		return false;
-}
-
-void Db_data::read_file(string filename) {
+void Db_data::read_file(Db_data ** db) {
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
 	char * datap = (char *) xmalloc(dataalloc);
 	unsigned long datalen = 0;
 
-	longest = 0;
-	longestheader = 0;
-	sequences = 0;
-	nucleotides = 0;
-	headerchars = 0;
+	unsigned long sequences = 0;
 
 	FILE * fp = NULL;
-	if (filename.c_str()) {
-		fp = fopen(filename.c_str(), "r");
+	if (Property::databasename.c_str()) {
+		fp = fopen(Property::databasename.c_str(), "r");
 		if (!fp)
-			fatal("Error: Unable to open input data file (%s).", filename.c_str());
+			fatal("Error: Unable to open input data file (%s).", Property::databasename.c_str());
 	} else
 		fp = stdin;
 
 	/* get file size */
 
 	long filesize = 0;
-	if (filename.c_str()) {
+	if (Property::databasename.c_str()) {
 		if (fseek(fp, 0, SEEK_END))
-			fatal("Error: Unable to seek in database file (%s)", filename.c_str());
+			fatal("Error: Unable to seek in database file (%s)", Property::databasename.c_str());
 		filesize = ftell(fp);
 		rewind(fp);
 	}
@@ -120,11 +111,6 @@ void Db_data::read_file(string filename) {
 		else
 			headerlen = strlen(line + 1);
 
-		headerchars += headerlen;
-
-		if (headerlen > longestheader)
-			longestheader = headerlen;
-
 		/* store the header */
 
 		while (datalen + headerlen + 1 > dataalloc) {
@@ -143,8 +129,6 @@ void Db_data::read_file(string filename) {
 
 		/* read sequence */
 
-		unsigned long seqbegin = datalen;
-
 		while (line[0] && (line[0] != '>')) {
 			char m;
 			char c;
@@ -152,10 +136,8 @@ void Db_data::read_file(string filename) {
 			while ((c = *p++))
 				if ((m = map_nt[(int) c]) >= 0) {
 					while (datalen >= dataalloc) {
-						if (process_line(lineno)) {
-							dataalloc += MEMCHUNK;
-							datap = (char *) xrealloc(datap, dataalloc);
-						}
+						dataalloc += MEMCHUNK;
+						datap = (char *) xrealloc(datap, dataalloc);
 					}
 
 					*(datap + datalen) = m;
@@ -171,25 +153,16 @@ void Db_data::read_file(string filename) {
 		}
 
 		while (datalen >= dataalloc) {
-			if (process_line(lineno)) {
-				dataalloc += MEMCHUNK;
-				datap = (char *) xrealloc(datap, dataalloc);
-			}
+			dataalloc += MEMCHUNK;
+			datap = (char *) xrealloc(datap, dataalloc);
 		}
-
-		long length = datalen - seqbegin;
-
-		nucleotides += length;
-
-		if (length > longest)
-			longest = length;
 
 		*(datap + datalen) = 0;
 		datalen++;
 
 		sequences++;
 
-		if (filename.c_str())
+		if (Property::databasename.c_str())
 			progress_update(ftell(fp));
 	}
 	progress_done();
@@ -206,9 +179,27 @@ void Db_data::read_file(string filename) {
 	unsigned long duplicatedidentifiers = 0;
 
 	/* create indices */
+	int missingabundance = 0;
 
-	seqindex = new seqinfo_t[sequences];
-	seqinfo_t * seqindex_p = seqindex;
+	int* longest_array = new int[Property::threads];
+	unsigned long * sequences_array = new unsigned long[Property::threads];
+	unsigned long * nucleotides_array = new unsigned long[Property::threads];
+	long *lastabundance = new long[Property::threads];
+	int *presorted = new int[Property::threads];
+
+	int tail = sequences - (sequences / Property::threads) * Property::threads;
+	for (int threadid = 0; threadid < Property::threads; threadid++) {
+		if ((Property::threads - threadid) <= tail) {
+			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads];
+		} else { //threadid is not tail, meaning that it will get more data
+			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads + 1];
+		}
+		longest_array[threadid] = 0;
+		sequences_array[threadid] = 0;
+		nucleotides_array[threadid] = 0;
+		lastabundance[threadid] = 0;
+		presorted[threadid] = 0;
+	}
 
 	regex_t db_regexp;
 	regmatch_t pmatch[4];
@@ -216,13 +207,11 @@ void Db_data::read_file(string filename) {
 	if (regcomp(&db_regexp, "(_)([0-9]+)$", REG_EXTENDED))
 		fatal("Regular expression compilation failed");
 
-	long lastabundance = LONG_MAX;
-
-	int presorted = 1;
-	int missingabundance = 0;
-
 	char * p = datap;
 	for (unsigned long i = 0; i < sequences; i++) {
+		int threadid = i % Property::threads;
+		sequences_array[threadid]++;
+		seqinfo_t * seqindex_p = &db[threadid]->seqindex[i / Property::threads];
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
@@ -243,10 +232,10 @@ void Db_data::read_file(string filename) {
 		if (seqindex_p->abundance < 1)
 			missingabundance++;
 
-		if (seqindex_p->abundance > lastabundance)
-			presorted = 0;
+		if (seqindex_p->abundance > lastabundance[threadid])
+			presorted[threadid] = 0;
 
-		lastabundance = seqindex_p->abundance;
+		lastabundance[threadid] = seqindex_p->abundance;
 
 		/* check hash, fatal error if found, otherwize insert new */
 		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
@@ -271,9 +260,13 @@ void Db_data::read_file(string filename) {
 
 		seqindex_p->seq = p;
 		seqindex_p->seqlen = strlen(p);
-		p += seqindex_p->seqlen + 1;
 
-		seqindex_p++;
+		if (seqindex_p->seqlen > longest_array[threadid]) {
+			longest_array[threadid] = seqindex_p->seqlen;
+		}
+		nucleotides_array[threadid] += seqindex_p->seqlen;
+
+		p += seqindex_p->seqlen + 1;
 	}
 
 	if (missingabundance) {
@@ -282,16 +275,24 @@ void Db_data::read_file(string filename) {
 		fatal(msg);
 	}
 
-	if (!presorted) {
-		qsort(seqindex, sequences, sizeof(seqinfo_t), compare_abundance);
-	}
-
 	delete (hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);
 
-	qgrams_init();
+	for (int threadid = 0; threadid < Property::threads; threadid++) {
+		if (!presorted[threadid]) {
+			fprintf(stderr, "Input file was not presorted, sorting now.\n");
+			qsort(db[threadid]->seqindex, db[threadid]->sequences, sizeof(seqinfo_t), compare_abundance);
+		}
+		db[threadid]->nucleotides = nucleotides_array[threadid];
+		db[threadid]->longest = longest_array[threadid];
+		db[threadid]->sequences = sequences_array[threadid];
+		db[threadid]->threadid = threadid;
+		db[threadid]->qgrams_init();
+		db[threadid]->print_debug();
+		db[threadid]->print_info();
+	}
 	free(datap);
 }
 
@@ -330,16 +331,9 @@ void Db_data::put_seq(long seqno) {
 }
 
 void Db_data::print_debug() {
-	fprintf(Property::debugfile, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
+	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::debugfile, "\n%ld: %s", i, seqindex[i].header);
+		fprintf(Property::dbdebug, "\n%ld: %s", i, seqindex[i].header);
 	}
-}
-
-Db_data::~Db_data() {
-	if (seqindex)
-		delete (seqindex);
-	if (qgrams)
-		delete[] (qgrams);
 }
 

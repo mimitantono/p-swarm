@@ -14,12 +14,6 @@
 #include "clusterresult.h"
 #include "db.h"
 
-struct partition_info {
-	unsigned long start;
-	unsigned long end;
-	unsigned long threadid;
-};
-
 struct ampliconinfo_s {
 	unsigned ampliconid;
 	unsigned diffestimate; /* lower bound estimate of dist from initial seed */
@@ -35,7 +29,7 @@ private:
 public:
 	cluster_job(Db_data * db);
 	virtual ~cluster_job();
-	cluster_result * algo_run(partition_info partition);
+	cluster_result * algo_run(int threadid);
 };
 
 #endif /* CLUSTER_H_ */
