@@ -18,7 +18,7 @@
 #define DEFAULT_MISMATCHSCORE (-4)
 #define DEFAULT_THREADS 2
 #define DEFAULT_RESOLUTION 1
-#define MAX_THREADS 10
+#define MAX_THREADS 100
 
 class Property {
 public:

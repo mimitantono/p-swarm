@@ -9,6 +9,8 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+	timeval start, end;
+	gettimeofday(&start, NULL);
 	Matrix::score_matrix_init();
 	CPU_Info::cpu_features_detect();
 	CPU_Info::cpu_features_show();
@@ -16,6 +18,9 @@ int main(int argc, char** argv) {
 	args_init(argc, argv);
 	run();
 	destroy();
+	gettimeofday(&end, NULL);
+	double dif = end.tv_sec + (end.tv_usec / 1000) - start.tv_sec - (start.tv_usec / 1000);
+	printf("\nduration %.2lf ms", dif);
 }
 
 void args_init(int argc, char **argv) {

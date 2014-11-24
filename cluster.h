@@ -25,7 +25,7 @@ struct ampliconinfo_s {
 class cluster_job {
 private:
 	Db_data * db;
-	scanner scanner;
+	class scanner scanner;
 public:
 	cluster_job(Db_data * db);
 	virtual ~cluster_job();

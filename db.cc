@@ -197,8 +197,8 @@ void Db_data::read_file(Db_data ** db) {
 		longest_array[threadid] = 0;
 		sequences_array[threadid] = 0;
 		nucleotides_array[threadid] = 0;
-		lastabundance[threadid] = 0;
-		presorted[threadid] = 0;
+		lastabundance[threadid] = -1;
+		presorted[threadid] = 1;
 	}
 
 	regex_t db_regexp;
@@ -232,7 +232,7 @@ void Db_data::read_file(Db_data ** db) {
 		if (seqindex_p->abundance < 1)
 			missingabundance++;
 
-		if (seqindex_p->abundance > lastabundance[threadid])
+		if (lastabundance[threadid] > 0 && seqindex_p->abundance > lastabundance[threadid])
 			presorted[threadid] = 0;
 
 		lastabundance[threadid] = seqindex_p->abundance;
@@ -333,7 +333,7 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::dbdebug, "\n%ld: %s", i, seqindex[i].header);
+		fprintf(Property::dbdebug, "\n%ld: %s [%ld]", i, seqindex[i].header, seqindex[i].abundance);
 	}
 }
 

@@ -14,6 +14,8 @@
 #include "cluster.h"
 #include <getopt.h>
 #include "parallel.h"
+#include <sys/time.h>
+#include "stdlib.h"
 
 void destroy();
 void run();
