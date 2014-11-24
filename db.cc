@@ -194,6 +194,7 @@ void Db_data::read_file(Db_data ** db) {
 		} else { //threadid is not tail, meaning that it will get more data
 			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads + 1];
 		}
+		fprintf(Property::debugfile, "Seq Index initialized thread #%d total #%p\n", threadid, (void *) db[threadid]->seqindex);
 		longest_array[threadid] = 0;
 		sequences_array[threadid] = 0;
 		nucleotides_array[threadid] = 0;
@@ -333,7 +334,7 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::dbdebug, "\n%ld: %s [%ld]", i, seqindex[i].header, seqindex[i].abundance);
+		fprintf(Property::dbdebug, "\n %ld : %s [%du]", i, seqindex[i].header, seqindex[i].abundance);
 	}
 }
 
