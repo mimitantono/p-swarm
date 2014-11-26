@@ -47,7 +47,6 @@ void Parallel::run() {
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
 		thread_data_array[i].db = db[i];
-		db[i]->print_debug();
 		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);

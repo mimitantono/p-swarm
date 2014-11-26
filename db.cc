@@ -28,6 +28,7 @@ Db_data::Db_data() {
 	sequences = 0;
 	nucleotides = 0;
 	threadid = 0;
+	query = new queryinfo_t;
 }
 
 Db_data::~Db_data() {
@@ -35,6 +36,8 @@ Db_data::~Db_data() {
 		delete (seqindex);
 	if (qgrams)
 		delete[] (qgrams);
+	if (query)
+		delete query;
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -334,7 +337,7 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::dbdebug, "\n %ld : %s [%du]", i, seqindex[i].header, seqindex[i].abundance);
+		fprintf(Property::dbdebug, "\n %ld : %s [%d]", i, seqindex[i].header, seqindex[i].abundance);
 	}
 }
 
