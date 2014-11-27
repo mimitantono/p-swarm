@@ -28,7 +28,6 @@ typedef struct thread_data {
 
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	fprintf(stderr, "\nMy Data: %lu", (unsigned long) my_data->thread_id);
 	cluster_job cluster_job(my_data->db);
 	Parallel::results.push_back(cluster_job.algo_run(my_data->thread_id));
 	pthread_exit(NULL);

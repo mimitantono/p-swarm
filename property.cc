@@ -105,3 +105,8 @@ void Property::set_gapextend(long value) {
 unsigned long int Property::diff_saturation() {
 	return MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
 }
+
+void Property::destroy() {
+	fclose(dbdebug);
+	fclose(debugfile);
+}
