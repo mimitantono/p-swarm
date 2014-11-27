@@ -729,9 +729,9 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 	return aligned - matches;
 }
 
-void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile, BYTE * hearray,
-		unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs, unsigned long * alignmentlengths,
-		unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data * db) {
+void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile,
+		BYTE * hearray, unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
+		unsigned long * alignmentlengths, unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data * db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -854,16 +854,13 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 						// get next sequence
 						seq_id[c] = next_id;
 						long seqno = seqnos[next_id];
-						char* address;
-						long length;
+						queryinfo_t query = db->get_sequence_and_length(seqno);
 
-						db->get_sequence_and_length(seqno, &address, &length);
+						d_address[c] = (BYTE*) query.seq;
+						d_length[c] = query.len;
 
-						d_address[c] = (BYTE*) address;
-						d_length[c] = length;
-
-						d_begin[c] = (unsigned char*) address;
-						d_end[c] = (unsigned char*) address + length;
+						d_begin[c] = (unsigned char*) query.seq;
+						d_end[c] = (unsigned char*) query.seq + query.len;
 						d_offset[c] = dir - dirbuffer;
 						next_id++;
 

@@ -59,8 +59,8 @@ void scanner::search_chunk(struct search_data * sdp, long bits) {
 	else
 		searcher.search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
 				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
-				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len, dirbufferbytes / 8, sdp->dir_array,
-				db);
+				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len, dirbufferbytes / 8,
+				sdp->dir_array, db);
 }
 
 int scanner::search_getwork(unsigned long * countref, unsigned long * firstref) {
@@ -100,7 +100,7 @@ void scanner::search_worker_core() {
 void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores,
 		unsigned long * diffs, unsigned long * alignlengths, long bits) {
 	db->query.qno = query_no;
-	db->get_sequence_and_length(query_no, &db->query.seq, &db->query.len);
+	db->query = db->get_sequence_and_length(query_no);
 
 	master_next = 0;
 	master_length = listlength;

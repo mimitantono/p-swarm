@@ -60,7 +60,7 @@ public:
 	void print_debug();
 	unsigned char * get_qgram_vector(unsigned long seq_no);
 	seqinfo_t * get_seqinfo(unsigned long seqno);
-	void get_sequence_and_length(unsigned long seqno, char ** address, long * length);
+	queryinfo_t get_sequence_and_length(unsigned long seqno);
 	void show_sequence(unsigned long seqno);
 	void show_all();
 	void print_info();

@@ -602,17 +602,15 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 						// get next sequence
 						seq_id[c] = next_id;
 						long seqno = seqnos[next_id];
-						char* address;
-						long length;
 
-						db->get_sequence_and_length(seqno, &address, &length);
+						queryinfo_t query = db->get_sequence_and_length(seqno);
 
 						// printf("Seqno: %ld Address: %p\n", seqno, address);
-						d_address[c] = (BYTE*) address;
-						d_length[c] = length;
+						d_address[c] = (BYTE*) query.seq;
+						d_length[c] = query.len;
 
-						d_begin[c] = (unsigned char*) address;
-						d_end[c] = (unsigned char*) address + length;
+						d_begin[c] = (unsigned char*) query.seq;
+						d_end[c] = (unsigned char*) query.seq + query.len;
 						d_offset[c] = dir - dirbuffer;
 						next_id++;
 

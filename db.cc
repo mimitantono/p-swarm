@@ -28,7 +28,6 @@ Db_data::Db_data() {
 	sequences = 0;
 	nucleotides = 0;
 	threadid = 0;
-	query = new queryinfo_t;
 }
 
 Db_data::~Db_data() {
@@ -36,8 +35,6 @@ Db_data::~Db_data() {
 		delete (seqindex);
 	if (qgrams)
 		delete[] (qgrams);
-	if (query)
-		delete query;
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -197,7 +194,6 @@ void Db_data::read_file(Db_data ** db) {
 		} else { //threadid is not tail, meaning that it will get more data
 			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads + 1];
 		}
-		fprintf(Property::debugfile, "Seq Index initialized thread #%d total #%p\n", threadid, (void *) db[threadid]->seqindex);
 		longest_array[threadid] = 0;
 		sequences_array[threadid] = 0;
 		nucleotides_array[threadid] = 0;
@@ -321,17 +317,17 @@ seqinfo_t * Db_data::get_seqinfo(unsigned long seqno) {
 	return seqindex + seqno;
 }
 
-void Db_data::get_sequence_and_length(unsigned long seqno, char ** address, long * length) {
-	*address = seqindex[seqno].seq;
-	*length = (long) (seqindex[seqno].seqlen);
+queryinfo_t Db_data::get_sequence_and_length(unsigned long seqno) {
+	queryinfo_t query;
+	query.seq = seqindex[seqno].seq;
+	query.len = (long) (seqindex[seqno].seqlen);
+	return query;
 }
 
 void Db_data::put_seq(long seqno) {
-	char * seq;
-	long len;
-	get_sequence_and_length(seqno, &seq, &len);
-	for (int i = 0; i < len; i++)
-		putchar(sym_nt[(int) (seq[i])]);
+	queryinfo_t query = get_sequence_and_length(seqno);
+	for (int i = 0; i < query.len; i++)
+		putchar(sym_nt[(int) (query.seq[i])]);
 }
 
 void Db_data::print_debug() {
