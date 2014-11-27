@@ -122,5 +122,5 @@ void args_usage() {
 
 void destroy() {
 	Matrix::score_matrix_free();
-	Property::destroy();
+	fclose(Property::debugfile);
 }

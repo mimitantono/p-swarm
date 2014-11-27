@@ -4,7 +4,8 @@ make clean
 make all
 ./main -t 1 test.fas
 
-echo "\nComparing results with oracle:"
+echo ""
+echo "Comparing results with oracle:"
 if diff debug.log testdata/test.log >temp; then
     echo "**** OK! ****";
     rm temp;

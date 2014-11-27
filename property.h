@@ -49,7 +49,6 @@ public:
 	static void set_gapopen(long value);
 	static void set_gapextend(long value);
 	static void calculate_penalty();
-	static void destroy();
 };
 
 #endif /* PROPERTY_H_ */

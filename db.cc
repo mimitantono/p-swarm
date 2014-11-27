@@ -335,5 +335,6 @@ void Db_data::print_debug() {
 	for (long i = 0; i < sequences; i++) {
 		fprintf(Property::dbdebug, "\n %ld : %s [%d]", i, seqindex[i].header, seqindex[i].abundance);
 	}
+	fclose(Property::dbdebug);
 }
 
