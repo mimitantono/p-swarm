@@ -13,7 +13,7 @@ merger::merger(cluster_result** cluster_results, int count) {
 }
 
 merger::~merger() {
-	delete cluster_results;
+	zap(cluster_results);
 }
 
 void merger::merge_results(cluster_result * merge_result) {

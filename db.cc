@@ -31,10 +31,10 @@ Db_data::Db_data() {
 }
 
 Db_data::~Db_data() {
-	if (seqindex)
-		delete (seqindex);
-	if (qgrams)
-		delete[] (qgrams);
+	delete (seqindex);
+	seqindex = NULL;
+	delete[] (qgrams);
+	qgrams = NULL;
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {

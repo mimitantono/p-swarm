@@ -13,6 +13,7 @@
 #include "scan.h"
 #include "clusterresult.h"
 #include "db.h"
+#include "util.h"
 
 struct ampliconinfo_s {
 	unsigned ampliconid;

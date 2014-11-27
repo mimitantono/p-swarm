@@ -15,7 +15,8 @@ scanner::scanner() {
 }
 
 scanner::~scanner() {
-	delete (sd);
+	delete(sd);
+	sd = NULL;
 }
 
 void scanner::search_alloc(struct search_data * sdp) {
@@ -32,12 +33,8 @@ void scanner::search_alloc(struct search_data * sdp) {
 }
 
 void scanner::search_delete(struct search_data * sdp) {
-	delete (sdp->qtable);
-	delete (sdp->qtable_w);
-	delete (sdp->dprofile);
-	delete (sdp->dprofile_w);
-	delete (sdp->hearray);
-	delete (sdp->dir_array);
+	delete (sdp);
+	sdp = NULL;
 }
 
 void scanner::search_init(struct search_data * sdp) {

@@ -32,8 +32,7 @@ static const unsigned long progress_granularity = 200;
 void progress_init(const char * prompt, unsigned long size) {
 	progress_prompt = prompt;
 	progress_size = size;
-	progress_chunk =
-			size < progress_granularity ? 1 : size / progress_granularity;
+	progress_chunk = size < progress_granularity ? 1 : size / progress_granularity;
 	progress_next = 0;
 //	fprintf(stderr, "%s %.0f%%", prompt, 0.0);
 }
@@ -150,7 +149,7 @@ unsigned long hash_djb2a(unsigned char * s, unsigned long n) {
 	return hash;
 }
 
-unsigned long hash_cityhash64(unsigned char * s, unsigned long n)
-{
-  return CityHash64((const char*)s, n);
+unsigned long hash_cityhash64(unsigned char * s, unsigned long n) {
+	return CityHash64((const char*) s, n);
 }
+

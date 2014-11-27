@@ -14,6 +14,7 @@
 #include "property.h"
 #include "clusterresult.h"
 #include "db.h"
+#include "util.h"
 
 class Parallel {
 private:

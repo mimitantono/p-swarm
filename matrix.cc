@@ -93,7 +93,10 @@ void Matrix::score_matrix_init() {
 
 void Matrix::score_matrix_free() {
 	delete Matrix::score_matrix_8;
+	score_matrix_8 = NULL;
 	delete Matrix::score_matrix_16;
+	score_matrix_16 = NULL;
 	delete Matrix::score_matrix_63;
+	score_matrix_63 = NULL;
 }
 

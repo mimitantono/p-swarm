@@ -18,7 +18,8 @@ Parallel::Parallel() {
 }
 
 Parallel::~Parallel() {
-	//db will be deleted when destroying pthread
+	delete[] db;
+	db = NULL;
 }
 
 typedef struct thread_data {
