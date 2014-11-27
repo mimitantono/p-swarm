@@ -62,5 +62,7 @@ void Parallel::run() {
 		}
 		printf("\nMain: completed join with thread %ld having a status of %ld\n", t + 1, (long) status);
 	}
+	delete[] thread_data_array;
+	thread_data_array = NULL;
 }
 

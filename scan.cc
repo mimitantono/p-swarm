@@ -15,49 +15,44 @@ scanner::scanner() {
 }
 
 scanner::~scanner() {
-	delete(sd);
+	delete (sd);
 	sd = NULL;
 }
 
-void scanner::search_alloc(struct search_data * sdp) {
+void scanner::search_alloc() {
 	dirbufferbytes = 8 * db->longest * ((db->longest + 3) / 4) * 4;
-	sdp->qtable = new BYTE*[db->longest];
-	sdp->qtable_w = new WORD*[db->longest];
-	sdp->dprofile = new BYTE[4 * 16 * 32];
-	sdp->dprofile_w = new WORD[4 * 2 * 8 * 32];
-	sdp->hearray = new BYTE[db->longest * 32];
-	sdp->dir_array = new unsigned long[dirbufferbytes];
+	sd->qtable = new BYTE*[db->longest];
+	sd->qtable_w = new WORD*[db->longest];
+	sd->dprofile = new BYTE[4 * 16 * 32];
+	sd->dprofile_w = new WORD[4 * 2 * 8 * 32];
+	sd->hearray = new BYTE[db->longest * 32];
+	sd->dir_array = new unsigned long[dirbufferbytes];
 
-	memset(sdp->hearray, 0, db->longest * 32);
-	memset(sdp->dir_array, 0, dirbufferbytes);
+	memset(sd->hearray, 0, db->longest * 32);
+	memset(sd->dir_array, 0, dirbufferbytes);
 }
 
-void scanner::search_delete(struct search_data * sdp) {
-	delete (sdp);
-	sdp = NULL;
-}
-
-void scanner::search_init(struct search_data * sdp) {
+void scanner::search_init() {
 	for (long i = 0; i < db->query.len; i++) {
-		sdp->qtable[i] = sdp->dprofile + 64 * db->query.seq[i];
-		sdp->qtable_w[i] = sdp->dprofile_w + 32 * db->query.seq[i];
+		sd->qtable[i] = sd->dprofile + 64 * db->query.seq[i];
+		sd->qtable_w[i] = sd->dprofile_w + 32 * db->query.seq[i];
 	}
 }
 
-void scanner::search_chunk(struct search_data * sdp, long bits) {
-	if (sdp->target_count == 0)
+void scanner::search_chunk(long bits) {
+	if (sd->target_count == 0)
 		return;
 
 	if (bits == 16)
-		searcher.search16(sdp->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
-				sdp->dprofile_w, (WORD*) sdp->hearray, sdp->target_count, master_targets + sdp->target_index,
-				master_scores + sdp->target_index, master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len,
-				dirbufferbytes / 8, sdp->dir_array, db);
+		searcher.search16(sd->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
+				sd->dprofile_w, (WORD*) sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
+				master_diffs + sd->target_index, master_alignlengths + sd->target_index, db->query.len, dirbufferbytes / 8, sd->dir_array,
+				db);
 	else
-		searcher.search8(sdp->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sdp->dprofile,
-				sdp->hearray, sdp->target_count, master_targets + sdp->target_index, master_scores + sdp->target_index,
-				master_diffs + sdp->target_index, master_alignlengths + sdp->target_index, db->query.len, dirbufferbytes / 8,
-				sdp->dir_array, db);
+		searcher.search8(sd->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sd->dprofile,
+				sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
+				master_diffs + sd->target_index, master_alignlengths + sd->target_index, db->query.len, dirbufferbytes / 8, sd->dir_array,
+				db);
 }
 
 int scanner::search_getwork(unsigned long * countref, unsigned long * firstref) {
@@ -89,9 +84,9 @@ void scanner::master_dump() {
 }
 
 void scanner::search_worker_core() {
-	search_init(sd);
+	search_init();
 	while (search_getwork(&sd->target_count, &sd->target_index))
-		search_chunk(sd, master_bits);
+		search_chunk(master_bits);
 }
 
 void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores,
@@ -114,7 +109,7 @@ void scanner::search_do(unsigned long query_no, unsigned long listlength, unsign
 }
 
 void scanner::search_begin() {
-	search_alloc(sd);
+	search_alloc();
 }
 
 void scanner::set_db(Db_data * db) {

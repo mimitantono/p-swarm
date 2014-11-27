@@ -293,6 +293,17 @@ void Db_data::read_file(Db_data ** db) {
 		db[threadid]->print_debug();
 		db[threadid]->print_info();
 	}
+
+	delete[] longest_array;
+	longest_array = NULL;
+	delete[] presorted;
+	presorted = NULL;
+	delete[] sequences_array;
+	sequences_array = NULL;
+	delete[] nucleotides_array;
+	nucleotides_array = NULL;
+	delete[] lastabundance;
+	lastabundance = NULL;
 	free(datap);
 }
 

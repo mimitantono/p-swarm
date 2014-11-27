@@ -51,10 +51,10 @@ private:
 	unsigned long * master_alignlengths;
 	int master_bits;
 	Db_data * db;
-	void search_alloc(struct search_data * sdp);
-	void search_delete(struct search_data * sdp);
-	void search_init(struct search_data * sdp);
-	void search_chunk(struct search_data * sdp, long bits);
+	void search_alloc();
+	void search_delete();
+	void search_init();
+	void search_chunk(long bits);
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
 	void master_dump();
 	void search_worker_core();
