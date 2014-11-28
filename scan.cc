@@ -16,6 +16,12 @@ scanner::scanner() {
 
 scanner::~scanner() {
 	delete (sd);
+	delete[] (sd->qtable);
+	delete[] (sd->qtable_w);
+	delete[] (sd->dprofile);
+	delete[] (sd->dprofile_w);
+	delete[] (sd->hearray);
+	delete[] (sd->dir_array);
 	sd = NULL;
 }
 

@@ -173,7 +173,7 @@ void Db_data::read_file(Db_data ** db) {
 
 	unsigned long hdrhashsize = 2 * sequences;
 
-	seqinfo_t * * hdrhashtable = new seqinfo_t*[hdrhashsize];
+	seqinfo_t ** hdrhashtable = new seqinfo_t*[hdrhashsize];
 	memset(hdrhashtable, 0, hdrhashsize * sizeof(seqinfo_t *));
 
 	unsigned long duplicatedidentifiers = 0;
@@ -275,7 +275,7 @@ void Db_data::read_file(Db_data ** db) {
 		fatal(msg);
 	}
 
-	delete (hdrhashtable);
+	delete[] (hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);

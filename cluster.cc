@@ -326,19 +326,19 @@ cluster_result * cluster_job::algo_run(int threadid) {
 	qgramamps = NULL;
 	delete (qgramindices);
 	qgramindices = NULL;
-	delete (hits);
+	delete[] (hits);
 	hits = NULL;
-	delete (alignlengths);
+	delete[] (alignlengths);
 	alignlengths = NULL;
 	delete (diffs);
 	diffs = NULL;
-	delete (scores);
+	delete[] (scores);
 	scores = NULL;
-	delete (targetindices);
+	delete[] (targetindices);
 	targetindices = NULL;
 	delete (targetampliconids);
 	targetampliconids = NULL;
-	delete (amps);
+	delete[] (amps);
 	amps = NULL;
 
 	return result;
