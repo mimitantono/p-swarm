@@ -10,16 +10,13 @@
 std::vector<cluster_result*> Parallel::results;
 
 Parallel::Parallel() {
-	db = new Db_data*[Property::threads];
 	for (int i = 0; i < Property::threads; i++) {
-		db[i] = new Db_data;
+		db.push_back(new Db_data);
 	}
 	Db_data::read_file(db);
 }
 
 Parallel::~Parallel() {
-	delete[] db;
-	db = NULL;
 }
 
 typedef struct thread_data {

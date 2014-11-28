@@ -1,6 +1,8 @@
 #!/bin/bash
 
 make clean
+rm *.log
+
 make all
 ./main -t 1 test.fas
 

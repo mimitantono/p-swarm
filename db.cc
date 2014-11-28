@@ -64,7 +64,7 @@ int compare_abundance(const void * a, const void * b) {
 		return 0;
 }
 
-void Db_data::read_file(Db_data ** db) {
+void Db_data::read_file(std::vector<Db_data*> db) {
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
@@ -275,7 +275,7 @@ void Db_data::read_file(Db_data ** db) {
 		fatal(msg);
 	}
 
-	delete[] (hdrhashtable);
+	delete (hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);

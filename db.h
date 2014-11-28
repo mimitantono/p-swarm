@@ -22,6 +22,7 @@
 #include <limits.h>
 #include <regex.h>
 #include <string>
+#include <vector>
 
 struct seqinfo_s {
 	char * header;
@@ -53,7 +54,7 @@ public:
 	int longest;
 	int threadid;
 
-	static void read_file(Db_data ** db);
+	static void read_file(std::vector<Db_data*> db);
 
 	Db_data();
 	virtual ~Db_data();

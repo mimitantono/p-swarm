@@ -18,7 +18,7 @@
 
 class Parallel {
 private:
-	Db_data ** db;
+	std::vector<Db_data*> db;
 public:
 	Parallel();
 	virtual ~Parallel();
