@@ -87,9 +87,6 @@ void args_init(int argc, char **argv) {
 void run() {
 	Parallel parallel;
 	parallel.run();
-	for (int i = 0; i < Parallel::results.size(); i++) {
-		Parallel::results[i].print();
-	}
 }
 
 void args_show() {

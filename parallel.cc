@@ -65,7 +65,10 @@ void Parallel::run() {
 	for (int i = 0; i < db.size(); i++) {
 		delete db[i];
 	}
-	free(datap);
 	thread_data_array = NULL;
+	for (int i = 0; i < results.size(); i++) {
+		results[i].print();
+	}
+	free(datap);
 }
 
