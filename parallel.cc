@@ -39,7 +39,7 @@ void Parallel::run() {
 	thread_data *thread_data_array = new thread_data[Property::threads];
 	std::vector<Db_data*> db;
 	char * datap = (char *) xmalloc(MEMCHUNK);
-	Db_data::read_file(db, datap);
+	datap = Db_data::read_file(db, datap);
 
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
@@ -67,6 +67,7 @@ void Parallel::run() {
 	for (int i = 0; i < Property::threads; i++) {
 		results[i].print();
 	}
-	free(datap);
+	if (datap)
+		free(datap);
 }
 

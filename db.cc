@@ -105,7 +105,7 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 	return false;
 }
 
-void Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
+char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	for (int i = 0; i < Property::threads; i++) {
 		db.push_back(new Db_data());
 	}
@@ -309,6 +309,8 @@ void Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	nucleotides_array = NULL;
 	delete[] lastabundance;
 	lastabundance = NULL;
+
+	return datap;
 }
 
 void Db_data::print_info() {

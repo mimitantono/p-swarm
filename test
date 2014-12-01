@@ -1,0 +1,416 @@
+==2882== Memcheck, a memory error detector
+==2882== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
+==2882== Using Valgrind-3.11.0.SVN and LibVEX; rerun with -h for copyright info
+==2882== Command: ./main -t4 test.fas
+==2882== Parent PID: 11101
+==2882== 
+--2882-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option
+--2882-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 2 times)
+--2882-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 4 times)
+==2882== Invalid read of size 32
+==2882==    at 0x100546C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009B6C: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:139)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882==  Address 0x100970240 is 16 bytes after a block of size 64 alloc'd
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x100009213: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:110)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Conditional jump or move depends on uninitialised value(s)
+==2882==    at 0x100546C7A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009CF7: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Invalid read of size 32
+==2882==    at 0x100546C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009CF7: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882==  Address 0x100970240 is 16 bytes after a block of size 64 alloc'd
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x100009213: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:110)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Conditional jump or move depends on uninitialised value(s)
+==2882==    at 0x100546C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009ED8: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:194)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Invalid read of size 32
+==2882==    at 0x100546C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009ED8: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:194)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882==  Address 0x100970240 is 16 bytes after a block of size 64 alloc'd
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x100009213: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:110)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Conditional jump or move depends on uninitialised value(s)
+==2882==    at 0x100546C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100009CF7: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== Conditional jump or move depends on uninitialised value(s)
+==2882==    at 0x100546C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033ABB6: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100345005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10036A9CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10036ACA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100340B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10033E9F7: printf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10001D12A: Parallel::run() (parallel.cc:60)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+--2882-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 8 times)
+==2882== Invalid read of size 32
+==2882==    at 0x100546C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==2882==    by 0x10033ABB6: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100345005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10036A9CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10036ACA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100340B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10033E9F7: printf (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x100000B05: main (main.cc:23)
+==2882==  Address 0x100c4f440 is 16 bytes after a block of size 48 in arena "client"
+==2882== 
+==2882== 
+==2882== HEAP SUMMARY:
+==2882==     in use at exit: 4,892,211 bytes in 1,308 blocks
+==2882==   total heap usage: 5,141 allocs, 3,833 frees, 7,678,648 bytes allocated
+==2882== 
+==2882== 16 bytes in 1 blocks are definitely lost in loss record 11 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005ED9B1: recursive_mutex_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005ED6FC: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100122A9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==2882==    by 0x7FFF5FC12CEA: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC12E77: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC0F870: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC0F805: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC0F6F7: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC0F968: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==2882== 
+==2882== 24 bytes in 1 blocks are possibly lost in loss record 19 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFF02: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFFF5: _NXHashRehashToCapacity (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFF3F: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFC00: NXCreateHashTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFA95: NXCreateHashTable (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF947: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F96DA: NXCreateMapTable (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1006048BB: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE7BE: sel_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE055: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882== 
+==2882== 32 bytes in 1 blocks are possibly lost in loss record 35 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFEB4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE42C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD91C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 48 bytes in 2 blocks are possibly lost in loss record 42 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFF02: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFFF5: _NXHashRehashToCapacity (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFF3F: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE43D: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882== 
+==2882== 96 bytes in 3 blocks are possibly lost in loss record 55 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFEB4: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE43D: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 96 bytes in 4 blocks are possibly lost in loss record 56 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFF02: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE43D: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 96 bytes in 4 blocks are possibly lost in loss record 57 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFF02: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFFF5: _NXHashRehashToCapacity (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EFF3F: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE42C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD91C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882== 
+==2882== 168 bytes in 1 blocks are possibly lost in loss record 62 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x10001CA66: Parallel::Parallel() (parallel.cc:13)
+==2882==    by 0x1000010C2: run() (main.cc:88)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== 168 bytes in 7 blocks are possibly lost in loss record 63 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EFF02: NXHashInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE42C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD91C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 528 bytes in 1 blocks are possibly lost in loss record 74 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005EFA29: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F0D40: unattachedCategories() (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE329: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD91C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882== 
+==2882== 730 bytes in 44 blocks are possibly lost in loss record 78 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005F0A6B: _strdup_internal (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F0A21: NXMapKeyCopyingInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF4C2: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 848 (120 direct, 728 indirect) bytes in 1 blocks are definitely lost in loss record 80 of 106
+==2882==    at 0x1000680C7: calloc (vg_replace_malloc.c:630)
+==2882==    by 0x10036EBC9: tre_compile (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10036E075: regncomp_l (in /usr/lib/system/libsystem_c.dylib)
+==2882==    by 0x10000A289: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:235)
+==2882==    by 0x10001CF49: Parallel::run() (parallel.cc:42)
+==2882==    by 0x1000010CA: run() (main.cc:89)
+==2882==    by 0x100000A7B: main (main.cc:19)
+==2882== 
+==2882== 1,040 bytes in 1 blocks are possibly lost in loss record 83 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005EFA29: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F0289: remappedClasses(signed char) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD04E: remapClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD453: readClass(objc_class*, bool, bool) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EEE90: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882== 
+==2882== 1,040 bytes in 1 blocks are possibly lost in loss record 84 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005EFA29: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F01F9: futureNamedClasses() (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD485: readClass(objc_class*, bool, bool) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EEE90: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 1,040 bytes in 1 blocks are possibly lost in loss record 85 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005F0B1A: _NXMapRehash(_NXMapTable*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F0828: NXMapInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF4C2: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882== 
+==2882== 2,064 bytes in 1 blocks are possibly lost in loss record 88 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005EFA29: NXCreateMapTableFromZone (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EED0C: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100122A9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==2882== 
+==2882== 2,064 bytes in 1 blocks are possibly lost in loss record 89 of 106
+==2882==    at 0x100067A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==2882==    by 0x1005F0B1A: _NXMapRehash(_NXMapTable*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F0828: NXMapInsert (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x100604907: __sel_registerName(char const*, int, int) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005F384F: fixupMethodList(method_list_t*, bool, bool) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x100602783: attachMethodLists(objc_class*, method_list_t**, int, bool, bool, bool) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FE2FC: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD91C: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005FD909: realizeClass(objc_class*) (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EF610: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882== 
+==2882== 3,872 bytes in 44 blocks are possibly lost in loss record 92 of 106
+==2882==    at 0x100068355: malloc_zone_calloc (vg_replace_malloc.c:632)
+==2882==    by 0x1005EF48C: _read_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EE067: map_images_nolock (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x1005EDB17: map_images (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x7FFF5FC0498E: dyld::notifyBatchPartial(dyld_image_states, bool, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x7FFF5FC046D6: dyld::registerImageStateBatchChangeHandler(dyld_image_states, char const* (*)(dyld_image_states, unsigned int, dyld_image_info const*)) (in /usr/lib/dyld)
+==2882==    by 0x1002A6958: dyld_register_image_state_change_handler (in /usr/lib/system/libdyld.dylib)
+==2882==    by 0x1005ED723: _objc_init (in /usr/lib/libobjc.A.dylib)
+==2882==    by 0x10025687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100256864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==2882==    by 0x100122A9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==2882==    by 0x7FFF5FC12CEA: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==2882== 
+==2882== 13,888 bytes in 201 blocks are possibly lost in loss record 99 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x10001C956: std::__1::__split_buffer<member_info, std::__1::allocator<member_info>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<member_info>&) (memory:1630)
+==2882==    by 0x10001C30F: void std::__1::vector<member_info, std::__1::allocator<member_info> >::__push_back_slow_path<member_info const>(member_info const&) (__split_buffer:328)
+==2882==    by 0x100019EFD: cluster_job::algo_run(int, cluster_result*) (vector:1543)
+==2882==    by 0x10001CCAE: run_cluster(void*) (parallel.cc:27)
+==2882==    by 0x10055A2FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x10055A278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x1005584B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882== 
+==2882== 40,960 bytes in 4 blocks are possibly lost in loss record 102 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x1000228E6: std::__1::__split_buffer<cluster_info, std::__1::allocator<cluster_info>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<cluster_info>&) (memory:1630)
+==2882==    by 0x10002207F: void std::__1::vector<cluster_info, std::__1::allocator<cluster_info> >::__push_back_slow_path<cluster_info const>(cluster_info const&) (__split_buffer:328)
+==2882==    by 0x10001ED38: cluster_result::new_cluster(long) (vector:1543)
+==2882==    by 0x100019D40: cluster_job::algo_run(int, cluster_result*) (cluster.cc:296)
+==2882==    by 0x10001CCAE: run_cluster(void*) (parallel.cc:27)
+==2882==    by 0x10055A2FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x10055A278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x1005584B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882== 
+==2882== 75,968 bytes in 640 blocks are possibly lost in loss record 103 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x100022DE0: std::__1::vector<member_info, std::__1::allocator<member_info> >::allocate(unsigned long) (memory:1630)
+==2882==    by 0x100022BAC: std::__1::vector<member_info, std::__1::allocator<member_info> >::vector(std::__1::vector<member_info, std::__1::allocator<member_info> > const&) (vector:1159)
+==2882==    by 0x10002234D: std::__1::vector<cluster_info, std::__1::allocator<cluster_info> >::__swap_out_circular_buffer(std::__1::__split_buffer<cluster_info, std::__1::allocator<cluster_info>&>&) (vector:1162)
+==2882==    by 0x100022159: void std::__1::vector<cluster_info, std::__1::allocator<cluster_info> >::__push_back_slow_path<cluster_info const>(cluster_info const&) (vector:1528)
+==2882==    by 0x10001ED38: cluster_result::new_cluster(long) (vector:1543)
+==2882==    by 0x100019D40: cluster_job::algo_run(int, cluster_result*) (cluster.cc:296)
+==2882==    by 0x10001CCAE: run_cluster(void*) (parallel.cc:27)
+==2882==    by 0x10055A2FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x10055A278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x1005584B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882== 
+==2882== 1,098,240 bytes in 1 blocks are possibly lost in loss record 104 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x10001037D: scanner::search_alloc() (scan.cc:35)
+==2882==    by 0x100018B29: cluster_job::cluster_job(Db_data*) (cluster.cc:6)
+==2882==    by 0x10001CC94: run_cluster(void*) (parallel.cc:26)
+==2882==    by 0x10055A2FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x10055A278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x1005584B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882== 
+==2882== 3,619,456 (256 direct, 3,619,200 indirect) bytes in 4 blocks are definitely lost in loss record 106 of 106
+==2882==    at 0x1000676F1: malloc (vg_replace_malloc.c:303)
+==2882==    by 0x1000AE43D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==2882==    by 0x10000FF5D: scanner::scanner() (scan.cc:4)
+==2882==    by 0x100018AF6: cluster_job::cluster_job(Db_data*) (cluster.cc:3)
+==2882==    by 0x10001CC94: run_cluster(void*) (parallel.cc:26)
+==2882==    by 0x10055A2FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x10055A278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882==    by 0x1005584B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==2882== 
+==2882== LEAK SUMMARY:
+==2882==    definitely lost: 392 bytes in 6 blocks
+==2882==    indirectly lost: 3,619,928 bytes in 34 blocks
+==2882==      possibly lost: 1,242,162 bytes in 963 blocks
+==2882==    still reachable: 29,729 bytes in 305 blocks
+==2882==         suppressed: 0 bytes in 0 blocks
+==2882== Reachable blocks (those to which a pointer was found) are not shown.
+==2882== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==2882== 
+==2882== For counts of detected and suppressed errors, rerun with: -v
+==2882== Use --track-origins=yes to see where uninitialised values come from
+==2882== ERROR SUMMARY: 160 errors from 31 contexts (suppressed: 0 from 0)

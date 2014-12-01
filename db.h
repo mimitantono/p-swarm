@@ -57,7 +57,7 @@ public:
 	int longest;
 	int threadid;
 
-	static void read_file(std::vector<Db_data*> &db, char * datap);
+	static char* read_file(std::vector<Db_data*> &db, char * datap);
 
 	Db_data();
 	virtual ~Db_data();
