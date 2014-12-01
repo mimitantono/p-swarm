@@ -9,7 +9,7 @@ cluster_job::cluster_job(Db_data * db) {
 cluster_job::~cluster_job() {
 }
 
-cluster_result * cluster_job::algo_run(int threadid) {
+cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	fprintf(stderr, "\nRunning thread #%d for %lu sequences", threadid, db->sequences);
 
 	unsigned long swarmed;
@@ -280,7 +280,6 @@ cluster_result * cluster_job::algo_run(int threadid) {
 
 	/* output results */
 
-	cluster_result * result = new cluster_result;
 	result->partition_id = threadid + 1;
 
 	char sep_amplicons = '\n'; /* usually a space */

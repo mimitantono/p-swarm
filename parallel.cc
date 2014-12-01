@@ -7,9 +7,10 @@
 
 #include "parallel.h"
 
-std::vector<cluster_result> Parallel::results;
+cluster_result * Parallel::results;
 
 Parallel::Parallel() {
+	results = new cluster_result[Property::threads];
 }
 
 Parallel::~Parallel() {
@@ -23,9 +24,7 @@ typedef struct thread_data {
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
 	cluster_job cluster_job(my_data->db);
-	cluster_result * result = cluster_job.algo_run(my_data->thread_id);
-	Parallel::results.push_back(*result);
-	delete result;
+	cluster_job.algo_run(my_data->thread_id, &Parallel::results[my_data->thread_id]);
 	pthread_exit(NULL);
 }
 
@@ -62,11 +61,11 @@ void Parallel::run() {
 		printf("\nMain: completed join with thread %ld having a status of %ld\n", t + 1, (long) status);
 	}
 	delete[] thread_data_array;
+	thread_data_array = NULL;
 	for (int i = 0; i < db.size(); i++) {
 		delete db[i];
 	}
-	thread_data_array = NULL;
-	for (int i = 0; i < results.size(); i++) {
+	for (int i = 0; i < Property::threads; i++) {
 		results[i].print();
 	}
 	free(datap);

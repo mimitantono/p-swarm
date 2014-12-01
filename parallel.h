@@ -21,8 +21,7 @@ public:
 	Parallel();
 	virtual ~Parallel();
 	void run();
-	cluster_result result;
-	static std::vector<cluster_result> results;
+	static cluster_result * results;
 };
 
 #endif /* PARALLEL_H_ */

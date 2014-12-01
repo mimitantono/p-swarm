@@ -30,7 +30,7 @@ private:
 public:
 	cluster_job(Db_data * db);
 	virtual ~cluster_job();
-	cluster_result * algo_run(int threadid);
+	cluster_result * algo_run(int threadid, cluster_result * result);
 };
 
 #endif /* CLUSTER_H_ */

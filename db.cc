@@ -240,13 +240,14 @@ void Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		seqindex_p->hdrhash = hdrhash;
 		unsigned long hashindex = hdrhash % hdrhashsize;
 
-		seqinfo_t * found;
+		seqinfo_t * found = hdrhashtable[hashindex];
 
-		while ((found = hdrhashtable[hashindex])) {
+		while (found) {
 			if ((found->hdrhash == hdrhash) && (found->headeridlen == seqindex_p->headeridlen)
 					&& (strncmp(found->header, seqindex_p->header, found->headeridlen) == 0))
 				break;
 			hashindex = (hashindex + 1) % hdrhashsize;
+			found = hdrhashtable[hashindex];
 		}
 
 		if (found) {
