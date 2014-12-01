@@ -12,3 +12,7 @@
 *.fas
 main
 
+
+leak
+
+main.dSYM/Contents/Info.plist

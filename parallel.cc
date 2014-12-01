@@ -18,12 +18,9 @@ Parallel::Parallel() {
 }
 
 Parallel::~Parallel() {
-//	for (int i = 0; i < results.size(); i++) {
-//		delete results[i];
-//	}
-//	for (int i = 0; i < db.size(); i++) {
-//		delete db[i];
-//	}
+	for (int i = 0; i < results.size(); i++) {
+		delete &results[i];
+	}
 }
 
 typedef struct thread_data {
@@ -34,7 +31,9 @@ typedef struct thread_data {
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
 	cluster_job cluster_job(my_data->db);
-	Parallel::results.push_back(*cluster_job.algo_run(my_data->thread_id));
+	cluster_result * result = cluster_job.algo_run(my_data->thread_id);
+	Parallel::results.push_back(*result);
+	delete result;
 	pthread_exit(NULL);
 }
 
@@ -70,6 +69,9 @@ void Parallel::run() {
 		printf("\nMain: completed join with thread %ld having a status of %ld\n", t + 1, (long) status);
 	}
 	delete[] thread_data_array;
+	for (int i = 0; i < db.size(); i++) {
+		delete db[i];
+	}
 	thread_data_array = NULL;
 }
 
