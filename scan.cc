@@ -15,13 +15,13 @@ scanner::scanner() {
 }
 
 scanner::~scanner() {
-	delete (sd);
 	delete[] (sd->qtable);
 	delete[] (sd->qtable_w);
 	delete[] (sd->dprofile);
 	delete[] (sd->dprofile_w);
 	delete[] (sd->hearray);
 	delete[] (sd->dir_array);
+	delete (sd);
 	sd = NULL;
 }
 
@@ -39,9 +39,9 @@ void scanner::search_alloc() {
 }
 
 void scanner::search_init() {
-	for (long i = 0; i < db->query.len; i++) {
-		sd->qtable[i] = sd->dprofile + 64 * db->query.seq[i];
-		sd->qtable_w[i] = sd->dprofile_w + 32 * db->query.seq[i];
+	for (long i = 0; i < query.len; i++) {
+		sd->qtable[i] = sd->dprofile + 64 * query.seq[i];
+		sd->qtable_w[i] = sd->dprofile_w + 32 * query.seq[i];
 	}
 }
 
@@ -52,12 +52,12 @@ void scanner::search_chunk(long bits) {
 	if (bits == 16)
 		searcher.search16(sd->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
 				sd->dprofile_w, (WORD*) sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
-				master_diffs + sd->target_index, master_alignlengths + sd->target_index, db->query.len, dirbufferbytes / 8, sd->dir_array,
+				master_diffs + sd->target_index, master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, sd->dir_array,
 				db);
 	else
 		searcher.search8(sd->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sd->dprofile,
 				sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
-				master_diffs + sd->target_index, master_alignlengths + sd->target_index, db->query.len, dirbufferbytes / 8, sd->dir_array,
+				master_diffs + sd->target_index, master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, sd->dir_array,
 				db);
 }
 
@@ -97,8 +97,7 @@ void scanner::search_worker_core() {
 
 void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores,
 		unsigned long * diffs, unsigned long * alignlengths, long bits) {
-	db->query.qno = query_no;
-	db->query = db->get_sequence_and_length(query_no);
+	query = db->get_sequence_and_length(query_no);
 
 	master_next = 0;
 	master_length = listlength;

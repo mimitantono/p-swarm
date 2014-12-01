@@ -38,6 +38,7 @@ public:
 	void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores, unsigned long * diffs,
 			unsigned long * alignlengths, long bits);
 	void search_begin();
+	queryinfo_t query;
 private:
 	class searcher searcher;
 	struct search_data * sd;

@@ -12,6 +12,12 @@ cluster_result::cluster_result() {
 }
 
 cluster_result::~cluster_result() {
+	for (int i = 0; i < clusters.size(); i++) {
+		for (int j = 0; j < clusters[i]->cluster_members.size(); j++) {
+			delete clusters[i]->cluster_members[j];
+		}
+		delete clusters[i];
+	}
 }
 
 cluster_info * cluster_result::new_cluster(long cluster_id) {

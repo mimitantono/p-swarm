@@ -47,14 +47,13 @@ private:
 	void qgrams_init();
 	bool process_line(long line);
 public:
-	queryinfo_t query;
 	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;
 	int longest;
 	int threadid;
 
-	static void read_file(std::vector<Db_data*> db);
+	static void read_file(std::vector<Db_data*> &db);
 
 	Db_data();
 	virtual ~Db_data();

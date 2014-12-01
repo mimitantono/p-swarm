@@ -7,16 +7,23 @@
 
 #include "parallel.h"
 
-std::vector<cluster_result*> Parallel::results;
+std::vector<cluster_result> Parallel::results;
 
 Parallel::Parallel() {
-	for (int i = 0; i < Property::threads; i++) {
-		db.push_back(new Db_data);
-	}
-	Db_data::read_file(db);
+//	for (int i = 0; i < Property::threads; i++) {
+//		Db_data * db_data = new Db_data();
+//		db.push_back(db_data);
+//	}
+//	Db_data::read_file (&db);
 }
 
 Parallel::~Parallel() {
+//	for (int i = 0; i < results.size(); i++) {
+//		delete results[i];
+//	}
+//	for (int i = 0; i < db.size(); i++) {
+//		delete db[i];
+//	}
 }
 
 typedef struct thread_data {
@@ -27,7 +34,7 @@ typedef struct thread_data {
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
 	cluster_job cluster_job(my_data->db);
-	Parallel::results.push_back(cluster_job.algo_run(my_data->thread_id));
+	Parallel::results.push_back(*cluster_job.algo_run(my_data->thread_id));
 	pthread_exit(NULL);
 }
 
@@ -40,9 +47,12 @@ void Parallel::run() {
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	thread_data *thread_data_array = new thread_data[Property::threads];
+	std::vector<Db_data*> db;
+	Db_data::read_file(db);
 
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
+		db[i]->print_debug();
 		thread_data_array[i].db = db[i];
 		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
 		if (rc) {

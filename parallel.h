@@ -17,14 +17,12 @@
 #include "util.h"
 
 class Parallel {
-private:
-	std::vector<Db_data*> db;
 public:
 	Parallel();
 	virtual ~Parallel();
 	void run();
 	cluster_result result;
-	static std::vector<cluster_result*> results;
+	static std::vector<cluster_result> results;
 };
 
 #endif /* PARALLEL_H_ */

@@ -1,0 +1,669 @@
+==82894== Memcheck, a memory error detector
+==82894== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
+==82894== Using Valgrind-3.11.0.SVN and LibVEX; rerun with -h for copyright info
+==82894== Command: ./main -t 2 test.fas
+==82894== Parent PID: 82788
+==82894== 
+--82894-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option
+--82894-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 2 times)
+--82894-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 4 times)
+==82894== Invalid read of size 32
+==82894==    at 0x10050CC6A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009827: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:127)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  Address 0x10096fe20 is 16 bytes after a block of size 4,096 alloc'd
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x100301856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030048F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100300394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1000094D2: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:88)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Conditional jump or move depends on uninitialised value(s)
+==82894==    at 0x10050CC7A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009827: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:127)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 32
+==82894==    at 0x10050CC6A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009A08: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:151)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  Address 0x10096fe20 is 16 bytes after a block of size 4,096 alloc'd
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x100301856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030048F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100300394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1000094D2: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:88)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Conditional jump or move depends on uninitialised value(s)
+==82894==    at 0x10050CC7A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009A08: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:151)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 32
+==82894==    at 0x10050CC21: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009827: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:127)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  Address 0x10096fe20 is 16 bytes after a block of size 4,096 alloc'd
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x100301856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030048F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100300394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1000094D2: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:88)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Conditional jump or move depends on uninitialised value(s)
+==82894==    at 0x10050CC3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009827: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:127)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 32
+==82894==    at 0x10050CC21: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009A08: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:151)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  Address 0x10096fe20 is 16 bytes after a block of size 4,096 alloc'd
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x100301856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030048F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100300394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1000094D2: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:88)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Conditional jump or move depends on uninitialised value(s)
+==82894==    at 0x10050CC3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x1002FE82A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009A08: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:151)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Warning: invalid file descriptor -1 in syscall close()
+==82894== Thread 2:
+==82894== Invalid read of size 1
+==82894==    at 0x10000C32F: scanner::search_worker_core() (scan.cc:43)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086ef55 is 389 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000C350: scanner::search_worker_core() (scan.cc:44)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086ef55 is 389 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000DB69: searcher::search8(unsigned char**, unsigned char, unsigned char, unsigned char*, unsigned char*, unsigned char*, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:873)
+==82894==    by 0x10000C178: scanner::search_chunk(long) (scan.cc:58)
+==82894==    by 0x10000C3B2: scanner::search_worker_core() (scan.cc:95)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100876a20 is 31,824 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000D5B6: searcher::search8(unsigned char**, unsigned char, unsigned char, unsigned char*, unsigned char*, unsigned char*, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:787)
+==82894==    by 0x10000C178: scanner::search_chunk(long) (scan.cc:58)
+==82894==    by 0x10000C3B2: scanner::search_worker_core() (scan.cc:95)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100876a24 is 31,828 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000D8D9: searcher::search8(unsigned char**, unsigned char, unsigned char, unsigned char*, unsigned char*, unsigned char*, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:815)
+==82894==    by 0x10000C178: scanner::search_chunk(long) (scan.cc:58)
+==82894==    by 0x10000C3B2: scanner::search_worker_core() (scan.cc:95)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100876a28 is 31,832 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000D288: backtrack(char*, char*, unsigned long, unsigned long, unsigned long*, unsigned long, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:720)
+==82894==    by 0x10000DA3D: searcher::search8(unsigned char**, unsigned char, unsigned char, unsigned char*, unsigned char*, unsigned char*, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:842)
+==82894==    by 0x10000C178: scanner::search_chunk(long) (scan.cc:58)
+==82894==    by 0x10000C3B2: scanner::search_worker_core() (scan.cc:95)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100876aa0 is 31,952 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000D291: backtrack(char*, char*, unsigned long, unsigned long, unsigned long*, unsigned long, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:720)
+==82894==    by 0x10000DA3D: searcher::search8(unsigned char**, unsigned char, unsigned char, unsigned char*, unsigned char*, unsigned char*, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, unsigned long, unsigned long, unsigned long*, Db_data*) (search8.cc:842)
+==82894==    by 0x10000C178: scanner::search_chunk(long) (scan.cc:58)
+==82894==    by 0x10000C3B2: scanner::search_worker_core() (scan.cc:95)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100014D81: cluster_job::algo_run(int, cluster_result*) (cluster.cc:119)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086efd5 is 517 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000C32F: scanner::search_worker_core() (scan.cc:43)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100015304: cluster_job::algo_run(int, cluster_result*) (cluster.cc:209)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10088040b is 71,227 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x10000C350: scanner::search_worker_core() (scan.cc:44)
+==82894==    by 0x10000C4E4: scanner::search_do(unsigned long, unsigned long, unsigned long*, unsigned long*, unsigned long*, unsigned long*, long) (scan.cc:114)
+==82894==    by 0x100015304: cluster_job::algo_run(int, cluster_result*) (cluster.cc:209)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10088040b is 71,227 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 16
+==82894==    at 0x1002C32DB: strnlen (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100307F10: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086edd0 is 0 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 16
+==82894==    at 0x1002C32F6: strnlen (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100307F10: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086ede0 is 16 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 16
+==82894==    at 0x100510FED: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086edea is 26 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 32
+==82894==    at 0x100510FF8: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10086edd0 is 0 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 8
+==82894==    at 0x10051103D: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10088d918 is 125,768 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 8
+==82894==    at 0x100511040: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10088d918 is 125,768 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Thread 3:
+==82894== Invalid read of size 16
+==82894==    at 0x100510FED: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10087a774 is 47,524 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 16
+==82894==    at 0x10051102B: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10087a773 is 47,523 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 16
+==82894==    at 0x10051102B: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10087a784 is 47,540 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Thread 2:
+==82894== Invalid read of size 8
+==82894==    at 0x10051103D: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x1008a6fbd is 229,869 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 8
+==82894==    at 0x100511040: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x1008a6fc2 is 229,874 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 32
+==82894==    at 0x100510FF8: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100875047 is 25,207 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x100511056: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10087506e is 25,246 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x100511064: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300DAF: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x10087506f is 25,247 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x100511056: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100870775 is 6,565 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== Invalid read of size 1
+==82894==    at 0x100511064: _platform_memmove$VARIANT$Unknown (in /usr/lib/system/libsystem_platform.dylib)
+==82894==    by 0x100300D81: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10030B005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003309CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100330CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100306B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF61F: fprintf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100015A10: cluster_job::algo_run(int, cluster_result*) (cluster.cc:303)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==  Address 0x100870776 is 6,566 bytes inside a block of size 1,048,576 free'd
+==82894==    at 0x100066C9D: free (vg_replace_malloc.c:480)
+==82894==    by 0x10000A82E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:307)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+--82894-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 8 times)
+==82894== Thread 1:
+==82894== Invalid read of size 8
+==82894==    at 0x10001EFAB: cluster_result::print() (vector:656)
+==82894==    by 0x1000013A6: run() (main.cc:91)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  Address 0x100d0aeb8 is not stack'd, malloc'd or (recently) free'd
+==82894== 
+==82894== 
+==82894== Process terminating with default action of signal 11 (SIGSEGV)
+==82894==  Access not within mapped region at address 0x100D0AEB8
+==82894==    at 0x10001EFAB: cluster_result::print() (vector:656)
+==82894==    by 0x1000013A6: run() (main.cc:91)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894==  If you believe this happened as a result of a stack
+==82894==  overflow in your program's main thread (unlikely but
+==82894==  possible), you can try to increase the size of the
+==82894==  main thread stack using the --main-stacksize= flag.
+==82894==  The main thread stack size used in this run was 8388608.
+==82894== 
+==82894== HEAP SUMMARY:
+==82894==     in use at exit: 2,788,775 bytes in 935 blocks
+==82894==   total heap usage: 3,476 allocs, 2,541 frees, 4,979,239 bytes allocated
+==82894== 
+==82894== 16 bytes in 1 blocks are definitely lost in loss record 13 of 112
+==82894==    at 0x100066A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==82894==    by 0x1005B39B1: recursive_mutex_init (in /usr/lib/libobjc.A.dylib)
+==82894==    by 0x1005B36FC: _objc_init (in /usr/lib/libobjc.A.dylib)
+==82894==    by 0x10021C87C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==82894==    by 0x10021C864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==82894==    by 0x100071A9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==82894==    by 0x7FFF5FC12CEA: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==82894==    by 0x7FFF5FC12E77: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==82894==    by 0x7FFF5FC0F870: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==82894==    by 0x7FFF5FC0F805: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==82894==    by 0x7FFF5FC0F6F7: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==82894==    by 0x7FFF5FC0F968: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==82894== 
+==82894== 848 (120 direct, 728 indirect) bytes in 1 blocks are definitely lost in loss record 82 of 112
+==82894==    at 0x1000670C7: calloc (vg_replace_malloc.c:630)
+==82894==    by 0x100334BC9: tre_compile (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100334075: regncomp_l (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100009EE1: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >) (db.cc:207)
+==82894==    by 0x100018906: Parallel::Parallel() (parallel.cc:16)
+==82894==    by 0x1000012FB: run() (main.cc:88)
+==82894==    by 0x100000CAB: main (main.cc:19)
+==82894== 
+==82894== 4,096 bytes in 1 blocks are definitely lost in loss record 103 of 112
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x100301856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1003163A7: __swsetup (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x100300AF0: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x1002FF82A: fputs (in /usr/lib/system/libsystem_c.dylib)
+==82894==    by 0x10001584E: cluster_job::algo_run(int, cluster_result*) (cluster.cc:298)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894== 
+==82894== 58,296 (24,576 direct, 33,720 indirect) bytes in 2 blocks are definitely lost in loss record 108 of 112
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x1000B443D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==82894==    by 0x100022A06: std::__1::__split_buffer<cluster_info, std::__1::allocator<cluster_info>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<cluster_info>&) (memory:1630)
+==82894==    by 0x10002219F: void std::__1::vector<cluster_info, std::__1::allocator<cluster_info> >::__push_back_slow_path<cluster_info const>(cluster_info const&) (__split_buffer:328)
+==82894==    by 0x10001EE1A: cluster_result::new_cluster(long) (vector:1543)
+==82894==    by 0x10001583B: cluster_job::algo_run(int, cluster_result*) (cluster.cc:297)
+==82894==    by 0x100018D60: run_cluster(void*) (parallel.cc:31)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894== 
+==82894== 2,428,240 (208 direct, 2,428,032 indirect) bytes in 2 blocks are definitely lost in loss record 112 of 112
+==82894==    at 0x1000666F1: malloc (vg_replace_malloc.c:303)
+==82894==    by 0x1000B443D: operator new(unsigned long) (in /usr/lib/libc++.1.dylib)
+==82894==    by 0x1000145B8: cluster_job::cluster_job(Db_data*) (cluster.cc:5)
+==82894==    by 0x100018D29: run_cluster(void*) (parallel.cc:29)
+==82894==    by 0x1005202FB: _pthread_body (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x100520278: _pthread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894==    by 0x10051E4B0: thread_start (in /usr/lib/system/libsystem_pthread.dylib)
+==82894== 
+==82894== LEAK SUMMARY:
+==82894==    definitely lost: 29,016 bytes in 7 blocks
+==82894==    indirectly lost: 2,462,480 bytes in 471 blocks
+==82894==      possibly lost: 12,978 bytes in 117 blocks
+==82894==    still reachable: 284,301 bytes in 340 blocks
+==82894==         suppressed: 0 bytes in 0 blocks
+==82894== Reachable blocks (those to which a pointer was found) are not shown.
+==82894== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==82894== 
+==82894== For counts of detected and suppressed errors, rerun with: -v
+==82894== ERROR SUMMARY: 761207 errors from 54 contexts (suppressed: 0 from 0)

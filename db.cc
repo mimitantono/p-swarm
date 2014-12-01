@@ -64,7 +64,10 @@ int compare_abundance(const void * a, const void * b) {
 		return 0;
 }
 
-void Db_data::read_file(std::vector<Db_data*> db) {
+void Db_data::read_file(std::vector<Db_data*>& db) {
+	for (int i = 0; i < Property::threads; i++) {
+		db.push_back(new Db_data());
+	}
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
@@ -211,7 +214,7 @@ void Db_data::read_file(std::vector<Db_data*> db) {
 	for (unsigned long i = 0; i < sequences; i++) {
 		int threadid = i % Property::threads;
 		sequences_array[threadid]++;
-		seqinfo_t * seqindex_p = &db[threadid]->seqindex[i / Property::threads];
+		seqinfo_t * seqindex_p = &(db[threadid]->seqindex[i / Property::threads]);
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
@@ -290,7 +293,7 @@ void Db_data::read_file(std::vector<Db_data*> db) {
 		db[threadid]->sequences = sequences_array[threadid];
 		db[threadid]->threadid = threadid;
 		db[threadid]->qgrams_init();
-		db[threadid]->print_debug();
+//		db[threadid]->print_debug();
 		db[threadid]->print_info();
 	}
 
@@ -332,6 +335,7 @@ queryinfo_t Db_data::get_sequence_and_length(unsigned long seqno) {
 	queryinfo_t query;
 	query.seq = seqindex[seqno].seq;
 	query.len = (long) (seqindex[seqno].seqlen);
+	query.qno = seqno;
 	return query;
 }
 
@@ -344,7 +348,7 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::dbdebug, "\n %ld : %s [%d]", i, seqindex[i].header, seqindex[i].abundance);
+		fprintf(Property::dbdebug, "\n %ld : %s [%d]\n%s", i, seqindex[i].header, seqindex[i].abundance, seqindex[i].seq);
 	}
 	fclose(Property::dbdebug);
 }

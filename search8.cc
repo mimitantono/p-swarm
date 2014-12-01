@@ -731,7 +731,7 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 
 void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile,
 		BYTE * hearray, unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignmentlengths, unsigned long qlen, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data * db) {
+		unsigned long * alignmentlengths, queryinfo_t *query, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data * db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -797,7 +797,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 			else
 				dprofile_fill8(dprofile, score_matrix, dseq);
 
-			donormal8(S, hep, qp, &Q, &R, qlen, 0, &F0, dir, &H0);
+			donormal8(S, hep, qp, &Q, &R, query->len, 0, &F0, dir, &H0);
 		} else {
 			// One or more sequences ended in the previous block
 			// We have to switch over to a new sequence
@@ -839,7 +839,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 						if (score < 255) {
 							long offset = d_offset[c];
-							diff = backtrack(db->query.seq, dbseq, qlen, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack(query->seq, dbseq, query->len, dbseqlen, dirbuffer, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = 255;
@@ -858,7 +858,6 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 						d_address[c] = (BYTE*) query.seq;
 						d_length[c] = query.len;
-
 						d_begin[c] = (unsigned char*) query.seq;
 						d_end[c] = (unsigned char*) query.seq + query.len;
 						d_offset[c] = dir - dirbuffer;
@@ -901,7 +900,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 			MQ = _mm_and_si128(M, Q);
 			MR = _mm_and_si128(M, R);
 
-			domasked8(S, hep, qp, &Q, &R, qlen, 0, &F0, dir, &H0, &M, &MQ, &MR);
+			domasked8(S, hep, qp, &Q, &R, query->len, 0, &F0, dir, &H0, &M, &MQ, &MR);
 		}
 
 		F0 = _mm_adds_epu8(F0, R);
