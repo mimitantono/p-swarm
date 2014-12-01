@@ -278,7 +278,7 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 		fatal(msg);
 	}
 
-	delete (hdrhashtable);
+	delete[] (hdrhashtable);
 
 	if (duplicatedidentifiers)
 		exit(1);
@@ -307,7 +307,8 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 	nucleotides_array = NULL;
 	delete[] lastabundance;
 	lastabundance = NULL;
-	free(datap);
+	if (datap)
+		free(datap);
 }
 
 void Db_data::print_info() {
@@ -348,7 +349,15 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		fprintf(Property::dbdebug, "\n %ld : %s [%d]\n%s", i, seqindex[i].header, seqindex[i].abundance, seqindex[i].seq);
+		if (!seqindex[i].header) {
+			fatal("Sequence index header should not be null");
+		} else if (!seqindex[i].abundance) {
+			fatal("Sequence index abundance should not be null");
+		} else if (!seqindex[i].seq) {
+			fatal("Sequence index content should not be null");
+		} else {
+			fprintf(Property::dbdebug, "\n %ld : %s [%d]\n%s", i, seqindex[i].header, seqindex[i].abundance, seqindex[i].seq);
+		}
 	}
 	fclose(Property::dbdebug);
 }

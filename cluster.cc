@@ -288,18 +288,18 @@ cluster_result * cluster_job::algo_run(int threadid) {
 
 	long previd = -1;
 	for (unsigned long i = 0; i < db->sequences; i++) {
-		member_info * member = new member_info;
-		member->sequence = db->get_seqinfo(amps[i].ampliconid);
-		member->generation = amps[i].generation;
-		member->radius = amps[i].radius;
-		member->qgram_diff = amps[i].diffestimate;
+		member_info member;
+		member.sequence = db->get_seqinfo(amps[i].ampliconid);
+		member.generation = amps[i].generation;
+		member.radius = amps[i].radius;
+		member.qgram_diff = amps[i].diffestimate;
 		if (amps[i].swarmid != previd) {
 			result->new_cluster(amps[i].swarmid);
 			fputs(sep_swarms, Property::debugfile);
 		} else {
 			fputc(sep_amplicons, Property::debugfile);
 		}
-		result->clusters.back()->cluster_members.push_back(member);
+		result->clusters.back().cluster_members.push_back(member);
 		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);
 		previd = amps[i].swarmid;
 	}

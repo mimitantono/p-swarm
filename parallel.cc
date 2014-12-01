@@ -19,7 +19,7 @@ Parallel::Parallel() {
 
 Parallel::~Parallel() {
 	for (int i = 0; i < results.size(); i++) {
-		delete &results[i];
+//		delete &results[i];
 	}
 }
 

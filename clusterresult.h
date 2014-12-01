@@ -21,14 +21,14 @@ struct member_info {
 
 struct cluster_info {
 	unsigned cluster_id;
-	std::vector<member_info*> cluster_members;
+	std::vector<member_info> cluster_members;
 };
 
 class cluster_result {
 public:
 	cluster_result();
 	virtual ~cluster_result();
-	std::vector<cluster_info*> clusters;
+	std::vector<cluster_info> clusters;
 	cluster_info * new_cluster(long cluster_id);
 	long partition_id;
 	void print();

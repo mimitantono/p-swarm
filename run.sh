@@ -5,7 +5,7 @@ rm *.log
 
 make all
 #./main -t 1 test.fas
-valgrind --dsymutil=yes --leak-check=yes --log-file=leak ./main -t1 test.fas
+valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-leak-kinds=definite ./main -t 1 test.fas
 
 echo ""
 echo "Comparing results with oracle:"
