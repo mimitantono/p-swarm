@@ -28,7 +28,7 @@ void cluster_result::print() {
 		fprintf(Property::outfile, "\nCluster #%ld.%u: %lu members", partition_id, clusters[i].cluster_id,
 				clusters[i].cluster_members.size());
 		for (long j = 0; j < clusters[i].cluster_members.size(); j++) {
-			fprintf(Property::outfile, "\n%ld. %s", j + 1, clusters[i].cluster_members[j].sequence->header);
+			fprintf(Property::outfile, "\n%ld. %s", j + 1, clusters[i].cluster_members[j].sequence.header);
 			total++;
 		}
 	}

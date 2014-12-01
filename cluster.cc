@@ -289,7 +289,7 @@ cluster_result * cluster_job::algo_run(int threadid) {
 	long previd = -1;
 	for (unsigned long i = 0; i < db->sequences; i++) {
 		member_info member;
-		member.sequence = db->get_seqinfo(amps[i].ampliconid);
+		member.sequence = *db->get_seqinfo(amps[i].ampliconid);
 		member.generation = amps[i].generation;
 		member.radius = amps[i].radius;
 		member.qgram_diff = amps[i].diffestimate;
