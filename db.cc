@@ -23,7 +23,6 @@ char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 
 Db_data::Db_data() {
 	qgrams = 0;
-	seqindex = 0;
 	longest = 0;
 	sequences = 0;
 	nucleotides = 0;
@@ -31,8 +30,6 @@ Db_data::Db_data() {
 }
 
 Db_data::~Db_data() {
-	delete (seqindex);
-	seqindex = NULL;
 	delete[] (qgrams);
 	qgrams = NULL;
 }
@@ -193,9 +190,9 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 	int tail = sequences - (sequences / Property::threads) * Property::threads;
 	for (int threadid = 0; threadid < Property::threads; threadid++) {
 		if ((Property::threads - threadid) <= tail) {
-			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads];
+//			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads];
 		} else { //threadid is not tail, meaning that it will get more data
-			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads + 1];
+//			db[threadid]->seqindex = new seqinfo_t[sequences / Property::threads + 1];
 		}
 		longest_array[threadid] = 0;
 		sequences_array[threadid] = 0;
@@ -214,7 +211,9 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 	for (unsigned long i = 0; i < sequences; i++) {
 		int threadid = i % Property::threads;
 		sequences_array[threadid]++;
-		seqinfo_t * seqindex_p = &(db[threadid]->seqindex[i / Property::threads]);
+		seqinfo_t seqinfo;
+		db[threadid]->seqindex.push_back(seqinfo);
+		seqinfo_t * seqindex_p = &(db[threadid]->seqindex.back());
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
@@ -284,10 +283,10 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 		exit(1);
 
 	for (int threadid = 0; threadid < Property::threads; threadid++) {
-		if (!presorted[threadid]) {
-			fprintf(stderr, "Input file was not presorted, sorting now.\n");
-			qsort(db[threadid]->seqindex, db[threadid]->sequences, sizeof(seqinfo_t), compare_abundance);
-		}
+//		if (!presorted[threadid]) {
+//			fprintf(stderr, "Input file was not presorted, sorting now.\n");
+//			qsort(db[threadid]->seqindex, db[threadid]->sequences, sizeof(seqinfo_t), compare_abundance);
+//		}
 		db[threadid]->nucleotides = nucleotides_array[threadid];
 		db[threadid]->longest = longest_array[threadid];
 		db[threadid]->sequences = sequences_array[threadid];
@@ -319,17 +318,14 @@ void Db_data::print_info() {
 
 void Db_data::qgrams_init() {
 	qgrams = new qgramvector_t[sequences];
-
-	seqinfo_t * seqindex_p = seqindex;
 	for (long i = 0; i < sequences; i++) {
 		/* find qgrams */
-		findqgrams((unsigned char*) seqindex_p->seq, seqindex_p->seqlen, qgrams[i]);
-		seqindex_p++;
+		findqgrams((unsigned char*) seqindex[i].seq, seqindex[i].seqlen, qgrams[i]);
 	}
 }
 
 seqinfo_t * Db_data::get_seqinfo(unsigned long seqno) {
-	return seqindex + seqno;
+	return &seqindex[seqno];
 }
 
 queryinfo_t Db_data::get_sequence_and_length(unsigned long seqno) {
@@ -349,11 +345,11 @@ void Db_data::put_seq(long seqno) {
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
 	for (long i = 0; i < sequences; i++) {
-		if (!seqindex[i].header) {
+		if (seqindex[i].header == NULL) {
 			fatal("Sequence index header should not be null");
-		} else if (!seqindex[i].abundance) {
+		} else if (seqindex[i].abundance == 0) {
 			fatal("Sequence index abundance should not be null");
-		} else if (!seqindex[i].seq) {
+		} else if (seqindex[i].seq == NULL) {
 			fatal("Sequence index content should not be null");
 		} else {
 			fprintf(Property::dbdebug, "\n %ld : %s [%d]\n%s", i, seqindex[i].header, seqindex[i].abundance, seqindex[i].seq);

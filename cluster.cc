@@ -320,23 +320,23 @@ cluster_result * cluster_job::algo_run(int threadid) {
 	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
 			(200.0 * (count_comparisons_8 + count_comparisons_16) / db->sequences / (db->sequences + 1)));
 
-	delete (qgramdiffs);
+	delete[] (qgramdiffs);
 	qgramdiffs = NULL;
-	delete (qgramamps);
+	delete[] (qgramamps);
 	qgramamps = NULL;
-	delete (qgramindices);
+	delete[] (qgramindices);
 	qgramindices = NULL;
 	delete[] (hits);
 	hits = NULL;
 	delete[] (alignlengths);
 	alignlengths = NULL;
-	delete (diffs);
+	delete[] (diffs);
 	diffs = NULL;
 	delete[] (scores);
 	scores = NULL;
 	delete[] (targetindices);
 	targetindices = NULL;
-	delete (targetampliconids);
+	delete[] (targetampliconids);
 	targetampliconids = NULL;
 	delete[] (amps);
 	amps = NULL;

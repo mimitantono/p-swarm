@@ -43,7 +43,7 @@ typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
 class Db_data {
 private:
 	void showseq(char * seq);
-	seqinfo_t * seqindex;
+	std::vector<seqinfo_t> seqindex;
 	void qgrams_init();
 	bool process_line(long line);
 public:
