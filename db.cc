@@ -1,8 +1,5 @@
 #include "db.h"
 
-#define MEMCHUNK 1048576
-#define LINEALLOC LINE_MAX
-
 char map_nt[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -61,14 +58,13 @@ int compare_abundance(const void * a, const void * b) {
 		return 0;
 }
 
-void Db_data::read_file(std::vector<Db_data*>& db) {
+void Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	for (int i = 0; i < Property::threads; i++) {
 		db.push_back(new Db_data());
 	}
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
-	char * datap = (char *) xmalloc(dataalloc);
 	unsigned long datalen = 0;
 
 	unsigned long sequences = 0;
@@ -306,8 +302,7 @@ void Db_data::read_file(std::vector<Db_data*>& db) {
 	nucleotides_array = NULL;
 	delete[] lastabundance;
 	lastabundance = NULL;
-	if (datap)
-		free(datap);
+//		free(datap);
 }
 
 void Db_data::print_info() {

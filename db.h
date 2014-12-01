@@ -11,6 +11,9 @@
 #define LINE_MAX 2048
 #define HASH hash_cityhash64
 
+#define MEMCHUNK 1048576
+#define LINEALLOC LINE_MAX
+
 #define QGRAMLENGTH 5
 #define QGRAMVECTORBITS (1<<(2*QGRAMLENGTH))
 #define QGRAMVECTORBYTES (QGRAMVECTORBITS/8)
@@ -53,7 +56,7 @@ public:
 	int longest;
 	int threadid;
 
-	static void read_file(std::vector<Db_data*> &db);
+	static void read_file(std::vector<Db_data*> &db, char * datap);
 
 	Db_data();
 	virtual ~Db_data();

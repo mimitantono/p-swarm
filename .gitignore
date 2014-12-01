@@ -16,3 +16,5 @@ main
 leak
 
 main.dSYM/Contents/Info.plist
+
+.suppressed

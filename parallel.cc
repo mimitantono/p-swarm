@@ -39,7 +39,8 @@ void Parallel::run() {
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	thread_data *thread_data_array = new thread_data[Property::threads];
 	std::vector<Db_data*> db;
-	Db_data::read_file(db);
+	char * datap = (char *) xmalloc(MEMCHUNK);
+	Db_data::read_file(db, datap);
 
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
@@ -64,6 +65,7 @@ void Parallel::run() {
 	for (int i = 0; i < db.size(); i++) {
 		delete db[i];
 	}
+	free(datap);
 	thread_data_array = NULL;
 }
 
