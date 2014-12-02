@@ -22,6 +22,7 @@ void merger::merge_results(cluster_result * merge_result) {
 			//Comparing cluster 0,j with cluster i,k
 			for (int k = 0; k < cluster_results[i]->clusters.size(); k++) {
 
+				seqinfo_t query = cluster_results[i]->clusters[k].cluster_members[0].sequence;
 				//compare sum of max generations with distance of seeds
 
 				//if less or equal, merge clusters

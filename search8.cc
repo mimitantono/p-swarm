@@ -729,9 +729,8 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 	return aligned - matches;
 }
 
-void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile,
-		BYTE * hearray, unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignmentlengths, queryinfo_t *query, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data * db) {
+void searcher::search8(struct search_data * sd, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
+		unsigned long * alignmentlengths, queryinfo_t *query, unsigned long dirbuffersize, Db_data * db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -754,14 +753,14 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 	unsigned long done;
 
 	T0 = _mm_set_epi8(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff);
-	Q = _mm_set1_epi8(gap_open_penalty + gap_extend_penalty);
-	R = _mm_set1_epi8(gap_extend_penalty);
+	Q = _mm_set1_epi8((BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend);
+	R = _mm_set1_epi8((BYTE) Property::penalty_gapextend);
 
 	zero = 0;
 	done = 0;
 
-	hep = (__m128i *) hearray;
-	qp = (__m128i **) q_start;
+	hep = (__m128i *) sd->hearray;
+	qp = (__m128i **) sd->qtable;
 
 	for (int c = 0; c < CHANNELS; c++) {
 		d_begin[c] = &zero;
@@ -774,7 +773,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 	int easy = 0;
 
-	unsigned long * dir = dirbuffer;
+	unsigned long * dir = sd->dir_array;
 
 	while (1) {
 
@@ -793,9 +792,9 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 			}
 
 			if (CPU_Info::ssse3_present)
-				dprofile_shuffle8(dprofile, score_matrix, dseq);
+				dprofile_shuffle8(sd->dprofile, (BYTE*) Matrix::score_matrix_8, dseq);
 			else
-				dprofile_fill8(dprofile, score_matrix, dseq);
+				dprofile_fill8(sd->dprofile, (BYTE*) Matrix::score_matrix_8, dseq);
 
 			donormal8(S, hep, qp, &Q, &R, query->len, 0, &F0, dir, &H0);
 		} else {
@@ -839,7 +838,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 
 						if (score < 255) {
 							long offset = d_offset[c];
-							diff = backtrack(query->seq, dbseq, query->len, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = 255;
@@ -850,7 +849,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 						done++;
 					}
 
-					if (next_id < sequences) {
+					if (next_id < sd->target_count) {
 						// get next sequence
 						seq_id[c] = next_id;
 						long seqno = seqnos[next_id];
@@ -860,11 +859,11 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 						d_length[c] = query.len;
 						d_begin[c] = (unsigned char*) query.seq;
 						d_end[c] = (unsigned char*) query.seq + query.len;
-						d_offset[c] = dir - dirbuffer;
+						d_offset[c] = dir - sd->dir_array;
 						next_id++;
 
 						((BYTE*) &H0)[c] = 0;
-						((BYTE*) &F0)[c] = gap_open_penalty + gap_extend_penalty;
+						((BYTE*) &F0)[c] = (BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend;
 
 						// fill channel
 						for (int j = 0; j < CDEPTH; j++) {
@@ -889,13 +888,13 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 				T = _mm_slli_si128(T, 1);
 			}
 
-			if (done == sequences)
+			if (done == sd->target_count)
 				break;
 
 			if (CPU_Info::ssse3_present)
-				dprofile_shuffle8(dprofile, score_matrix, dseq);
+				dprofile_shuffle8(sd->dprofile, (BYTE*) Matrix::score_matrix_8, dseq);
 			else
-				dprofile_fill8(dprofile, score_matrix, dseq);
+				dprofile_fill8(sd->dprofile, (BYTE*) Matrix::score_matrix_8, dseq);
 
 			MQ = _mm_and_si128(M, Q);
 			MR = _mm_and_si128(M, R);
@@ -910,7 +909,7 @@ void searcher::search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_
 		F0 = _mm_adds_epu8(F0, R);
 
 		dir += 4 * db->longest;
-		if (dir >= dirbuffer + dirbuffersize)
+		if (dir >= sd->dir_array + dirbuffersize)
 			dir -= dirbuffersize;
 	}
 }

@@ -13,17 +13,30 @@
 #include "util.h"
 #include "db.h"
 
+struct search_data {
+	BYTE ** qtable;
+	WORD ** qtable_w;
+
+	BYTE * dprofile;
+	WORD * dprofile_w;
+
+	BYTE * hearray;
+
+	unsigned long * dir_array;
+
+	unsigned long target_count;
+	unsigned long target_index;
+};
+
 class searcher {
 public:
 	searcher();
 	virtual ~searcher();
-	void search8(BYTE * * q_start, BYTE gap_open_penalty, BYTE gap_extend_penalty, BYTE * score_matrix, BYTE * dprofile, BYTE * hearray,
-			unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-			unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data* db);
+	void search8(struct search_data *sd, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
+			unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, Db_data* db);
 
-	void search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile, WORD * hearray,
-			unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-			unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data* db);
+	void search16(struct search_data *sd, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
+			unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, Db_data* db);
 };
 
 #endif /* SEARCH_H_ */

@@ -15,21 +15,6 @@
 #include "search.h"
 #include "db.h"
 
-struct search_data {
-	BYTE ** qtable;
-	WORD ** qtable_w;
-
-	BYTE * dprofile;
-	WORD * dprofile_w;
-
-	BYTE * hearray;
-
-	unsigned long * dir_array;
-
-	unsigned long target_count;
-	unsigned long target_index;
-};
-
 class scanner {
 public:
 	scanner();

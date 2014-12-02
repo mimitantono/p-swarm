@@ -474,9 +474,8 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	return aligned - matches;
 }
 
-void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend_penalty, WORD * score_matrix, WORD * dprofile,
-		WORD * hearray, unsigned long sequences, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, unsigned long * dirbuffer, Db_data*db) {
+void searcher::search16(struct search_data* sd, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
+		unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, Db_data*db) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -500,14 +499,14 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 	unsigned long done;
 
 	T0 = _mm_set_epi16(0, 0, 0, 0, 0, 0, 0, 0xffff);
-	Q = _mm_set1_epi16(gap_open_penalty + gap_extend_penalty);
-	R = _mm_set1_epi16(gap_extend_penalty);
+	Q = _mm_set1_epi16((BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend);
+	R = _mm_set1_epi16((BYTE) Property::penalty_gapextend);
 
 	zero = 0;
 	done = 0;
 
-	hep = (__m128i *) hearray;
-	qp = (__m128i **) q_start;
+	hep = (__m128i *) (WORD*) sd->hearray;
+	qp = (__m128i **) sd->qtable_w;
 
 	for (int c = 0; c < CHANNELS; c++) {
 		d_begin[c] = &zero;
@@ -520,7 +519,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 
 	int easy = 0;
 
-	unsigned long * dir = dirbuffer;
+	unsigned long * dir = sd->dir_array;
 
 	while (1) {
 
@@ -539,9 +538,9 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 			}
 
 			if (CPU_Info::ssse3_present)
-				dprofile_shuffle16(dprofile, score_matrix, dseq);
+				dprofile_shuffle16(sd->dprofile_w, (WORD*) Matrix::score_matrix_16, dseq);
 			else
-				dprofile_fill16(dprofile, score_matrix, dseq);
+				dprofile_fill16(sd->dprofile_w, (WORD*) Matrix::score_matrix_16, dseq);
 
 			donormal16(S, hep, qp, &Q, &R, query->len, 0, &F0, dir, &H0);
 		} else {
@@ -586,7 +585,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, dirbuffer, offset, dirbuffersize, c,
+							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c,
 									alignmentlengths + cand_id, db);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),
@@ -598,7 +597,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 						done++;
 					}
 
-					if (next_id < sequences) {
+					if (next_id < sd->target_count) {
 						// get next sequence
 						seq_id[c] = next_id;
 						long seqno = seqnos[next_id];
@@ -612,11 +611,11 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 						d_begin[c] = (unsigned char*) query.seq;
 						d_end[c] = (unsigned char*) query.seq + query.len;
 
-						d_offset[c] = dir - dirbuffer;
+						d_offset[c] = dir - sd->dir_array;
 						next_id++;
 
 						((WORD*) &H0)[c] = 0;
-						((WORD*) &F0)[c] = gap_open_penalty + gap_extend_penalty;
+						((WORD*) &F0)[c] = (BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend;
 
 						// fill channel
 						for (int j = 0; j < CDEPTH; j++) {
@@ -641,13 +640,13 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 				T = _mm_slli_si128(T, 2);
 			}
 
-			if (done == sequences)
+			if (done == sd->target_count)
 				break;
 
 			if (CPU_Info::ssse3_present)
-				dprofile_shuffle16(dprofile, score_matrix, dseq);
+				dprofile_shuffle16(sd->dprofile_w, (WORD*) Matrix::score_matrix_16, dseq);
 			else
-				dprofile_fill16(dprofile, score_matrix, dseq);
+				dprofile_fill16(sd->dprofile_w, (WORD*) Matrix::score_matrix_16, dseq);
 
 			MQ = _mm_and_si128(M, Q);
 			MR = _mm_and_si128(M, R);
@@ -663,7 +662,7 @@ void searcher::search16(WORD * * q_start, WORD gap_open_penalty, WORD gap_extend
 
 		dir += 4 * db->longest;
 
-		if (dir >= dirbuffer + dirbuffersize) {
+		if (dir >= sd->dir_array + dirbuffersize) {
 			dir -= dirbuffersize;
 		}
 	}

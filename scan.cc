@@ -50,20 +50,16 @@ void scanner::search_chunk(long bits) {
 		return;
 
 	if (bits == 16)
-		searcher.search16(sd->qtable_w, Property::penalty_gapopen, Property::penalty_gapextend, (WORD*) Matrix::score_matrix_16,
-				sd->dprofile_w, (WORD*) sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
-				master_diffs + sd->target_index, master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, sd->dir_array,
-				db);
+		searcher.search16(sd, master_targets + sd->target_index, master_scores + sd->target_index, master_diffs + sd->target_index,
+				master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, db);
 	else
-		searcher.search8(sd->qtable, Property::penalty_gapopen, Property::penalty_gapextend, (BYTE*) Matrix::score_matrix_8, sd->dprofile,
-				sd->hearray, sd->target_count, master_targets + sd->target_index, master_scores + sd->target_index,
-				master_diffs + sd->target_index, master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, sd->dir_array,
-				db);
+		searcher.search8(sd, master_targets + sd->target_index, master_scores + sd->target_index, master_diffs + sd->target_index,
+				master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, db);
 }
 
 int scanner::search_getwork(unsigned long * countref, unsigned long * firstref) {
-	// * countref = how many sequences to search
-	// * firstref = index into master_targets/scores/diffs where thread should start
+// * countref = how many sequences to search
+// * firstref = index into master_targets/scores/diffs where thread should start
 
 	unsigned long status = 0;
 
@@ -107,7 +103,7 @@ void scanner::search_do(unsigned long query_no, unsigned long listlength, unsign
 	master_alignlengths = alignlengths;
 	master_bits = bits;
 
-	//TODO Thread assumed 1 here, need refactoring
+//TODO Thread assumed 1 here, need refactoring
 	remainingchunks = 1;
 
 	search_worker_core();
