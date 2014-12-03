@@ -2,7 +2,6 @@
 
 scanner::scanner() {
 	sd = new struct search_data;
-	master_bits = 0;
 	master_targets = 0;
 	dirbufferbytes = 0;
 	db = 0;
@@ -25,7 +24,7 @@ void scanner::search_init() {
 	}
 }
 
-void scanner::search_chunk(long bits) {
+void scanner::search_chunk() {
 	if (sd->target_count == 0)
 		return;
 
@@ -34,7 +33,7 @@ void scanner::search_chunk(long bits) {
 		targets.push_back(db->get_sequence_and_length(master_targets[i]));
 	}
 
-	if (bits == 16)
+	if (Property::bits == 16)
 		searcher.search16(sd, targets, &master_result, &query, dirbufferbytes / 8, db->longest);
 	else
 		searcher.search8(sd, targets, &master_result, &query, dirbufferbytes / 8, db->longest);
@@ -48,16 +47,15 @@ void scanner::master_dump() {
 	}
 }
 
-void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, long bits) {
+void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets) {
 	query = db->get_sequence_and_length(query_no);
 
 	master_targets = targets;
-	master_bits = bits;
 
 	sd->target_count = listlength;
 
 	search_init();
-	search_chunk(master_bits);
+	search_chunk();
 }
 
 void scanner::search_begin() {

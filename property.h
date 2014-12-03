@@ -37,7 +37,8 @@ public:
 	static long mismatchscore;
 	static long threads;
 	static long resolution;
-	static unsigned long diff_saturation();
+	static unsigned long bits;
+	static unsigned long diff_saturation;
 	static FILE* outfile;
 	static FILE* debugfile;
 	static FILE* dbdebug;

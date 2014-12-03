@@ -20,7 +20,7 @@ public:
 	scanner();
 	virtual ~scanner();
 	void set_db(Db_data * db);
-	void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, long bits);
+	void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets);
 	void search_begin();
 	queryinfo_t query;
 	std::vector<search_result> master_result;
@@ -29,12 +29,11 @@ private:
 	class searcher searcher;
 	unsigned long dirbufferbytes;
 	unsigned long * master_targets;
-	int master_bits;
 	Db_data * db;
 	void search_alloc();
 	void search_delete();
 	void search_init();
-	void search_chunk(long bits);
+	void search_chunk();
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
 	void master_dump();
 	void search_worker_core();

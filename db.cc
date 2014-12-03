@@ -309,7 +309,6 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	nucleotides_array = NULL;
 	delete[] lastabundance;
 	lastabundance = NULL;
-	delete &db_regexp;
 
 	return datap;
 }

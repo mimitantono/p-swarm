@@ -17,6 +17,8 @@ long Property::mismatchscore;
 long Property::threads;
 long Property::penalty_factor;
 long Property::resolution;
+unsigned long Property::diff_saturation;
+unsigned long Property::bits;
 FILE * Property::outfile;
 FILE * Property::debugfile;
 FILE * Property::dbdebug;
@@ -47,7 +49,11 @@ void Property::calculate_penalty() {
 	penalty_gapextend /= penalty_factor;
 	penalty_mismatch /= penalty_factor;
 	penalty_gapopen /= penalty_factor;
-
+	diff_saturation = MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
+	if ((unsigned long) Property::resolution <= diff_saturation)
+		bits = 8;
+	else
+		bits = 16;
 }
 
 void Property::print() {
@@ -100,9 +106,5 @@ void Property::set_gapopen(long value) {
 void Property::set_gapextend(long value) {
 	if (gapextend < 0)
 		fatal("Illegal gap extend specified.");
-}
-
-unsigned long int Property::diff_saturation() {
-	return MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
 }
 

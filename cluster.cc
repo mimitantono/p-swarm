@@ -14,8 +14,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 
 	unsigned long swarmed;
 	unsigned long seeded;
-	unsigned long count_comparisons_8 = 0;
-	unsigned long count_comparisons_16 = 0;
+	unsigned long count_comparison = 0;
 
 	unsigned long targetcount;
 	unsigned long * targetindices = new unsigned long[db->sequences];
@@ -41,13 +40,6 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	}
 
 	/* always search in 8 bit mode unless resolution is very high */
-
-	unsigned long bits;
-
-	if ((unsigned long) Property::resolution <= Property::diff_saturation())
-		bits = 8;
-	else
-		bits = 16;
 
 	seeded = 0;
 	swarmed = 0;
@@ -112,13 +104,10 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		}
 
 		if (targetcount > 0) {
-			scanner.search_do(seedampliconid, targetcount, targetampliconids, bits);
+			scanner.search_do(seedampliconid, targetcount, targetampliconids);
 			searches++;
 
-			if (bits == 8)
-				count_comparisons_8 += targetcount;
-			else
-				count_comparisons_16 += targetcount;
+			count_comparison += targetcount;
 
 			for (unsigned long t = 0; t < targetcount; t++) {
 				unsigned diff = scanner.master_result[t].diff;
@@ -202,13 +191,10 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 					}
 
 				if (targetcount > 0) {
-					scanner.search_do(subseedampliconid, targetcount, targetampliconids, bits);
+					scanner.search_do(subseedampliconid, targetcount, targetampliconids);
 					searches++;
 
-					if (bits == 8)
-						count_comparisons_8 += targetcount;
-					else
-						count_comparisons_16 += targetcount;
+					count_comparison += targetcount;
 
 					for (unsigned long t = 0; t < targetcount; t++) {
 						unsigned diff = scanner.master_result[t].diff;
@@ -309,12 +295,12 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	fprintf(stderr, "Estimates:         %lu\n", estimates);
 	fprintf(stderr, "Searches:          %lu\n", searches);
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparisons_8,
-			(200.0 * count_comparisons_8 / db->sequences / (db->sequences + 1)));
-	fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparisons_16,
-			(200.0 * count_comparisons_16 / db->sequences / (db->sequences + 1)));
-	fprintf(stderr, "Comparisons (tot): %lu (%.2lf%%)\n", count_comparisons_8 + count_comparisons_16,
-			(200.0 * (count_comparisons_8 + count_comparisons_16) / db->sequences / (db->sequences + 1)));
+	if (Property::bits == 8)
+		fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparison,
+				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
+	else
+		fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparison,
+				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
 
 	delete[] (qgramdiffs);
 	qgramdiffs = NULL;
