@@ -9,7 +9,7 @@ valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no
 
 echo ""
 echo "Comparing results with oracle:"
-if diff debug.log testdata/test.log >temp; then
+if diff debug.log testdata/data1 >temp; then
     echo "**** OK! ****";
     rm temp;
 else
