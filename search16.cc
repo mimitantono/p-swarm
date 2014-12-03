@@ -376,7 +376,7 @@ inline void domasked16(__m128i * Sm, __m128i * hep, __m128i ** qp, __m128i * Qm,
 }
 
 unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned long dlen, unsigned long * dirbuffer, unsigned long offset,
-		unsigned long dirbuffersize, unsigned long channel, unsigned long * alignmentlengthp, Db_data *db) {
+		unsigned long dirbuffersize, unsigned long channel, search_result * sr, long longest) {
 	unsigned long maskup = 3UL << (2 * channel + 0);
 	unsigned long maskleft = 3UL << (2 * channel + 16);
 	unsigned long maskextup = 3UL << (2 * channel + 32);
@@ -449,7 +449,7 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	while ((i >= 0) && (j >= 0)) {
 		aligned++;
 
-		unsigned long d = dirbuffer[(offset + db->longest * 4 * (j / 4) + 4 * i + (j & 3)) % dirbuffersize];
+		unsigned long d = dirbuffer[(offset + longest * 4 * (j / 4) + 4 * i + (j & 3)) % dirbuffersize];
 
 		if ((op == 'I') && (d & maskextleft)) {
 			j--;
@@ -470,12 +470,12 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 		}
 	}
 	aligned += i + j + 2;
-	*alignmentlengthp = aligned;
+	sr->alignlength = aligned;
 	return aligned - matches;
 }
 
-void searcher::search16(struct search_data* sd, unsigned long * seqnos, unsigned long * scores, unsigned long * diffs,
-		unsigned long * alignmentlengths, queryinfo_t * query, unsigned long dirbuffersize, Db_data*db) {
+void searcher::search16(struct search_data* sd, std::vector<queryinfo_t> targets, std::vector<search_result> *result, queryinfo_t * query,
+		unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -579,37 +579,34 @@ void searcher::search16(struct search_data* sd, unsigned long * seqnos, unsigned
 						long dbseqlen = d_length[c];
 						long z = (dbseqlen + 3) % 4;
 						long score = ((WORD*) S)[z * CHANNELS + c];
-						scores[cand_id] = score;
 
+						search_result * sr = &(*result)[cand_id];
+						sr->score = score;
 						unsigned long diff;
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c,
-									alignmentlengths + cand_id, db);
+							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c, sr,
+									longest);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),
 									(65535 - Property::penalty_gapopen) / Property::penalty_gapextend);
 						}
 
-						diffs[cand_id] = diff;
-
+						sr->diff = diff;
 						done++;
 					}
 
 					if (next_id < sd->target_count) {
 						// get next sequence
 						seq_id[c] = next_id;
-						long seqno = seqnos[next_id];
-
-						queryinfo_t query = db->get_sequence_and_length(seqno);
 
 						// printf("Seqno: %ld Address: %p\n", seqno, address);
-						d_address[c] = (BYTE*) query.seq;
-						d_length[c] = query.len;
+						d_address[c] = (BYTE*) targets[next_id].seq;
+						d_length[c] = targets[next_id].len;
 
-						d_begin[c] = (unsigned char*) query.seq;
-						d_end[c] = (unsigned char*) query.seq + query.len;
+						d_begin[c] = (unsigned char*) targets[next_id].seq;
+						d_end[c] = (unsigned char*) targets[next_id].seq + targets[next_id].len;
 
 						d_offset[c] = dir - sd->dir_array;
 						next_id++;
@@ -660,7 +657,7 @@ void searcher::search16(struct search_data* sd, unsigned long * seqnos, unsigned
 		H0 = F0;
 		F0 = _mm_adds_epu16(F0, R);
 
-		dir += 4 * db->longest;
+		dir += 4 * longest;
 
 		if (dir >= sd->dir_array + dirbuffersize) {
 			dir -= dirbuffersize;

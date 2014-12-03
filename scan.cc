@@ -2,14 +2,8 @@
 
 scanner::scanner() {
 	sd = new struct search_data;
-	master_alignlengths = 0;
 	master_bits = 0;
-	master_diffs = 0;
-	master_length = 0;
-	master_next = 0;
-	master_scores = 0;
 	master_targets = 0;
-	remainingchunks = 0;
 	dirbufferbytes = 0;
 	db = 0;
 }
@@ -21,21 +15,7 @@ scanner::~scanner() {
 	delete[] (sd->dprofile_w);
 	delete[] (sd->hearray);
 	delete[] (sd->dir_array);
-	delete (sd);
-	sd = NULL;
-}
-
-void scanner::search_alloc() {
-	dirbufferbytes = 8 * db->longest * ((db->longest + 3) / 4) * 4;
-	sd->qtable = new BYTE*[db->longest];
-	sd->qtable_w = new WORD*[db->longest];
-	sd->dprofile = new BYTE[4 * 16 * 32];
-	sd->dprofile_w = new WORD[4 * 2 * 8 * 32];
-	sd->hearray = new BYTE[db->longest * 32];
-	sd->dir_array = new unsigned long[dirbufferbytes];
-
-	memset(sd->hearray, 0, db->longest * 32);
-	memset(sd->dir_array, 0, dirbufferbytes);
+	delete sd;
 }
 
 void scanner::search_init() {
@@ -49,70 +29,54 @@ void scanner::search_chunk(long bits) {
 	if (sd->target_count == 0)
 		return;
 
-	if (bits == 16)
-		searcher.search16(sd, master_targets + sd->target_index, master_scores + sd->target_index, master_diffs + sd->target_index,
-				master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, db);
-	else
-		searcher.search8(sd, master_targets + sd->target_index, master_scores + sd->target_index, master_diffs + sd->target_index,
-				master_alignlengths + sd->target_index, &query, dirbufferbytes / 8, db);
-}
-
-int scanner::search_getwork(unsigned long * countref, unsigned long * firstref) {
-// * countref = how many sequences to search
-// * firstref = index into master_targets/scores/diffs where thread should start
-
-	unsigned long status = 0;
-
-	if (master_next < master_length) {
-		unsigned long chunksize = ((master_length - master_next + remainingchunks - 1) / remainingchunks);
-
-		*countref = chunksize;
-		*firstref = master_next;
-
-		master_next += chunksize;
-		remainingchunks--;
-		status = 1;
+	std::vector<queryinfo_t> targets;
+	for (int i = 0; i < sd->target_count; i++) {
+		targets.push_back(db->get_sequence_and_length(master_targets[i]));
 	}
 
-	return status;
+	if (bits == 16)
+		searcher.search16(sd, targets, &master_result, &query, dirbufferbytes / 8, db->longest);
+	else
+		searcher.search8(sd, targets, &master_result, &query, dirbufferbytes / 8, db->longest);
 }
 
 void scanner::master_dump() {
 	printf("master_dump\n");
 	printf("   i    t    s    d\n");
 	for (unsigned long i = 0; i < 1403; i++) {
-		printf("%4lu %4lu %4lu %4lu\n", i, master_targets[i], master_scores[i], master_diffs[i]);
+		printf("%4lu %4lu %4lu %4lu\n", i, master_targets[i], master_result[i].score, master_result[i].diff);
 	}
 }
 
-void scanner::search_worker_core() {
-	search_init();
-	while (search_getwork(&sd->target_count, &sd->target_index))
-		search_chunk(master_bits);
-}
-
-void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, unsigned long * scores,
-		unsigned long * diffs, unsigned long * alignlengths, long bits) {
+void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets, long bits) {
 	query = db->get_sequence_and_length(query_no);
 
-	master_next = 0;
-	master_length = listlength;
 	master_targets = targets;
-	master_scores = scores;
-	master_diffs = diffs;
-	master_alignlengths = alignlengths;
 	master_bits = bits;
 
-//TODO Thread assumed 1 here, need refactoring
-	remainingchunks = 1;
+	sd->target_count = listlength;
 
-	search_worker_core();
+	search_init();
+	search_chunk(master_bits);
 }
 
 void scanner::search_begin() {
-	search_alloc();
+	dirbufferbytes = 8 * db->longest * ((db->longest + 3) / 4) * 4;
+	sd->qtable = new BYTE*[db->longest];
+	sd->qtable_w = new WORD*[db->longest];
+	sd->dprofile = new BYTE[4 * 16 * 32];
+	sd->dprofile_w = new WORD[4 * 2 * 8 * 32];
+	sd->hearray = new BYTE[db->longest * 32];
+	sd->dir_array = new unsigned long[dirbufferbytes];
+
+	memset(sd->hearray, 0, db->longest * 32);
+	memset(sd->dir_array, 0, dirbufferbytes);
 }
 
 void scanner::set_db(Db_data * db) {
 	this->db = db;
+	for (int i = 0; i < db->sequences; i++) {
+		search_result sr;
+		master_result.push_back(sr);
+	}
 }

@@ -20,9 +20,6 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	unsigned long targetcount;
 	unsigned long * targetindices = new unsigned long[db->sequences];
 	unsigned long * targetampliconids = new unsigned long[db->sequences];
-	unsigned long * scores = new unsigned long[db->sequences];
-	unsigned long * diffs = new unsigned long[db->sequences];
-	unsigned long * alignlengths = new unsigned long[db->sequences];
 	unsigned long * qgramamps = new unsigned long[db->sequences];
 	unsigned long * qgramdiffs = new unsigned long[db->sequences];
 	unsigned long * qgramindices = new unsigned long[db->sequences];
@@ -115,7 +112,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		}
 
 		if (targetcount > 0) {
-			scanner.search_do(seedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
+			scanner.search_do(seedampliconid, targetcount, targetampliconids, bits);
 			searches++;
 
 			if (bits == 8)
@@ -124,7 +121,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 				count_comparisons_16 += targetcount;
 
 			for (unsigned long t = 0; t < targetcount; t++) {
-				unsigned diff = diffs[t];
+				unsigned diff = scanner.master_result[t].diff;
 
 				if (diff <= (unsigned long) Property::resolution) {
 					unsigned i = targetindices[t];
@@ -205,7 +202,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 					}
 
 				if (targetcount > 0) {
-					scanner.search_do(subseedampliconid, targetcount, targetampliconids, scores, diffs, alignlengths, bits);
+					scanner.search_do(subseedampliconid, targetcount, targetampliconids, bits);
 					searches++;
 
 					if (bits == 8)
@@ -214,7 +211,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 						count_comparisons_16 += targetcount;
 
 					for (unsigned long t = 0; t < targetcount; t++) {
-						unsigned diff = diffs[t];
+						unsigned diff = scanner.master_result[t].diff;
 
 						if (diff <= (unsigned long) Property::resolution) {
 							unsigned i = targetindices[t];
@@ -327,12 +324,6 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	qgramindices = NULL;
 	delete[] (hits);
 	hits = NULL;
-	delete[] (alignlengths);
-	alignlengths = NULL;
-	delete[] (diffs);
-	diffs = NULL;
-	delete[] (scores);
-	scores = NULL;
 	delete[] (targetindices);
 	targetindices = NULL;
 	delete[] (targetampliconids);

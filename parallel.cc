@@ -23,8 +23,9 @@ typedef struct thread_data {
 
 void *run_cluster(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	cluster_job cluster_job(my_data->db);
-	cluster_job.algo_run(my_data->thread_id, &Parallel::results[my_data->thread_id]);
+	class cluster_job *cluster_job = new class cluster_job(my_data->db);
+	cluster_job->algo_run(my_data->thread_id, &Parallel::results[my_data->thread_id]);
+	delete cluster_job;
 	pthread_exit(NULL);
 }
 
