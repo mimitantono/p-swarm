@@ -5,7 +5,7 @@ FLAGS = -c $(INCLUDES)
 CXXFLAGS=$(COMPILEOPT) $(COMMON) -O3
 OBJS=main.o matrix.o cpu_info.o qgram.o cityhash/city.o\
      util.o db.o scan.o search8.o search16.o property.o cluster.o\
-     parallel.o clusterresult.o
+     parallel.o clusterresult.o merger.o search.o
 LINKFLAGS=-g
 LIBS=
 

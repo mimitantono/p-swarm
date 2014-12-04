@@ -66,7 +66,11 @@ void Parallel::run() {
 		delete db[i];
 	}
 	for (int i = 0; i < Property::threads; i++) {
-		results[i].print();
+//		results[i].print();
+	}
+	if (Property::threads > 1) {
+		merger merger(&results, Property::threads);
+		merger.merge_groups();
 	}
 	if (datap)
 		free(datap);

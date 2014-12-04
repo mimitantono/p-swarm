@@ -16,7 +16,8 @@ long Property::matchscore;
 long Property::mismatchscore;
 long Property::threads;
 long Property::penalty_factor;
-long Property::resolution;
+unsigned long Property::longest;
+unsigned long Property::resolution;
 unsigned long Property::diff_saturation;
 unsigned long Property::bits;
 FILE * Property::outfile;
@@ -50,7 +51,7 @@ void Property::calculate_penalty() {
 	penalty_mismatch /= penalty_factor;
 	penalty_gapopen /= penalty_factor;
 	diff_saturation = MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
-	if ((unsigned long) Property::resolution <= diff_saturation)
+	if (Property::resolution <= diff_saturation)
 		bits = 8;
 	else
 		bits = 16;

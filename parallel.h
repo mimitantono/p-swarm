@@ -15,6 +15,7 @@
 #include "clusterresult.h"
 #include "db.h"
 #include "util.h"
+#include "merger.h"
 
 class Parallel {
 public:

@@ -154,35 +154,25 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 
 				/* process each subseed */
 
-				unsigned subseedampliconid;
-				unsigned subseedradius;
-
-				unsigned long subseedindex;
-				unsigned long subseedgeneration;
-
-				subseedindex = seeded;
-				subseedampliconid = amps[subseedindex].ampliconid;
-				subseedradius = amps[subseedindex].radius;
-				subseedgeneration = amps[subseedindex].generation;
+				unsigned long subseedindex = seeded;
 
 				seeded++;
-
-				targetcount = 0;
 
 				unsigned long listlen = 0;
 				for (unsigned long i = swarmed; i < db->sequences; i++) {
 					unsigned long targetampliconid = amps[i].ampliconid;
-					if (amps[i].diffestimate <= subseedradius + Property::resolution) {
+					if (amps[i].diffestimate <= amps[subseedindex].radius + Property::resolution) {
 						qgramamps[listlen] = targetampliconid;
 						qgramindices[listlen] = i;
 						listlen++;
 					}
 				}
 
-				qgram_work_diff(subseedampliconid, listlen, qgramamps, qgramdiffs, db);
+				qgram_work_diff(amps[subseedindex].ampliconid, listlen, qgramamps, qgramdiffs, db);
 
 				estimates += listlen;
 
+				targetcount = 0;
 				for (unsigned long i = 0; i < listlen; i++)
 					if ((long) qgramdiffs[i] <= Property::resolution) {
 						targetindices[targetcount] = qgramindices[i];
@@ -191,7 +181,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 					}
 
 				if (targetcount > 0) {
-					scanner.search_do(subseedampliconid, targetcount, targetampliconids);
+					scanner.search_do(amps[subseedindex].ampliconid, targetcount, targetampliconids);
 					searches++;
 
 					count_comparison += targetcount;
@@ -214,7 +204,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 							unsigned pos = swarmed;
 
 							while ((pos > seeded) && (amps[pos - 1].ampliconid > targetampliconid)
-									&& (amps[pos - 1].generation > subseedgeneration))
+									&& (amps[pos - 1].generation > amps[subseedindex].generation))
 								pos--;
 
 							if (pos < i) {
@@ -226,10 +216,10 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 							}
 
 							amps[pos].swarmid = swarmid;
-							amps[pos].generation = subseedgeneration + 1;
+							amps[pos].generation = amps[subseedindex].generation + 1;
 							if (maxgen < amps[pos].generation)
 								maxgen = amps[pos].generation;
-							amps[pos].radius = subseedradius + diff;
+							amps[pos].radius = amps[subseedindex].radius + diff;
 							if (amps[pos].radius > maxradius)
 								maxradius = amps[pos].radius;
 
@@ -280,6 +270,9 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 			fputs(sep_swarms, Property::debugfile);
 		} else {
 			fputc(sep_amplicons, Property::debugfile);
+		}
+		if (member.generation > result->clusters.back().max_generation) {
+			result->clusters.back().max_generation = member.generation;
 		}
 		result->clusters.back().cluster_members.push_back(member);
 		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);

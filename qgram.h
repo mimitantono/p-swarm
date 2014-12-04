@@ -1,10 +1,3 @@
-/*
- * qgram.h
- *
- *  Created on: Oct 25, 2014
- *      Author: mimitantono
- */
-
 #ifndef QGRAM_H_
 #define QGRAM_H_
 

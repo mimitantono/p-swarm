@@ -3,12 +3,6 @@
 #define CHANNELS 16
 #define CDEPTH 4
 
-searcher::searcher() {
-}
-
-searcher::~searcher() {
-}
-
 void dprofile_dump8(BYTE * dprofile) {
 	char * ss = sym_nt;
 

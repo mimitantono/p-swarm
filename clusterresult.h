@@ -12,17 +12,18 @@
 #include<string>
 #include "db.h"
 
-struct member_info {
+typedef struct member_info {
 	seqinfo_t sequence;
 	unsigned qgram_diff;
 	unsigned generation;
 	unsigned radius;
-};
+} member_info;
 
-struct cluster_info {
+typedef struct cluster_info {
 	unsigned cluster_id;
+	unsigned max_generation;
 	std::vector<member_info> cluster_members;
-};
+} cluster_info;
 
 class cluster_result {
 public:
@@ -31,6 +32,7 @@ public:
 	std::vector<cluster_info> clusters;
 	cluster_info * new_cluster(long cluster_id);
 	long partition_id;
+	void merge_cluster(cluster_info* cluster, cluster_info* merge);
 	void print();
 };
 

@@ -294,6 +294,9 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		db[threadid]->threadid = threadid;
 		db[threadid]->qgrams_init();
 		db[threadid]->print_info();
+		if (db[threadid]->longest > Property::longest) {
+			Property::longest = db[threadid]->longest;
+		}
 	}
 
 	if (detect_duplicates(db))

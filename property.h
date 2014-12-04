@@ -36,7 +36,8 @@ public:
 	static long matchscore;
 	static long mismatchscore;
 	static long threads;
-	static long resolution;
+	static unsigned long longest;
+	static unsigned long resolution;
 	static unsigned long bits;
 	static unsigned long diff_saturation;
 	static FILE* outfile;

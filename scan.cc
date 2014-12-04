@@ -59,7 +59,7 @@ void scanner::search_do(unsigned long query_no, unsigned long listlength, unsign
 }
 
 void scanner::search_begin() {
-	dirbufferbytes = 8 * db->longest * ((db->longest + 3) / 4) * 4;
+	dirbufferbytes = 8 * Property::longest * ((Property::longest + 3) / 4) * 4;
 	sd->qtable = new BYTE*[db->longest];
 	sd->qtable_w = new WORD*[db->longest];
 	sd->dprofile = new BYTE[4 * 16 * 32];
