@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
 	run();
 	destroy();
 	gettimeofday(&end, NULL);
-	double dif = end.tv_sec + (end.tv_usec / 100000) - start.tv_sec - (start.tv_usec / 100000);
+	double dif = end.tv_sec - start.tv_sec;
 	printf("\nduration %.2lf secs\n", dif);
 }
 

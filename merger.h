@@ -16,7 +16,7 @@ private:
 	int count;
 	cluster_result** cluster_results;
 	cluster_result merge_result;
-	bool merge_clusters(cluster_info cluster, cluster_info other);
+	bool merge_clusters(cluster_info * cluster, cluster_info * other, cluster_result * temp);
 public:
 	merger(cluster_result** cluster_results, int count);
 	virtual ~merger();

@@ -28,38 +28,39 @@ void merger::merge_groups() {
 			for (int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
 //				fprintf(stderr, "Comparing cluster #0.%d with cluster #%d.%d\n", j, i, k);
 				//comparing seed.j with i.k
-				if (merge_clusters(temp.clusters[j], (*cluster_results)[i].clusters[k])) {
+				if (merge_clusters(&temp.clusters[j], &(*cluster_results)[i].clusters[k], &temp)) {
 					(*cluster_results)[i].clusters.erase((*cluster_results)[i].clusters.begin() + k);
 				}
 			}
 		}
+		fprintf(stderr, "Merge residue cluster #%d is %lu\n", i, (*cluster_results)[i].clusters.size());
 		for (int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
 			temp.clusters.push_back((*cluster_results)[i].clusters[k]);
 		}
 	}
-	temp.print();
+//	temp.print();
 	while (!temp.clusters.empty()) {
 		merge_result.clusters.push_back(temp.clusters.back());
 		temp.clusters.pop_back();
 		for (int i = 0; i < temp.clusters.size(); i++) {
-			if (merge_clusters(merge_result.clusters.back(), temp.clusters[i])) {
-				merge_result.merge_cluster(&merge_result.clusters.back(), &temp.clusters[i]);
+			if (merge_clusters(&merge_result.clusters.back(), &temp.clusters[i], &merge_result)) {
 				temp.clusters.erase(temp.clusters.begin() + i);
 			}
 		}
 	}
-//	merge_result.print();
+	merge_result.print();
 }
 
-bool merger::merge_clusters(cluster_info cluster, cluster_info other) {
-	seqinfo_t query = cluster.cluster_members[0].sequence;
-	seqinfo_t target = other.cluster_members[0].sequence;
+bool merger::merge_clusters(cluster_info *cluster, cluster_info* other, cluster_result * temp) {
+	seqinfo_t query = cluster->cluster_members[0].sequence;
+	seqinfo_t target = other->cluster_members[0].sequence;
 	search_result result = searcher::search_single(&query, &target);
 	//compare sum of max generations with distance of seeds
 	//if less or equal, merge clusters
-	if ((cluster.max_generation + other.max_generation) * Property::resolution <= result.diff) {
-//		fprintf(stderr, "Diff of %s and %s %ld\n", query.header, target.header, result.diff);
-		merge_result.merge_cluster(&cluster, &other);
+	//wrong logic! should be the reverse, if diff less than resolution, proceed with confirmation of merging
+	if ((cluster->max_generation + other->max_generation) * Property::resolution > result.diff) {
+		fprintf(stderr, "Diff of %s and %s %ld\n", query.header, target.header, result.diff);
+		temp->merge_cluster(cluster, other);
 		return true;
 	}
 	return false;
