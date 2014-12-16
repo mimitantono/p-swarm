@@ -1,6 +1,7 @@
 INCLUDES = -I ./include
 COMPILEOPT=-Wall -mssse3 -mtune=core2 -Icityhash
-CXX = gcc -g -v -lstdc++ -lpthread -fprofile-arcs -ftest-coverage
+#CXX = gcc -g -v -lstdc++ -lpthread -fprofile-arcs -ftest-coverage
+CXX = gcc -g -v -lstdc++ -lpthread 
 FLAGS = -c $(INCLUDES)
 CXXFLAGS=$(COMPILEOPT) $(COMMON) -O3
 OBJS=main.o matrix.o cpu_info.o qgram.o cityhash/city.o\
