@@ -187,9 +187,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 					count_comparison += targetcount;
 
 					for (unsigned long t = 0; t < targetcount; t++) {
-						unsigned diff = scanner.master_result[t].diff;
-
-						if (diff <= (unsigned long) Property::resolution) {
+						if (scanner.master_result[t].diff <= Property::resolution) {
 							unsigned i = targetindices[t];
 
 							/* find correct position in list */
@@ -219,13 +217,13 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 							amps[pos].generation = amps[subseedindex].generation + 1;
 							if (maxgen < amps[pos].generation)
 								maxgen = amps[pos].generation;
-							amps[pos].radius = amps[subseedindex].radius + diff;
+							amps[pos].radius = amps[subseedindex].radius + scanner.master_result[t].diff;
 							if (amps[pos].radius > maxradius)
 								maxradius = amps[pos].radius;
 
 							unsigned poolampliconid = amps[pos].ampliconid;
 							hits[hitcount++] = poolampliconid;
-							diffsum += diff;
+							diffsum += scanner.master_result[t].diff;
 
 							abundance = db->get_seqinfo(poolampliconid)->abundance;
 							amplicons_copies += abundance;
@@ -276,8 +274,8 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		}
 		max_generation = member.generation;
 		result->clusters.back().cluster_members.push_back(member);
-		fprintf(Property::debugfile, "%.*s [%u]", db->get_seqinfo(amps[i].ampliconid)->headeridlen,
-				db->get_seqinfo(amps[i].ampliconid)->header, member.generation);
+		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen,
+				db->get_seqinfo(amps[i].ampliconid)->header);
 		previd = amps[i].swarmid;
 	}
 	fputc('\n', Property::debugfile);

@@ -17,34 +17,58 @@ cluster_result::~cluster_result() {
 cluster_info * cluster_result::new_cluster(long cluster_id) {
 	cluster_info info;
 	info.cluster_id = cluster_id;
-	info.max_generation = 0;
+	info.max_generation = 1;
 	clusters.push_back(info);
 	return &clusters.back();
 }
 
-void cluster_result::print() {
-	long total = 0;
-	fprintf(Property::outfile, "\n\nThere are %lu clusters produced for thread #%ld", clusters.size(), partition_id);
+struct compare_cluster {
+	inline bool operator()(const cluster_info& struct1, const cluster_info& struct2) {
+		return (struct1.cluster_members[0].sequence.header < struct2.cluster_members[0].sequence.header);
+	}
+};
+
+struct compare_member {
+	inline bool operator()(const member_info & struct1, const member_info & struct2) {
+		return (struct1.sequence.header < struct2.sequence.header);
+	}
+};
+
+struct sort_erased {
+	inline bool operator()(const cluster_info& struct1, const cluster_info& struct2) {
+		return struct1.erased;
+	}
+};
+
+/**
+ * Need to print out consistent format (such as correct result will look exactly the same)
+ * this will be an expensive method, turn off except for unit test
+ */
+void cluster_result::print(FILE * stream) {
+	std::sort(clusters.begin(), clusters.end(), sort_erased());
+	while (clusters.back().erased) {
+		clusters.pop_back();
+	}
 	for (long i = 0; i < clusters.size(); i++) {
-		fprintf(Property::outfile, "\nCluster #%u max generation %d with %lu members", clusters[i].cluster_id, clusters[i].max_generation,
-				clusters[i].cluster_members.size());
+		std::sort(clusters[i].cluster_members.begin(), clusters[i].cluster_members.end(), compare_member());
+	}
+	std::sort(clusters.begin(), clusters.end(), compare_cluster());
+	long total = 0;
+	for (long i = 0; i < clusters.size(); i++) {
 		for (long j = 0; j < clusters[i].cluster_members.size(); j++) {
-			fprintf(Property::outfile, "\n%ld. %s", j + 1, clusters[i].cluster_members[j].sequence.header);
+			fprintf(stream, "\n%s", clusters[i].cluster_members[j].sequence.header);
 			total++;
 		}
+		fprintf(stream, "\n");
 	}
-	fprintf(Property::outfile, "\n\n In total we have #%ld sequences", total);
+	fprintf(stream, "\n\n In total we have %ld clusters of %ld sequences", clusters.size(), total);
 }
 
 void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
-	fprintf(stderr, "Size of members before merge: %lu\n", cluster->cluster_members.size());
 	for (int i = 0; i < merge->cluster_members.size(); i++) {
 		//need to determine max generation more precisely for the merged cluster otherwise it will be difficult
 		//for second time merging (because we don't know actual max generation)
 		cluster->cluster_members.push_back(merge->cluster_members[i]);
 	}
-	if (merge->max_generation > cluster->max_generation) {
-		cluster->max_generation = merge->max_generation;
-	}
-	fprintf(stderr, "Size of members after merge: %lu\n", cluster->cluster_members.size());
+	cluster->max_generation += merge->max_generation;
 }

@@ -71,6 +71,10 @@ void Parallel::run() {
 	if (Property::threads > 1) {
 		merger merger(&results, Property::threads);
 		merger.merge_groups();
+		merger.final_merge();
+		merger.merge_result.print(Property::outfile);
+	} else {
+		results[0].print(Property::outfile);
 	}
 	if (datap)
 		free(datap);

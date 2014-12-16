@@ -9,7 +9,7 @@
 
 merger::merger(cluster_result** cluster_results, int count) {
 	this->cluster_results = cluster_results;
-	this->count = count;
+	this->result_count = count;
 	merge_result.partition_id = -1;
 }
 
@@ -17,57 +17,73 @@ merger::~merger() {
 }
 
 void merger::merge_groups() {
-	cluster_result temp;
 	//asigning first group as seed
 	for (int i = 0; i < (*cluster_results)[0].clusters.size(); i++) {
-		temp.clusters.push_back((*cluster_results)[0].clusters[i]);
+		merge_result.clusters.push_back((*cluster_results)[0].clusters[i]);
 	}
 	//comparing seed with each groups
-	for (int i = 1; i < count; i++) {
-		for (int j = 0; j < temp.clusters.size(); j++) {
-			for (int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
-//				fprintf(stderr, "Comparing cluster #0.%d with cluster #%d.%d\n", j, i, k);
-				//comparing seed.j with i.k
-				if (merge_clusters(&temp.clusters[j], &(*cluster_results)[i].clusters[k], &temp)) {
-					(*cluster_results)[i].clusters.erase((*cluster_results)[i].clusters.begin() + k);
+	for (int i = 1; i < result_count; i++) {
+		for (long j = 0; j < merge_result.clusters.size(); j++) {
+			for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
+				if (merge_clusters(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k])) {
+					merge_result.merge_cluster(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k]);
+					merge_result.clusters[j].expired = true;
 				}
 			}
 		}
-		fprintf(stderr, "Merge residue cluster #%d is %lu\n", i, (*cluster_results)[i].clusters.size());
-		for (int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
-			temp.clusters.push_back((*cluster_results)[i].clusters[k]);
-		}
-	}
-//	temp.print();
-	while (!temp.clusters.empty()) {
-		merge_result.clusters.push_back(temp.clusters.back());
-		temp.clusters.pop_back();
-		for (int i = 0; i < temp.clusters.size(); i++) {
-			if (merge_clusters(&merge_result.clusters.back(), &temp.clusters[i], &merge_result)) {
-				temp.clusters.erase(temp.clusters.begin() + i);
+		for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
+			if (!(*cluster_results)[i].clusters[k].erased) {
+				merge_result.clusters.push_back((*cluster_results)[i].clusters[k]);
 			}
 		}
 	}
-	merge_result.print();
 }
 
-bool merger::merge_clusters(cluster_info *cluster, cluster_info* other, cluster_result * temp) {
+void merger::final_merge() {
+	bool repeat = true;
+	while (repeat) {
+		repeat = false;
+		for (long i = 0; i < merge_result.clusters.size() - 1; i++) {
+			long merged = 0;
+			for (int j = i + 1; j < merge_result.clusters.size(); j++) {
+				if (merge_result.clusters[i].expired) {
+					if (merge_clusters(&merge_result.clusters[i], &merge_result.clusters[j])) {
+						merge_result.merge_cluster(&merge_result.clusters[i], &merge_result.clusters[j]);
+						merged++;
+					}
+				}
+			}
+			if (merged > 0) {
+				merge_result.clusters[i].expired = true;
+				repeat = true;
+			} else {
+				merge_result.clusters[i].expired = false;
+			}
+		}
+	}
+}
+
+bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
+	if (other->erased)
+		return false;
+//	fprintf(stderr, "Test merge cluster\n");
 	seqinfo_t query = cluster->cluster_members[0].sequence;
 	seqinfo_t target = other->cluster_members[0].sequence;
 	search_result result = searcher::search_single(&query, &target);
-	//compare sum of max generations with distance of seeds
-	//if less or equal, merge clusters
-	//wrong logic! should be the reverse, if diff less than resolution, proceed with confirmation of merging
-	if ((cluster->max_generation + other->max_generation) * Property::resolution > result.diff) {
-		fprintf(stderr, "Diff of %s and %s %ld\n", query.header, target.header, result.diff);
-		temp->merge_cluster(cluster, other);
-		return true;
+	if (result.diff > (cluster->max_generation + other->max_generation) * Property::resolution) {
+		return false;
+	}
+	for (int i = 0; i < cluster->cluster_members.size(); i++) {
+		for (int j = 0; j < other->cluster_members.size(); j++) {
+			seqinfo_t _query = cluster->cluster_members[i].sequence;
+			seqinfo_t _target = other->cluster_members[j].sequence;
+			search_result _result = searcher::search_single(&_query, &_target);
+//			fprintf(stderr, "Diff of %s and %s %ld\n", _query.header, _target.header, _result.diff);
+			if (_result.diff <= Property::resolution) {
+				other->erased = true;
+				return true;
+			}
+		}
 	}
 	return false;
-
-//otherwise proceed to search every member
-
-//if any of cluster members are near with each other, merge clusters
-
-//otherwise store the cluster as it was in the result set
 }

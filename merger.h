@@ -13,14 +13,15 @@
 
 class merger {
 private:
-	int count;
+	int result_count;
 	cluster_result** cluster_results;
-	cluster_result merge_result;
-	bool merge_clusters(cluster_info * cluster, cluster_info * other, cluster_result * temp);
+	bool merge_clusters(cluster_info * cluster, cluster_info * other);
 public:
 	merger(cluster_result** cluster_results, int count);
 	virtual ~merger();
 	void merge_groups();
+	void final_merge();
+	cluster_result merge_result;
 };
 
 #endif /* MERGER_H_ */

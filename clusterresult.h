@@ -23,6 +23,8 @@ typedef struct cluster_info {
 	unsigned cluster_id;
 	unsigned max_generation;
 	std::vector<member_info> cluster_members;
+	bool expired;
+	bool erased;
 } cluster_info;
 
 class cluster_result {
@@ -33,7 +35,7 @@ public:
 	cluster_info * new_cluster(long cluster_id);
 	long partition_id;
 	void merge_cluster(cluster_info* cluster, cluster_info* merge);
-	void print();
+	void print(FILE * stream);
 };
 
 #endif /* CLUSTERRESULT_H_ */
