@@ -20,17 +20,33 @@ void merger::merge_groups() {
 	//asigning first group as seed
 	for (int i = 0; i < (*cluster_results)[0].clusters.size(); i++) {
 		merge_result.clusters.push_back((*cluster_results)[0].clusters[i]);
+
 	}
 	//comparing seed with each groups
 	for (int i = 1; i < result_count; i++) {
-		for (long j = 0; j < merge_result.clusters.size(); j++) {
-			for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
-				if (merge_clusters(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k])) {
-					merge_result.merge_cluster(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k]);
-					merge_result.clusters[j].expired = true;
+		int recursive = 0;
+		bool repeat = true;
+		while (repeat) {
+			repeat = false;
+			for (long j = 0; j < merge_result.clusters.size(); j++) {
+				if (recursive == 0 || merge_result.clusters[j].expired) {
+					long merged = 0;
+					for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
+						if (merge_clusters(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k])) {
+							merged++;
+						}
+					}
+					if (merged > 0) {
+						merge_result.clusters[j].expired = true;
+						repeat = true;
+					} else {
+						merge_result.clusters[j].expired = false;
+					}
 				}
 			}
+			recursive++;
 		}
+		fprintf(stderr, "\nRecursively compared first stage THREAD #%d for %d times", i, recursive);
 		for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
 			if (!(*cluster_results)[i].clusters[k].erased) {
 				merge_result.clusters.push_back((*cluster_results)[i].clusters[k]);
@@ -41,30 +57,32 @@ void merger::merge_groups() {
 
 void merger::final_merge() {
 	bool repeat = true;
+	int recursive = 0;
 	while (repeat) {
 		repeat = false;
 		for (long i = 0; i < merge_result.clusters.size() - 1; i++) {
-			long merged = 0;
-			for (int j = i + 1; j < merge_result.clusters.size(); j++) {
-				if (merge_result.clusters[i].expired) {
+			if (recursive == 0 || merge_result.clusters[i].expired) {
+				long merged = 0;
+				for (int j = i + 1; j < merge_result.clusters.size(); j++) {
 					if (merge_clusters(&merge_result.clusters[i], &merge_result.clusters[j])) {
-						merge_result.merge_cluster(&merge_result.clusters[i], &merge_result.clusters[j]);
 						merged++;
 					}
 				}
-			}
-			if (merged > 0) {
-				merge_result.clusters[i].expired = true;
-				repeat = true;
-			} else {
-				merge_result.clusters[i].expired = false;
+				if (merged > 0) {
+					merge_result.clusters[i].expired = true;
+					repeat = true;
+				} else {
+					merge_result.clusters[i].expired = false;
+				}
 			}
 		}
+		recursive++;
 	}
+	fprintf(stderr, "\nRecursively compared second stage for %d times", recursive);
 }
 
 bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
-	if (other->erased)
+	if (other->erased || cluster->erased)
 		return false;
 //	fprintf(stderr, "Test merge cluster\n");
 	seqinfo_t query = cluster->cluster_members[0].sequence;
@@ -80,6 +98,7 @@ bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
 			search_result _result = searcher::search_single(&_query, &_target);
 //			fprintf(stderr, "Diff of %s and %s %ld\n", _query.header, _target.header, _result.diff);
 			if (_result.diff <= Property::resolution) {
+				merge_result.merge_cluster(cluster, other);
 				other->erased = true;
 				return true;
 			}

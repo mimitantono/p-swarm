@@ -18,6 +18,8 @@ cluster_info * cluster_result::new_cluster(long cluster_id) {
 	cluster_info info;
 	info.cluster_id = cluster_id;
 	info.max_generation = 1;
+	info.erased = false;
+	info.expired = true;
 	clusters.push_back(info);
 	return &clusters.back();
 }
@@ -36,7 +38,7 @@ struct compare_member {
 
 struct sort_erased {
 	inline bool operator()(const cluster_info& struct1, const cluster_info& struct2) {
-		return struct2.erased;
+		return (struct1.erased < struct2.erased);
 	}
 };
 
@@ -46,7 +48,6 @@ struct sort_erased {
  */
 void cluster_result::print(FILE * stream) {
 	std::sort(clusters.begin(), clusters.end(), sort_erased());
-	fprintf(stderr, "Erasing...\n");
 	while (clusters.back().erased) {
 		clusters.pop_back();
 	}

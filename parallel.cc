@@ -73,6 +73,7 @@ void Parallel::run() {
 	} else {
 		results[0].print(Property::outfile);
 	}
+	fprintf(stderr, "\nfinished.....");
 	if (datap)
 		free(datap);
 }

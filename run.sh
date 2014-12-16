@@ -20,15 +20,15 @@ make all
 valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 test.fas
 mv debug.log debug1.log
 mv result.log result1.log
-./main -t 2 test.fas
-mv debug.log debug2.log
-mv result.log result2.log
-./main -t 8 test.fas
-mv debug.log debug3.log
-mv result.log result3.log
+#./main -t 2 test.fas
+#mv debug.log debug2.log
+#mv result.log result2.log
+#./main -t 8 test.fas
+#mv debug.log debug3.log
+#mv result.log result3.log
 
 compareResult debug1.log testdata/data1 temp1
 compareResult result1.log testdata/data2 temp11
-compareResult result2.log testdata/data2 temp2
-compareResult result3.log testdata/data2 temp3
+#compareResult result2.log testdata/data2 temp2
+#compareResult result3.log testdata/data2 temp3
 
