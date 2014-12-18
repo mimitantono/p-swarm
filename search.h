@@ -36,7 +36,7 @@ struct search_result {
 
 class searcher {
 private:
-	static search_data * search_data;
+	static struct search_data * search_data;
 public:
 	searcher();
 	virtual ~searcher();

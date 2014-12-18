@@ -72,5 +72,5 @@ void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
 		//for second time merging (because we don't know actual max generation)
 		cluster->cluster_members.push_back(merge->cluster_members[i]);
 	}
-	cluster->max_generation += merge->max_generation;
+	cluster->max_generation += merge->max_generation * 2;
 }

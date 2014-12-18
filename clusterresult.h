@@ -10,6 +10,7 @@
 
 #include<vector>
 #include<string>
+#include<algorithm>
 #include "db.h"
 
 typedef struct member_info {
