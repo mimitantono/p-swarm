@@ -17,6 +17,7 @@ typedef struct member_info {
 	unsigned qgram_diff;
 	unsigned generation;
 	unsigned radius;
+	unsigned char * qgrams;
 } member_info;
 
 typedef struct cluster_info {

@@ -264,6 +264,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		member.generation = amps[i].generation;
 		member.radius = amps[i].radius;
 		member.qgram_diff = amps[i].diffestimate;
+		member.qgrams = db->qgrams[amps[i].ampliconid];
 		if (amps[i].swarmid != previd) {
 			if (!result->clusters.empty())
 				result->clusters.back().max_generation = max_generation + 1;
@@ -274,8 +275,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		}
 		max_generation = member.generation;
 		result->clusters.back().cluster_members.push_back(member);
-		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen,
-				db->get_seqinfo(amps[i].ampliconid)->header);
+		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);
 		previd = amps[i].swarmid;
 	}
 	fputc('\n', Property::debugfile);

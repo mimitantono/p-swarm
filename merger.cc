@@ -93,14 +93,16 @@ bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
 	}
 	for (int i = 0; i < cluster->cluster_members.size(); i++) {
 		for (int j = 0; j < other->cluster_members.size(); j++) {
-			seqinfo_t _query = cluster->cluster_members[i].sequence;
-			seqinfo_t _target = other->cluster_members[j].sequence;
-			search_result _result = searcher::search_single(&_query, &_target);
+			if (qgram_diff(cluster->cluster_members[i].qgrams, other->cluster_members[j].qgrams) <= Property::resolution) {
+				seqinfo_t _query = cluster->cluster_members[i].sequence;
+				seqinfo_t _target = other->cluster_members[j].sequence;
+				search_result _result = searcher::search_single(&_query, &_target);
 //			fprintf(stderr, "Diff of %s and %s %ld\n", _query.header, _target.header, _result.diff);
-			if (_result.diff <= Property::resolution) {
-				merge_result.merge_cluster(cluster, other);
-				other->erased = true;
-				return true;
+				if (_result.diff <= Property::resolution) {
+					merge_result.merge_cluster(cluster, other);
+					other->erased = true;
+					return true;
+				}
 			}
 		}
 	}

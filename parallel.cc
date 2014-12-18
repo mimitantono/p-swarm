@@ -58,13 +58,10 @@ void Parallel::run() {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
 			exit(-1);
 		}
-		printf("\nMain: completed join with thread %ld having a status of %ld\n", t + 1, (long) status);
+		printf("\nMain: completed join with thread %ld having a status of %ld\n", t, (long) status);
 	}
 	delete[] thread_data_array;
 	thread_data_array = NULL;
-	for (int i = 0; i < db.size(); i++) {
-		delete db[i];
-	}
 	if (Property::threads > 1) {
 		merger merger(&results, Property::threads);
 		merger.merge_groups();
@@ -74,6 +71,9 @@ void Parallel::run() {
 		results[0].print(Property::outfile);
 	}
 	fprintf(stderr, "\nfinished.....");
+	for (int i = 0; i < db.size(); i++) {
+		delete db[i];
+	}
 	if (datap)
 		free(datap);
 }

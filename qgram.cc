@@ -125,14 +125,14 @@ unsigned long compareqgramvectors(unsigned char * a, unsigned char * b) {
 		return compareqgramvectors_128(a, b);
 }
 
-inline unsigned long qgram_diff(unsigned long a, unsigned long b, class Db_data * db) {
-	unsigned long diffqgrams = compareqgramvectors(db->get_qgram_vector(a), db->get_qgram_vector(b));
+unsigned long qgram_diff(qgramvector_t a, qgramvector_t b){
+	unsigned long diffqgrams = compareqgramvectors(a, b);
 	unsigned long mindiff = (diffqgrams + 2 * QGRAMLENGTH - 1) / (2 * QGRAMLENGTH);
 	return mindiff;
 }
 
 void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist, class Db_data * db) {
 	for (unsigned long i = 0; i < listlen; i++)
-		difflist[i] = qgram_diff(seed, amplist[i], db);
+		difflist[i] = qgram_diff(db->get_qgram_vector(seed), db->get_qgram_vector(amplist[i]));
 }
 

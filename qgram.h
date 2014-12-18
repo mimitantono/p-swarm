@@ -9,5 +9,7 @@
 
 void findqgrams(unsigned char * seq, unsigned long seqlen, unsigned char * qgramvector);
 void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist, class Db_data* db);
+unsigned long qgram_diff(unsigned char * a, unsigned char * b);
+void printqgrams(unsigned char * qgramvector);
 
 #endif /* QGRAM_H_ */
