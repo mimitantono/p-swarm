@@ -28,11 +28,12 @@ public:
 private:
 	struct search_data * search_data;
 	Db_data * db;
-	bool ** matrix;
-	bool ** guestbook;
+	std::vector<unsigned long int> ** matrix;
+	std::vector<unsigned long int> ** guestbook;
 	cluster_result result;
 	void crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation);
 	bool has_match(int row_id);
+	bool vector_contains(std::vector<unsigned long int> * vector, unsigned long int lookup);
 };
 
 #endif /* BIGMATRIX_H_ */
