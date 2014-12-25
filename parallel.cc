@@ -10,7 +10,7 @@
 cluster_result * Parallel::results;
 
 Parallel::Parallel() {
-	results = new cluster_result[Property::threads];
+	results = new cluster_result[Property::partition];
 }
 
 Parallel::~Parallel() {
@@ -30,19 +30,19 @@ void *run_cluster(void *threadargs) {
 }
 
 void Parallel::run() {
-	pthread_t threads[Property::threads];
+	pthread_t threads[Property::partition];
 	pthread_attr_t attr;
 	int rc;
 	long t;
 	void *status;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-	thread_data *thread_data_array = new thread_data[Property::threads];
+	thread_data *thread_data_array = new thread_data[Property::partition];
 	std::vector<Db_data*> db;
 	char * datap = (char *) xmalloc(MEMCHUNK);
 	datap = Db_data::read_file(db, datap);
 
-	for (long i = 0; i < Property::threads; i++) {
+	for (long i = 0; i < Property::partition; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
 		thread_data_array[i].db = db[i];
 		rc = pthread_create(&threads[i], &attr, run_cluster, (void *) &thread_data_array[i]);
@@ -52,18 +52,18 @@ void Parallel::run() {
 		}
 	}
 	pthread_attr_destroy(&attr);
-	for (t = 0; t < Property::threads; t++) {
+	for (t = 0; t < Property::partition; t++) {
 		rc = pthread_join(threads[t], &status);
 		if (rc) {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
 			exit(-1);
 		}
-		printf("\nMain: completed join with thread %ld having a status of %ld\n", t, (long) status);
+		printf("\nMain: completed join with thread %ld produced [%lu] clusters\n", t, results[t].clusters.size());
 	}
 	delete[] thread_data_array;
 	thread_data_array = NULL;
-	if (Property::threads > 1) {
-		merger merger(&results, Property::threads);
+	if (Property::partition > 1) {
+		merger merger(&results, Property::partition);
 		merger.merge_groups();
 		merger.final_merge();
 		merger.merge_result.print(Property::outfile);

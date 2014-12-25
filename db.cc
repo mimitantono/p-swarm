@@ -63,7 +63,7 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 
 	unsigned long hdrhashsize = 0;
 
-	for (int i = 0; i < Property::threads; i++) {
+	for (int i = 0; i < Property::partition; i++) {
 		hdrhashsize += db[i]->sequences;
 	}
 	hdrhashsize *= 2;
@@ -73,7 +73,7 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 
 	unsigned long duplicatedidentifiers = 0;
 	/* check hash, fatal error if found, otherwize insert new */
-	for (int i = 0; i < Property::threads; i++) {
+	for (int i = 0; i < Property::partition; i++) {
 		for (long j = 0; j < db[i]->sequences; j++) {
 			seqinfo_t *seqindex_p = &db[i]->seqindex[j];
 			unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
@@ -106,7 +106,7 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 }
 
 char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
-	for (int i = 0; i < Property::threads; i++) {
+	for (int i = 0; i < Property::partition; i++) {
 		db.push_back(new Db_data());
 	}
 	/* allocate space */
@@ -140,7 +140,7 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 
 	long lineno = 1;
 
-	progress_init("Reading database: ", filesize);
+	progress_init("Reading database   :", filesize);
 	while (line[0]) {
 		/* read header */
 		/* the header ends at a space character, a newline or a nul character */
@@ -215,13 +215,13 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	/* create indices */
 	int missingabundance = 0;
 
-	int* longest_array = new int[Property::threads];
-	unsigned long * sequences_array = new unsigned long[Property::threads];
-	unsigned long * nucleotides_array = new unsigned long[Property::threads];
-	long *lastabundance = new long[Property::threads];
-	int *presorted = new int[Property::threads];
+	int* longest_array = new int[Property::partition];
+	unsigned long * sequences_array = new unsigned long[Property::partition];
+	unsigned long * nucleotides_array = new unsigned long[Property::partition];
+	long *lastabundance = new long[Property::partition];
+	int *presorted = new int[Property::partition];
 
-	for (int threadid = 0; threadid < Property::threads; threadid++) {
+	for (int threadid = 0; threadid < Property::partition; threadid++) {
 		longest_array[threadid] = 0;
 		sequences_array[threadid] = 0;
 		nucleotides_array[threadid] = 0;
@@ -237,7 +237,8 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 
 	char * p = datap;
 	for (unsigned long i = 0; i < sequences; i++) {
-		int threadid = i % Property::threads;
+		int threadid = i * Property::partition / sequences;
+//		int threadid = i % Property::threads;
 		sequences_array[threadid]++;
 		seqinfo_t seqinfo;
 		db[threadid]->seqindex.push_back(seqinfo);
@@ -284,7 +285,7 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		fatal(msg);
 	}
 
-	for (int threadid = 0; threadid < Property::threads; threadid++) {
+	for (int threadid = 0; threadid < Property::partition; threadid++) {
 		if (!presorted[threadid]) {
 			fatal("Input file was not presorted.\n");
 		}
@@ -317,7 +318,7 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 }
 
 void Db_data::print_info() {
-	fprintf(stderr, "Database info:     %lu nt", nucleotides);
+	fprintf(stderr, "Database info      : %lu nt", nucleotides);
 	fprintf(stderr, " in %ld sequences,", sequences);
 	fprintf(stderr, " longest %d nt\n", longest);
 }

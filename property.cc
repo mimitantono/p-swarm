@@ -14,6 +14,7 @@ long Property::penalty_gapextend;
 long Property::penalty_mismatch = 18;
 long Property::matchscore;
 long Property::mismatchscore;
+long Property::partition;
 long Property::threads;
 long Property::penalty_factor;
 unsigned long Property::longest;
@@ -21,7 +22,6 @@ unsigned long Property::resolution;
 unsigned long Property::diff_saturation;
 unsigned long Property::bits;
 FILE * Property::outfile;
-FILE * Property::debugfile;
 FILE * Property::dbdebug;
 std::string Property::databasename;
 std::string Property::outfilename;
@@ -32,9 +32,9 @@ void Property::init() {
 	gapopen = DEFAULT_GAPOPEN;
 	gapextend = DEFAULT_GAPEXTEND;
 	resolution = DEFAULT_RESOLUTION;
+	partition = 1;
 	threads = DEFAULT_THREADS;
 	calculate_penalty();
-	debugfile = fopen("debug.log", "w");
 	dbdebug = fopen("db.log", "w");
 }
 
@@ -68,7 +68,7 @@ void Property::print() {
 	fprintf(stderr, "penalty_gapextend  : %ld\n", penalty_gapextend);
 	fprintf(stderr, "penalty_mismatch   : %ld\n", Property::penalty_mismatch);
 	fprintf(stderr, "penalty_factor     : %ld\n", penalty_factor);
-	fprintf(stderr, "threads            : %ld\n", threads);
+	fprintf(stderr, "threads            : %ld\n", partition);
 	fprintf(stderr, "resolution         : %ld\n", resolution);
 }
 

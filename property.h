@@ -35,6 +35,7 @@ public:
 	static long gapopenextend;
 	static long matchscore;
 	static long mismatchscore;
+	static long partition;
 	static long threads;
 	static unsigned long longest;
 	static unsigned long resolution;

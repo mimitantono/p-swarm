@@ -93,12 +93,10 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		estimates += listlen;
 
 		for (unsigned long i = 0; i < listlen; i++) {
-			unsigned poolampliconid = qgramamps[i];
-			long diff = qgramdiffs[i];
-			amps[swarmed + i].diffestimate = diff;
-			if (diff <= Property::resolution) {
+			amps[swarmed + i].diffestimate = qgramdiffs[i];
+			if (qgramdiffs[i] <= Property::resolution) {
 				targetindices[targetcount] = swarmed + i;
-				targetampliconids[targetcount] = poolampliconid;
+				targetampliconids[targetcount] = qgramamps[i];
 				targetcount++;
 			}
 		}
@@ -253,9 +251,6 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 
 	result->partition_id = threadid + 1;
 
-	char sep_amplicons = '\n'; /* usually a space */
-	char sep_swarms[] = "\n\n";
-
 	long previd = -1;
 	unsigned max_generation;
 	for (unsigned long i = 0; i < db->sequences; i++) {
@@ -269,16 +264,11 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 			if (!result->clusters.empty())
 				result->clusters.back().max_generation = max_generation + 1;
 			result->new_cluster(amps[i].swarmid);
-			fputs(sep_swarms, Property::debugfile);
-		} else {
-			fputc(sep_amplicons, Property::debugfile);
 		}
 		max_generation = member.generation;
 		result->clusters.back().cluster_members.push_back(member);
-		fprintf(Property::debugfile, "%.*s", db->get_seqinfo(amps[i].ampliconid)->headeridlen, db->get_seqinfo(amps[i].ampliconid)->header);
 		previd = amps[i].swarmid;
 	}
-	fputc('\n', Property::debugfile);
 
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Number of swarms:  %lu\n", swarmid);

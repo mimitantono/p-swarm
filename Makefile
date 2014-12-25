@@ -1,12 +1,12 @@
 INCLUDES = -I ./include
 COMPILEOPT=-Wall -mssse3 -mtune=core2 -Icityhash
 #CXX = gcc -g -v -lstdc++ -lpthread -fprofile-arcs -ftest-coverage
-CXX = gcc -g -v -lstdc++ -lpthread 
+CXX = gcc -g -v -lstdc++ -lpthread -pg
 FLAGS = -c $(INCLUDES)
 CXXFLAGS=$(COMPILEOPT) $(COMMON) -O3
 OBJS=main.o matrix.o cpu_info.o qgram.o cityhash/city.o\
-     util.o db.o scan.o search8.o search16.o property.o cluster.o\
-     parallel.o clusterresult.o merger.o search.o
+     util.o db.o scan.o search8.o search16.o property.o \
+     clusterresult.o search.o Bigmatrix.o
 LINKFLAGS=-g
 LIBS=
 
@@ -28,4 +28,3 @@ main :  $(OBJS)
 
 clean :
 	rm -f *.o *~ $(PROG) gmon.out cityhash/*.o
-	find . -name "*.gcda" -print0 | xargs -0 rm

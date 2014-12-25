@@ -17,13 +17,14 @@ rm *.log
 
 make all
 
-valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 test.fas
-mv debug.log debug1.log
+#valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 test.fas
+#mv debug.log debug1.log
+./main -t1 test.fas
 mv result.log result1.log
-valgrind --dsymutil=yes --leak-check=yes --log-file=leak2 --show-possibly-lost=no ./main -t 2 test.fas
-mv result.log result2.log
+#valgrind --dsymutil=yes --leak-check=yes --log-file=leak2 --show-possibly-lost=no ./main -t 2 test.fas
+#mv result.log result2.log
 
-compareResult debug1.log testdata/data1 temp0
+#compareResult debug1.log testdata/data1 temp0
 compareResult result1.log testdata/data2 temp1
-compareResult result2.log testdata/data2 temp2
+#compareResult result2.log testdata/data2 temp2
 
