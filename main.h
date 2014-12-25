@@ -16,7 +16,7 @@
 #include "parallel.h"
 #include <sys/time.h>
 #include "stdlib.h"
-#include "bigmatrix.h"
+#include "Bigmatrix.h"
 
 typedef struct thread_data {
 	unsigned long thread_id;
