@@ -26,7 +26,7 @@ public:
 	void calculate_partition(int thread_id, int total_thread);
 	void init_partition(int thread_id, int total_thread);
 private:
-	search_data * search_data;
+	struct search_data * search_data;
 	Db_data * db;
 	int ** matrix;
 	cluster_result result;
