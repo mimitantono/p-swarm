@@ -28,7 +28,8 @@ public:
 private:
 	struct search_data * search_data;
 	Db_data * db;
-	int ** matrix;
+	bool ** matrix;
+	bool ** guestbook;
 	cluster_result result;
 	void crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation);
 	bool has_match(int row_id);
