@@ -88,7 +88,7 @@ void run() {
 	std::vector<Db_data*> db_data;
 	char * datap = (char *) xmalloc(MEMCHUNK);
 	datap = Db_data::read_file(db_data, datap);
-	Bigmatrix * bigmatrix = new Bigmatrix(db_data[0]);
+	Bigmatrix * bigmatrix = new class Bigmatrix(db_data[0]);
 	calculate_matrix(bigmatrix);
 	bigmatrix->form_clusters();
 	bigmatrix->print_clusters();
@@ -111,7 +111,7 @@ void *run_thread(void *threadargs) {
 	pthread_exit(NULL);
 }
 
-void calculate_matrix(Bigmatrix *bigmatrix) {
+void calculate_matrix(class Bigmatrix *bigmatrix) {
 	pthread_t threads_init[Property::threads];
 	pthread_attr_t attr;
 	int rc;

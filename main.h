@@ -22,11 +22,11 @@ void destroy();
 void run();
 void args_init(int argc, char** argv);
 void args_usage();
-void calculate_matrix(Bigmatrix *bigmatrix);
+void calculate_matrix(class Bigmatrix *bigmatrix);
 
 typedef struct thread_data {
 	unsigned long thread_id;
-	Bigmatrix *bigmatrix;
+	class Bigmatrix *bigmatrix;
 } thread_data;
 
 #endif /* MAIN_H_ */
