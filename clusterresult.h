@@ -38,6 +38,7 @@ public:
 	long partition_id;
 	void merge_cluster(cluster_info* cluster, cluster_info* merge);
 	void print(FILE * stream);
+	cluster_info * find_member(unsigned long int sequence_id);
 };
 
 #endif /* CLUSTERRESULT_H_ */

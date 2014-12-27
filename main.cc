@@ -9,8 +9,6 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-	timeval start, end;
-	gettimeofday(&start, NULL);
 	Matrix::score_matrix_init();
 	CPU_Info::cpu_features_detect();
 	CPU_Info::cpu_features_show();
@@ -18,9 +16,6 @@ int main(int argc, char** argv) {
 	args_init(argc, argv);
 	run();
 	destroy();
-	gettimeofday(&end, NULL);
-	double dif = end.tv_sec - start.tv_sec;
-	printf("\nduration %.2lf secs\n", dif);
 }
 
 void args_init(int argc, char **argv) {
@@ -85,15 +80,25 @@ void args_init(int argc, char **argv) {
 }
 
 void run() {
+	timeval start, end;
+	gettimeofday(&start, NULL);
 	std::vector<Db_data*> db_data;
 	char * datap = (char *) xmalloc(MEMCHUNK);
 	datap = Db_data::read_file(db_data, datap);
 	class Bigmatrix bigmatrix(db_data[0]);
 	calculate_matrix(&bigmatrix);
+	gettimeofday(&end, NULL);
+	double dif = end.tv_sec - start.tv_sec;
+	printf("\nduration %.2lf secs\n", dif);
+	gettimeofday(&start, NULL);
+	bigmatrix.print_matrix();
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
-	bigmatrix.print_matrix();
-	delete db_data[0];
+	gettimeofday(&end, NULL);
+	dif = end.tv_sec - start.tv_sec;
+	printf("\nduration %.2lf secs\n", dif);
+//	if (db_data[0])
+//		delete db_data[0];
 	if (datap)
 		free(datap);
 }

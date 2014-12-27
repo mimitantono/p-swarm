@@ -92,7 +92,7 @@ bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
 		} else {
 			seqinfo_t query = cluster->cluster_members[0].sequence;
 			seqinfo_t target = other->cluster_members[0].sequence;
-			search_result result = searcher::search_single(&query, &target);
+			search_result result = searcher::search_single(&query, &target, searcher::search_data);
 			if (result.diff > (cluster->max_generation + other->max_generation) * Property::resolution) {
 				return false;
 			}
@@ -103,7 +103,7 @@ bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
 			if (qgram_diff(cluster->cluster_members[i].qgrams, other->cluster_members[j].qgrams) <= Property::resolution) {
 				seqinfo_t _query = cluster->cluster_members[i].sequence;
 				seqinfo_t _target = other->cluster_members[j].sequence;
-				search_result _result = searcher::search_single(&_query, &_target);
+				search_result _result = searcher::search_single(&_query, &_target, searcher::search_data);
 //				fprintf(stderr, "Diff of %s and %s %ld\n", _query.header, _target.header, _result.diff);
 				if (_result.diff <= Property::resolution) {
 					merge_result.merge_cluster(cluster, other);

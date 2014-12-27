@@ -72,5 +72,19 @@ void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
 		//for second time merging (because we don't know actual max generation)
 		cluster->cluster_members.push_back(merge->cluster_members[i]);
 	}
+	merge->erased = true;
 	cluster->max_generation += merge->max_generation * 2;
+}
+
+cluster_info * cluster_result::find_member(unsigned long int sequence_id) {
+	for (int i = 0; i < clusters.size(); i++) {
+		if (!clusters[i].erased) {
+			for (int j = 0; j < clusters[i].cluster_members.size(); j++) {
+				if (clusters[i].cluster_members[j].sequence.clusterid == sequence_id) {
+					return &clusters[i];
+				}
+			}
+		}
+	}
+	return NULL;
 }
