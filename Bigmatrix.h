@@ -34,13 +34,12 @@ private:
 	unsigned long int total_match;
 	unsigned long int total_skip;
 	std::vector<unsigned long int *> * matrix;
+//	unsigned long int ** guestbook;
 	cluster_result result;
 	void crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation);
 	bool has_match(unsigned long int row_id);
 	bool vector_contains(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col);
 	void vector_put(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col);
-	int organize_sequences(int cluster_id, std::unordered_map<unsigned long int, unsigned long int>& map);
-	void push_members(int cluster_id, std::unordered_map<unsigned long int, unsigned long int>& map);
 };
 
 #endif /* BIGMATRIX_H_ */

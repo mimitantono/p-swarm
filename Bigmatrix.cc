@@ -9,6 +9,8 @@
 
 Bigmatrix::Bigmatrix(Db_data * db) {
 	this->db = db;
+//	search_data = new struct search_data[Property::threads];
+//	guestbook = new unsigned long int*[db->sequences];
 	scanner = new class scanner[Property::threads];
 	for (int i = 0; i < Property::threads; i++) {
 		scanner[i].set_db(db);
@@ -20,11 +22,9 @@ Bigmatrix::Bigmatrix(Db_data * db) {
 }
 
 Bigmatrix::~Bigmatrix() {
+//	delete guestbook;
+//	delete matrix;
 	delete[] scanner;
-	for (int i = 0; i < Property::threads; i++) {
-		matrix[i].clear();
-	}
-	delete[] matrix;
 }
 
 void Bigmatrix::init_partition(int thread_id, int total_thread) {
@@ -47,28 +47,38 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
 	for (unsigned long int i = thread_id; i < db->sequences; i += total_thread) {
 //		std::vector<int> visited;
 
-		int qgram_count = 0;
-		for (unsigned long j = i + 1; j < db->sequences; j++) {
-			qgramamps[qgram_count] = j;
-			qgram_count++;
+		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
+			qgramamps[j] = j + i + 1;
 		}
-		qgram_work_diff(i, qgram_count, qgramamps, qgramdiffs, db);
+		qgram_work_diff(i, db->sequences - i - 1, qgramamps, qgramdiffs, db);
 
 		unsigned long int targetcount = 0;
 		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
-			if ((long) qgramdiffs[j] <= Property::resolution) {
+			if (qgramdiffs[j] <= Property::resolution) {
 				targetampliconids[targetcount] = qgramamps[j];
 				targetcount++;
 			}
+//			if (qgramdiffs[j] == 0) {
+//				visited.push_back(qgramamps[j]);
+//			}
 		}
 		scanner[thread_id].search_do(i, targetcount, targetampliconids);
 
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
 				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-//				vector_put(&matrix[thread_id], targetampliconids[j], i);
+				vector_put(&matrix[thread_id], targetampliconids[j], i);
+//				visited.push_back(j);
 			}
 		}
+//		if (visited.size() > 0) {
+//			for (int k = 0; k < visited.size() - 1; k++) {
+//				for (int l = k + 1; l < visited.size(); l++) {
+//					vector_put(guestbook, &guestbook_p, visited[l], visited[k]);
+//					memcpy(db->qgrams[visited[k]], db->qgrams[visited[l]], 128);
+//				}
+//			}
+//		}
 		if (thread_id == 0)
 			progress_update(i);
 	}
@@ -80,102 +90,117 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
 	delete[] targetampliconids;
 }
 
-int Bigmatrix::organize_sequences(int cluster_id, std::unordered_map<unsigned long int, unsigned long int>& map) {
+void Bigmatrix::form_clusters() {
 	for (int t = 0; t < Property::threads; t++) {
 		for (unsigned long int i = 0; i < matrix[t].size(); i++) {
 			unsigned long int first = matrix[t][i][0];
 			unsigned long int second = matrix[t][i][1];
-			unsigned long int existing_first = map.find(first) == map.end() ? 0 : map[first];
-			unsigned long int existing_second = map.find(second) == map.end() ? 0 : map[second];
-			if (existing_first > 0 && existing_second > 0 && existing_first != existing_second) {
-				for (std::unordered_map<unsigned long int, unsigned long int>::const_iterator it = map.begin(); it != map.end(); ++it) {
-					if (it->second == existing_second) {
-						map[it->first] = existing_first;
-					}
-				}
-			} else if (existing_first == 0 && existing_second > 0) {
-				map[first] = map[second];
-			} else if (existing_first > 0 && existing_second == 0) {
-				map[second] = map[first];
-			} else {
-				map[first] = cluster_id;
-				map[second] = cluster_id;
-				cluster_id++;
-			}
-		}
-	}
-	return cluster_id;
-}
-
-void Bigmatrix::push_members(int cluster_id, std::unordered_map<unsigned long int, unsigned long int>& map) {
-	for (unsigned long int i = 1; i < cluster_id; i++) {
-		cluster_info* new_cluster = result.new_cluster(cluster_id);
-		for (std::unordered_map<unsigned long int, unsigned long int>::const_iterator it = map.begin(); it != map.end(); ++it) {
-			if (it->second == i) {
+			cluster_info * existing_first = result.find_member(first);
+			cluster_info * existing_second = result.find_member(second);
+			if (existing_first != NULL && existing_second == NULL) {
 				member_info member;
-				member.sequence = *db->get_seqinfo(it->first);
+				member.sequence = *db->get_seqinfo(second);
+				member.sequence.clusterid = second;
 				member.generation = 0;
-				new_cluster->cluster_members.push_back(member);
+				existing_first->cluster_members.push_back(member);
+			} else if (existing_first == NULL && existing_second != NULL) {
+				member_info member;
+				member.sequence = *db->get_seqinfo(first);
+				member.sequence.clusterid = first;
+				member.generation = 0;
+				existing_second->cluster_members.push_back(member);
+			} else if (existing_first == NULL && existing_second == NULL) {
+				int cluster_id = result.clusters.size();
+				result.new_cluster(cluster_id);
+				member_info member;
+				member.sequence = *db->get_seqinfo(first);
+				member.sequence.clusterid = first;
+				member.generation = 0;
+				result.clusters[cluster_id].cluster_members.push_back(member);
+				member_info member1;
+				member1.sequence = *db->get_seqinfo(second);
+				member1.sequence.clusterid = second;
+				member1.generation = 0;
+				result.clusters[cluster_id].cluster_members.push_back(member1);
+			} else if (existing_first != NULL && existing_second != NULL) {
+				if (existing_first->cluster_id != existing_second->cluster_id) {
+					result.merge_cluster(existing_first, existing_second);
+				}
 			}
 		}
-		if (new_cluster->cluster_members.size() == 0) {
-			new_cluster->erased = true;
+	}
+	std::vector<unsigned long int> singletons;
+	for (unsigned long int i = 0; i < db->sequences; i++) {
+		if (result.find_member(i) == NULL) {
+			singletons.push_back(i);
 		}
+	}
+	for (unsigned long int i = 0; i < singletons.size(); i++) {
+		int cluster_id = result.clusters.size();
+		result.new_cluster(cluster_id);
+		member_info member;
+		member.sequence = *db->get_seqinfo(singletons[i]);
+		member.sequence.clusterid = singletons[i];
+		member.generation = 0;
+		result.clusters[cluster_id].cluster_members.push_back(member);
 	}
 }
 
-void Bigmatrix::form_clusters() {
-	std::unordered_map<unsigned long int, unsigned long int> map;
-	int cluster_id = 1;
-	cluster_id = organize_sequences(cluster_id, map);
-	push_members(cluster_id, map);
-//	std::vector<unsigned long int> singletons;
+//void Bigmatrix::form_clusters() {
+//	progress_init("Forming clusters   :", db->sequences);
+//	int cluster_id = 0;
+//	bool * row_guestbook = new bool[db->sequences];
 //	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		if (map.find(i) == map.end()) {
-//			singletons.push_back(i);
+//		row_guestbook[i] = false;
+//	}
+//	for (unsigned long int i = 0; i < db->sequences; i++) {
+//		if (row_guestbook[i] == false) {
+//			if (has_match(i)) {
+//				result.new_cluster(cluster_id);
+//				member_info member;
+//				member.sequence = *db->get_seqinfo(i);
+//				member.generation = 0;
+//				result.clusters[cluster_id].cluster_members.push_back(member);
+//				crawl_row(&row_guestbook, cluster_id, i, 0);
+//				cluster_id++;
+//			}
+//		}
+//		progress_update(i);
+//	}
+//	for (unsigned long int i = 0; i < db->sequences; i++) {
+//		if (row_guestbook[i] == false) {
+//			result.new_cluster(cluster_id);
+//			member_info member;
+//			member.sequence = *db->get_seqinfo(i);
+//			member.generation = 0;
+//			result.clusters[cluster_id].cluster_members.push_back(member);
+//			cluster_id++;
+////			fprintf(stderr, "\n%s", member.sequence.header);
 //		}
 //	}
-//	for (unsigned long int i = 0; i < singletons.size(); i++) {
-//		cluster_info * new_cluster = result.new_cluster(cluster_id);
-//		member_info member;
-//		member.sequence = *db->get_seqinfo(singletons[i]);
-//		member.generation = 0;
-//		new_cluster->cluster_members.push_back(member);
-//		cluster_id++;
-//	}
-}
+//	delete row_guestbook;
+//	progress_done();
+//}
 
 bool Bigmatrix::has_match(unsigned long int row_id) {
-//	for (unsigned long int j = row_id + 1; j < db->sequences; j++) {
+	for (unsigned long int j = row_id + 1; j < db->sequences; j++) {
 //		if (vector_contains(&matrix, row_id, j)) {
 //			return true;
 //		}
-//	}
+	}
 	return false;
 }
 
 void Bigmatrix::crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation) {
 	(*row_guestbook)[row_id] = true;
-	std::vector<member_info> members;
 	for (unsigned long int i = 0; i < db->sequences; i++) {
-		if (!(*row_guestbook)[i] && vector_contains(matrix, row_id, i)) {
-			member_info member;
-			member.sequence = *db->get_seqinfo(i);
-			member.generation = generation;
-			member.sequence.clusterid = i;
-			members.push_back(member);
-		}
-	}
-	if (generation == 0 && members.size() > 0) {
-		result.new_cluster(cluster_id);
-		member_info member;
-		member.sequence = *db->get_seqinfo(row_id);
-		member.generation = 0;
-		result.clusters[cluster_id].cluster_members[row_id] = member;
-	}
-	for (int i = 0; i < members.size(); i++) {
-		result.clusters[cluster_id].cluster_members[i] = members[i];
-		crawl_row(row_guestbook, cluster_id, members[i].sequence.clusterid, generation + 1);
+//		if (!(*row_guestbook)[i] && vector_contains(&matrix, row_id, i)) {
+//			member_info member;
+//			member.sequence = *db->get_seqinfo(i);
+//			member.generation = generation;
+//			result.clusters[cluster_id].cluster_members.push_back(member);
+//			crawl_row(row_guestbook, cluster_id, i, generation + 1);
+//		}
 	}
 }
 
