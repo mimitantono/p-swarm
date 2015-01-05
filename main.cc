@@ -88,15 +88,17 @@ void run() {
 	class Bigmatrix bigmatrix(db_data[0]);
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);
-	double dif = end.tv_sec - start.tv_sec;
-	printf("\nduration %.2lf secs\n", dif);
+	double dif1 = end.tv_sec - start.tv_sec;
+	printf("\nduration %.2lf secs\n", dif1);
 	gettimeofday(&start, NULL);
 	bigmatrix.print_matrix();
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);
-	dif = end.tv_sec - start.tv_sec;
-	printf("\nduration %.2lf secs\n", dif);
+	double dif2= end.tv_sec - start.tv_sec;
+	printf("\nduration %.2lf secs\n", dif2);
+	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
+	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
 //	if (db_data[0])
 //		delete db_data[0];
 	if (datap)

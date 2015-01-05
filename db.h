@@ -54,7 +54,7 @@ public:
 	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;
-	int longest;
+	unsigned long longest;
 	int threadid;
 
 	static char* read_file(std::vector<Db_data*> &db, char * datap);

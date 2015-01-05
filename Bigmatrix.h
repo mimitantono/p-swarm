@@ -9,8 +9,6 @@
 #define BIGMATRIX_H_
 
 #include <vector>
-#include <array>
-#include <unordered_map>
 #include <pthread.h>
 #include "qgram.h"
 #include "scan.h"

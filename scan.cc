@@ -29,7 +29,7 @@ void scanner::search_chunk() {
 		return;
 
 	std::vector<queryinfo_t> targets;
-	for (int i = 0; i < sd->target_count; i++) {
+	for (unsigned long i = 0; i < sd->target_count; i++) {
 		targets.push_back(db->get_sequence_and_length(master_targets[i]));
 	}
 
@@ -73,7 +73,7 @@ void scanner::search_begin() {
 
 void scanner::set_db(Db_data * db) {
 	this->db = db;
-	for (int i = 0; i < db->sequences; i++) {
+	for (unsigned long i = 0; i < db->sequences; i++) {
 		search_result sr;
 		master_result.push_back(sr);
 	}

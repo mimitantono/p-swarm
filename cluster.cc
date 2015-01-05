@@ -266,7 +266,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 			result->new_cluster(amps[i].swarmid);
 		}
 		max_generation = member.generation;
-		result->clusters.back().cluster_members.push_back(member);
+		result->clusters.back().cluster_members.insert(member);
 		previd = amps[i].swarmid;
 	}
 

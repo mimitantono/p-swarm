@@ -1,5 +1,5 @@
 INCLUDES = -I ./include
-COMPILEOPT=-Wall -mssse3 -mtune=core2 -Icityhash
+COMPILEOPT=-Wall -msse -msse2 -mssse3 -mtune=core2 -Icityhash
 #CXX = gcc -g -v -lstdc++ -lpthread -fprofile-arcs -ftest-coverage
 CXX = g++ -g
 FLAGS = -c $(INCLUDES)

@@ -67,7 +67,7 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
 				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-				vector_put(&matrix[thread_id], targetampliconids[j], i);
+//				vector_put(&matrix[thread_id], targetampliconids[j], i);
 //				visited.push_back(j);
 			}
 		}
@@ -91,6 +91,7 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
 }
 
 void Bigmatrix::form_clusters() {
+	unsigned long int cluster_id = 1;
 	for (int t = 0; t < Property::threads; t++) {
 		for (unsigned long int i = 0; i < matrix[t].size(); i++) {
 			unsigned long int first = matrix[t][i][0];
@@ -102,28 +103,32 @@ void Bigmatrix::form_clusters() {
 				member.sequence = *db->get_seqinfo(second);
 				member.sequence.clusterid = second;
 				member.generation = 0;
-				existing_first->cluster_members.push_back(member);
+				result.add_member(existing_first, member);
+				fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_first->cluster_id);
 			} else if (existing_first == NULL && existing_second != NULL) {
 				member_info member;
 				member.sequence = *db->get_seqinfo(first);
 				member.sequence.clusterid = first;
 				member.generation = 0;
-				existing_second->cluster_members.push_back(member);
+				result.add_member(existing_second, member);
+				fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_second->cluster_id);
 			} else if (existing_first == NULL && existing_second == NULL) {
-				int cluster_id = result.clusters.size();
-				result.new_cluster(cluster_id);
+				cluster_info * added = result.new_cluster(cluster_id);
 				member_info member;
 				member.sequence = *db->get_seqinfo(first);
 				member.sequence.clusterid = first;
 				member.generation = 0;
-				result.clusters[cluster_id].cluster_members.push_back(member);
+				result.add_member(added, member);
 				member_info member1;
 				member1.sequence = *db->get_seqinfo(second);
 				member1.sequence.clusterid = second;
 				member1.generation = 0;
-				result.clusters[cluster_id].cluster_members.push_back(member1);
+				result.add_member(added, member1);
+				fprintf(Property::dbdebug, "Create cluster %ld for %s and %s\n", cluster_id, member1.sequence.header, member.sequence.header);
+				cluster_id++;
 			} else if (existing_first != NULL && existing_second != NULL) {
 				if (existing_first->cluster_id != existing_second->cluster_id) {
+					fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
 					result.merge_cluster(existing_first, existing_second);
 				}
 			}
@@ -136,13 +141,13 @@ void Bigmatrix::form_clusters() {
 		}
 	}
 	for (unsigned long int i = 0; i < singletons.size(); i++) {
-		int cluster_id = result.clusters.size();
-		result.new_cluster(cluster_id);
+		cluster_info * added = result.new_cluster(cluster_id);
 		member_info member;
 		member.sequence = *db->get_seqinfo(singletons[i]);
 		member.sequence.clusterid = singletons[i];
 		member.generation = 0;
-		result.clusters[cluster_id].cluster_members.push_back(member);
+		result.add_member(added, member);
+		cluster_id++;
 	}
 }
 

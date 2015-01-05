@@ -58,7 +58,7 @@ void Parallel::run() {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
 			exit(-1);
 		}
-		printf("\nMain: completed join with thread %ld produced [%lu] clusters\n", t, results[t].clusters.size());
+//		printf("\nMain: completed join with thread %ld produced [%lu] clusters\n", t, results[t].clusters.size());
 	}
 	delete[] thread_data_array;
 	thread_data_array = NULL;
