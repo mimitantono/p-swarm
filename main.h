@@ -21,6 +21,7 @@
 typedef struct thread_data {
 	unsigned long thread_id;
 	class Bigmatrix *bigmatrix;
+	pthread_mutex_t workmutex;
 } thread_data;
 
 void destroy();

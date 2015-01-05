@@ -19,6 +19,8 @@ Bigmatrix::Bigmatrix(Db_data * db) {
 	matrix = new std::vector<unsigned long int *>[Property::threads];
 	total_match = 0;
 	total_skip = 0;
+	skip_by_guestbook = 0;
+//	guestbook.set_empty_key(a_pair(-1,-1));
 }
 
 Bigmatrix::~Bigmatrix() {
@@ -38,22 +40,31 @@ void Bigmatrix::init_partition(int thread_id, int total_thread) {
 		progress_done();
 }
 
-void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
+void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mutex_t workmutex) {
 	unsigned long int * qgramamps = new unsigned long int[db->sequences];
 	unsigned long int * qgramdiffs = new unsigned long int[db->sequences];
 	unsigned long int * targetampliconids = new unsigned long[db->sequences];
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", db->sequences);
 	for (unsigned long int i = thread_id; i < db->sequences; i += total_thread) {
-//		std::vector<int> visited;
+//		std::vector<unsigned long int> visited;
 
+		unsigned long int qgram_count = 0;
 		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
-			qgramamps[j] = j + i + 1;
+			bool include = true;
+//			if (guestbook.find(a_pair(i, j + i + 1)) != guestbook.end()) {
+//				include = false;
+//				skip_by_guestbook++;
+//			}
+			if (include) {
+				qgramamps[j] = j + i + 1;
+				qgram_count++;
+			}
 		}
-		qgram_work_diff(i, db->sequences - i - 1, qgramamps, qgramdiffs, db);
+		qgram_work_diff(i, qgram_count, qgramamps, qgramdiffs, db);
 
 		unsigned long int targetcount = 0;
-		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
+		for (unsigned long j = 0; j < qgram_count; j++) {
 			if (qgramdiffs[j] <= Property::resolution) {
 				targetampliconids[targetcount] = qgramamps[j];
 				targetcount++;
@@ -67,15 +78,21 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
 				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-//				vector_put(&matrix[thread_id], targetampliconids[j], i);
 //				visited.push_back(j);
 			}
 		}
 //		if (visited.size() > 0) {
-//			for (int k = 0; k < visited.size() - 1; k++) {
-//				for (int l = k + 1; l < visited.size(); l++) {
-//					vector_put(guestbook, &guestbook_p, visited[l], visited[k]);
-//					memcpy(db->qgrams[visited[k]], db->qgrams[visited[l]], 128);
+//			for (unsigned long int k = 0; k < visited.size() - 1; k++) {
+//				for (unsigned long int l = k + 1; l < visited.size(); l++) {
+//					if (visited[k] < visited[l] && visited[k] > i) {
+//						pthread_mutex_lock(&workmutex);
+//						guestbook[a_pair(visited[k], visited[l])] = true;
+//						pthread_mutex_unlock(&workmutex);
+//					} else if (visited[l] > i) {
+//						pthread_mutex_lock(&workmutex);
+//						guestbook[a_pair(visited[l], visited[k])] = true;
+//						pthread_mutex_unlock(&workmutex);
+//					}
 //				}
 //			}
 //		}
@@ -124,7 +141,8 @@ void Bigmatrix::form_clusters() {
 				member1.sequence.clusterid = second;
 				member1.generation = 0;
 				result.add_member(added, member1);
-				fprintf(Property::dbdebug, "Create cluster %ld for %s and %s\n", cluster_id, member1.sequence.header, member.sequence.header);
+				fprintf(Property::dbdebug, "Create cluster %ld for %s and %s\n", cluster_id, member1.sequence.header,
+						member.sequence.header);
 				cluster_id++;
 			} else if (existing_first != NULL && existing_second != NULL) {
 				if (existing_first->cluster_id != existing_second->cluster_id) {
@@ -218,7 +236,8 @@ void Bigmatrix::print_matrix() {
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Map [%d] size\t: %ld\n", t, matrix[t].size());
 	}
-
+	fprintf(Property::dbdebug, "Guestbook size\t: %ld\n", guestbook.size());
+	fprintf(Property::dbdebug, "Skipped by guestbook\t: %ld\n", skip_by_guestbook);
 }
 
 bool Bigmatrix::vector_contains(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col) {

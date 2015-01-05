@@ -95,14 +95,14 @@ void run() {
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);
-	double dif2= end.tv_sec - start.tv_sec;
+	double dif2 = end.tv_sec - start.tv_sec;
 	printf("\nduration %.2lf secs\n", dif2);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
 //	if (db_data[0])
 //		delete db_data[0];
-	if (datap)
-		free(datap);
+//	if (datap)
+//		free(datap);
 }
 
 void *init_thread(void *threadargs) {
@@ -113,7 +113,7 @@ void *init_thread(void *threadargs) {
 
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads);
+	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads, my_data->workmutex);
 	pthread_exit(NULL);
 }
 
@@ -130,6 +130,7 @@ void calculate_matrix(class Bigmatrix *bigmatrix) {
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
 		thread_data_array[i].bigmatrix = bigmatrix;
+		pthread_mutex_init(&thread_data_array[i].workmutex, NULL);
 		rc = pthread_create(&threads_init[i], &attr, init_thread, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
@@ -157,6 +158,7 @@ void calculate_matrix(class Bigmatrix *bigmatrix) {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
 			exit(-1);
 		}
+		pthread_mutex_destroy(&thread_data_array[t].workmutex);
 	}
 	pthread_attr_destroy(&attr);
 	delete[] thread_data_array;
