@@ -47,17 +47,19 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", db->sequences);
 	for (unsigned long int i = thread_id; i < db->sequences; i += total_thread) {
-//		std::vector<unsigned long int> visited;
+		std::vector<unsigned long int> visited;
 
 		unsigned long int qgram_count = 0;
 		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
 			bool include = true;
-//			if (guestbook.find(a_pair(i, j + i + 1)) != guestbook.end()) {
-//				include = false;
-//				skip_by_guestbook++;
-//			}
+			unsigned long int col = j + i + 1;
+			unsigned long int combined = (i << 32) | (col & 0xffffffff);
+			if (std::find(guestbook.begin(), guestbook.end(), combined) != guestbook.end()) {
+				include = false;
+				skip_by_guestbook++;
+			}
 			if (include) {
-				qgramamps[j] = j + i + 1;
+				qgramamps[j] = col;
 				qgram_count++;
 			}
 		}
@@ -69,33 +71,35 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 				targetampliconids[targetcount] = qgramamps[j];
 				targetcount++;
 			}
-//			if (qgramdiffs[j] == 0) {
-//				visited.push_back(qgramamps[j]);
-//			}
+			if (qgramdiffs[j] == 0) {
+				visited.push_back(qgramamps[j]);
+			}
 		}
 		scanner[thread_id].search_do(i, targetcount, targetampliconids);
 
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
 				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-//				visited.push_back(j);
+				visited.push_back(j);
 			}
 		}
-//		if (visited.size() > 0) {
-//			for (unsigned long int k = 0; k < visited.size() - 1; k++) {
-//				for (unsigned long int l = k + 1; l < visited.size(); l++) {
-//					if (visited[k] < visited[l] && visited[k] > i) {
-//						pthread_mutex_lock(&workmutex);
-//						guestbook[a_pair(visited[k], visited[l])] = true;
-//						pthread_mutex_unlock(&workmutex);
-//					} else if (visited[l] > i) {
-//						pthread_mutex_lock(&workmutex);
-//						guestbook[a_pair(visited[l], visited[k])] = true;
-//						pthread_mutex_unlock(&workmutex);
-//					}
-//				}
-//			}
-//		}
+		if (visited.size() > 0) {
+			for (unsigned long int k = 0; k < visited.size() - 1; k++) {
+				for (unsigned long int l = k + 1; l < visited.size(); l++) {
+					if (visited[k] < visited[l] && visited[k] > i) {
+						unsigned long combined = (visited[k] << 32) | (visited[l] & 0xffffffff);
+						pthread_mutex_lock(&workmutex);
+						guestbook.insert(combined);
+						pthread_mutex_unlock(&workmutex);
+					} else if (visited[l] > i) {
+						unsigned long combined = (visited[l] << 32) | (visited[k] & 0xffffffff);
+						pthread_mutex_lock(&workmutex);
+						guestbook.insert(combined);
+						pthread_mutex_unlock(&workmutex);
+					}
+				}
+			}
+		}
 		if (thread_id == 0)
 			progress_update(i);
 	}

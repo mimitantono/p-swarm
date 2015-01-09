@@ -10,7 +10,7 @@
 
 #include <sparsehash/dense_hash_map>
 #include <vector>
-#include <map>
+#include <set>
 #include <pthread.h>
 #include "qgram.h"
 #include "scan.h"
@@ -23,8 +23,6 @@ struct eqstr {
 		return (s1 == s2) || (s1.first == s2.first && s1.second == s2.second);
 	}
 };
-
-typedef std::pair<unsigned long int, unsigned long int> a_pair;
 
 class Bigmatrix {
 public:
@@ -43,7 +41,7 @@ private:
 	unsigned long int total_skip;
 	unsigned long int skip_by_guestbook;
 	std::vector<unsigned long int *> * matrix;
-	std::map<a_pair, bool> guestbook;
+	std::set<unsigned long int> guestbook;
 	cluster_result result;
 	void crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation);
 	bool has_match(unsigned long int row_id);
