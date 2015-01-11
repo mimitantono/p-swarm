@@ -18,7 +18,7 @@ merger::~merger() {
 
 void merger::merge_groups() {
 	//asigning first group as seed
-	for (int i = 0; i < (*cluster_results)[0].clusters.size(); i++) {
+	for (unsigned int i = 0; i < (*cluster_results)[0].clusters.size(); i++) {
 		merge_result.clusters.push_back((*cluster_results)[0].clusters[i]);
 
 	}
@@ -28,10 +28,10 @@ void merger::merge_groups() {
 		bool repeat = true;
 		while (repeat) {
 			repeat = false;
-			for (long j = 0; j < merge_result.clusters.size(); j++) {
+			for (unsigned int j = 0; j < merge_result.clusters.size(); j++) {
 				if (recursive == 0 || merge_result.clusters[j].expired) {
 					long merged = 0;
-					for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
+					for (unsigned int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
 						if (merge_clusters(&merge_result.clusters[j], &(*cluster_results)[i].clusters[k])) {
 							merged++;
 						}
@@ -47,7 +47,7 @@ void merger::merge_groups() {
 			recursive++;
 		}
 		fprintf(stderr, "\nRecursively compared first stage THREAD #%d for %d times", i, recursive);
-		for (long k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
+		for (unsigned int k = 0; k < (*cluster_results)[i].clusters.size(); k++) {
 			if (!(*cluster_results)[i].clusters[k].erased) {
 				merge_result.clusters.push_back((*cluster_results)[i].clusters[k]);
 			}
@@ -60,10 +60,10 @@ void merger::final_merge() {
 	int recursive = 0;
 	while (repeat) {
 		repeat = false;
-		for (long i = 0; i < merge_result.clusters.size() - 1; i++) {
+		for (unsigned int i = 0; i < merge_result.clusters.size() - 1; i++) {
 			if (recursive == 0 || merge_result.clusters[i].expired) {
 				long merged = 0;
-				for (int j = i + 1; j < merge_result.clusters.size(); j++) {
+				for (unsigned int j = i + 1; j < merge_result.clusters.size(); j++) {
 					if (merge_clusters(&merge_result.clusters[i], &merge_result.clusters[j])) {
 						merged++;
 					}
@@ -91,8 +91,9 @@ bool merger::merge_clusters(cluster_info *cluster, cluster_info* other) {
 	if (result.diff > (cluster->max_generation + other->max_generation) * Property::resolution) {
 		return false;
 	}
-	for (int i = 0; i < cluster->cluster_members.size(); i++) {
-		for (int j = 0; j < other->cluster_members.size(); j++) {
+	for (unsigned int i = 0; i < cluster->cluster_members.size(); i++) {
+		for (unsigned int j = 0; j < other->cluster_members.size(); j++) {
+			Property::program_statistics.total_estimation++;
 			if (qgram_diff(cluster->cluster_members[i].qgrams, other->cluster_members[j].qgrams) <= Property::resolution) {
 				seqinfo_t _query = cluster->cluster_members[i].sequence;
 				seqinfo_t _target = other->cluster_members[j].sequence;

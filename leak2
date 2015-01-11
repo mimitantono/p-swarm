@@ -1,110 +1,144 @@
-==73539== Memcheck, a memory error detector
-==73539== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
-==73539== Using Valgrind-3.11.0.SVN and LibVEX; rerun with -h for copyright info
-==73539== Command: ./main -t 2 test.fas
-==73539== Parent PID: 73423
-==73539== 
---73539-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option
---73539-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 2 times)
---73539-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 4 times)
-==73539== Invalid read of size 32
-==73539==    at 0x100513C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x10030582A: fgets (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100003FF4: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:139)
-==73539==    by 0x10000B9DD: Parallel::run() (parallel.cc:43)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539==  Address 0x10093c940 is 16 bytes after a block of size 1,048,576 alloc'd
-==73539==    at 0x100036110: malloc_zone_memalign (vg_replace_malloc.c:769)
-==73539==    by 0x10047756E: posix_memalign (in /usr/lib/system/libsystem_malloc.dylib)
-==73539==    by 0x1000037BB: xmalloc(unsigned long) (util.cc:74)
-==73539==    by 0x10000B9CE: Parallel::run() (parallel.cc:42)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== Conditional jump or move depends on uninitialised value(s)
-==73539==    at 0x100513C7A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x10030582A: fgets (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10000419E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
-==73539==    by 0x10000B9DD: Parallel::run() (parallel.cc:43)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== Invalid read of size 32
-==73539==    at 0x100513C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x10030582A: fgets (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10000419E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
-==73539==    by 0x10000B9DD: Parallel::run() (parallel.cc:43)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539==  Address 0x10093c940 is 16 bytes after a block of size 1,048,576 alloc'd
-==73539==    at 0x100036110: malloc_zone_memalign (vg_replace_malloc.c:769)
-==73539==    by 0x10047756E: posix_memalign (in /usr/lib/system/libsystem_malloc.dylib)
-==73539==    by 0x1000037BB: xmalloc(unsigned long) (util.cc:74)
-==73539==    by 0x10000B9CE: Parallel::run() (parallel.cc:42)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== Conditional jump or move depends on uninitialised value(s)
-==73539==    at 0x100513C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x10030582A: fgets (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10000419E: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:170)
-==73539==    by 0x10000B9DD: Parallel::run() (parallel.cc:43)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== Conditional jump or move depends on uninitialised value(s)
-==73539==    at 0x100513C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x100307BB6: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100312005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x1003379CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100337CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10030DB91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10030B9F7: printf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10000BAA6: Parallel::run() (parallel.cc:61)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== Invalid read of size 32
-==73539==    at 0x100513C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
-==73539==    by 0x100307BB6: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100312005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x1003379CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100337CA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10030DB91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10030B9F7: printf (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10000126F: main (main.cc:23)
-==73539==  Address 0x101596bc0 is 16 bytes after a block of size 48 in arena "client"
-==73539== 
-==73539== 
-==73539== HEAP SUMMARY:
-==73539==     in use at exit: 1,415,939 bytes in 931 blocks
-==73539==   total heap usage: 53,849 allocs, 52,918 frees, 8,954,955 bytes allocated
-==73539== 
-==73539== 16 bytes in 1 blocks are definitely lost in loss record 11 of 107
-==73539==    at 0x100034A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
-==73539==    by 0x1005BA9B1: recursive_mutex_init (in /usr/lib/libobjc.A.dylib)
-==73539==    by 0x1005BA6FC: _objc_init (in /usr/lib/libobjc.A.dylib)
-==73539==    by 0x10022387C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
-==73539==    by 0x100223864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
-==73539==    by 0x1000EFA9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
-==73539==    by 0x7FFF5FC12CEA: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==73539==    by 0x7FFF5FC12E77: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
-==73539==    by 0x7FFF5FC0F870: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==73539==    by 0x7FFF5FC0F805: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==73539==    by 0x7FFF5FC0F6F7: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
-==73539==    by 0x7FFF5FC0F968: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
-==73539== 
-==73539== 848 (120 direct, 728 indirect) bytes in 1 blocks are definitely lost in loss record 83 of 107
-==73539==    at 0x1000350C7: calloc (vg_replace_malloc.c:630)
-==73539==    by 0x10033BBC9: tre_compile (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x10033B075: regncomp_l (in /usr/lib/system/libsystem_c.dylib)
-==73539==    by 0x100004357: Db_data::read_file(std::__1::vector<Db_data*, std::__1::allocator<Db_data*> >&, char*) (db.cc:235)
-==73539==    by 0x10000B9DD: Parallel::run() (parallel.cc:43)
-==73539==    by 0x10000122C: main (main.cc:89)
-==73539== 
-==73539== LEAK SUMMARY:
-==73539==    definitely lost: 136 bytes in 2 blocks
-==73539==    indirectly lost: 728 bytes in 11 blocks
-==73539==      possibly lost: 145,042 bytes in 606 blocks
-==73539==    still reachable: 1,270,033 bytes in 312 blocks
-==73539==         suppressed: 0 bytes in 0 blocks
-==73539== Reachable blocks (those to which a pointer was found) are not shown.
-==73539== To see them, rerun with: --leak-check=full --show-leak-kinds=all
-==73539== 
-==73539== For counts of detected and suppressed errors, rerun with: -v
-==73539== Use --track-origins=yes to see where uninitialised values come from
-==73539== ERROR SUMMARY: 156 errors from 29 contexts (suppressed: 0 from 0)
+==25157== Memcheck, a memory error detector
+==25157== Copyright (C) 2002-2013, and GNU GPL'd, by Julian Seward et al.
+==25157== Using Valgrind-3.11.0.SVN and LibVEX; rerun with -h for copyright info
+==25157== Command: ./main -t 2 test.fas
+==25157== Parent PID: 25059
+==25157== 
+--25157-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option
+--25157-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 2 times)
+--25157-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 4 times)
+==25157== Invalid read of size 32
+==25157==    at 0x100606C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1003F882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1000043A9: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:139)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157==  Address 0x100b18c80 is 32 bytes before a block of size 4,096 in arena "client"
+==25157== 
+==25157== Invalid read of size 32
+==25157==    at 0x100606C6A: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1003F882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000449E: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:194)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157==  Address 0x100b19ca0 is 0 bytes after a block of size 4,096 alloc'd
+==25157==    at 0x1000396F1: malloc (vg_replace_malloc.c:303)
+==25157==    by 0x1003FB856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1003FA48F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1003FA394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000435C: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:131)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== Invalid read of size 32
+==25157==    at 0x100606C1D: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1003F882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000449E: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:194)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157==  Address 0x100b18c80 is 32 bytes before a block of size 4,096 in arena "client"
+==25157== 
+==25157== Invalid read of size 32
+==25157==    at 0x100606C21: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1003F882A: fgets (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000449E: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:194)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157==  Address 0x100b19ca0 is 0 bytes after a block of size 4,096 alloc'd
+==25157==    at 0x1000396F1: malloc (vg_replace_malloc.c:303)
+==25157==    by 0x1003FB856: __smakebuf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1003FA48F: _fseeko (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1003FA394: fseek (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000435C: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:131)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== Conditional jump or move depends on uninitialised value(s)
+==25157==    at 0x10060723C: _platform_strchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1004360BB: tre_tnfa_run_parallel (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E71E: tre_match (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E62E: regnexec (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1000048DA: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:253)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== Conditional jump or move depends on uninitialised value(s)
+==25157==    at 0x100607219: _platform_strchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1004360BB: tre_tnfa_run_parallel (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E71E: tre_match (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E62E: regnexec (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1000048DA: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:253)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== Use of uninitialised value of size 8
+==25157==    at 0x100607243: _platform_strchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1004360BB: tre_tnfa_run_parallel (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E71E: tre_match (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E62E: regnexec (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1000048DA: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:253)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+--25157-- UNKNOWN mach_msg unhandled MACH_SEND_TRAILER option (repeated 8 times)
+==25157== Conditional jump or move depends on uninitialised value(s)
+==25157==    at 0x100606C3F: _platform_memchr$VARIANT$Haswell (in /usr/lib/system/libsystem_platform.dylib)
+==25157==    by 0x1003FABB6: __sfvwrite (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x100405005: __vfprintf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042A9CE: __v2printf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042ACA0: __xvprintf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x100400B91: vfprintf_l (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x1003FE9F7: printf (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10000BC1B: Parallel::run() (parallel.cc:61)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== 
+==25157== HEAP SUMMARY:
+==25157==     in use at exit: 1,416,034 bytes in 934 blocks
+==25157==   total heap usage: 54,892 allocs, 53,958 frees, 10,218,742 bytes allocated
+==25157== 
+==25157== 16 bytes in 1 blocks are definitely lost in loss record 11 of 510
+==25157==    at 0x100039A6C: malloc_zone_malloc (vg_replace_malloc.c:305)
+==25157==    by 0x1006AD9B1: recursive_mutex_init (in /usr/lib/libobjc.A.dylib)
+==25157==    by 0x1006AD6FC: _objc_init (in /usr/lib/libobjc.A.dylib)
+==25157==    by 0x10031687C: _os_object_init (in /usr/lib/system/libdispatch.dylib)
+==25157==    by 0x100316864: libdispatch_init (in /usr/lib/system/libdispatch.dylib)
+==25157==    by 0x1001FBA9F: libSystem_initializer (in /usr/lib/libSystem.B.dylib)
+==25157==    by 0x7FFF5FC12CEA: ImageLoaderMachO::doModInitFunctions(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==25157==    by 0x7FFF5FC12E77: ImageLoaderMachO::doInitialization(ImageLoader::LinkContext const&) (in /usr/lib/dyld)
+==25157==    by 0x7FFF5FC0F870: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==25157==    by 0x7FFF5FC0F805: ImageLoader::recursiveInitialization(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==25157==    by 0x7FFF5FC0F6F7: ImageLoader::processInitializers(ImageLoader::LinkContext const&, unsigned int, ImageLoader::InitializerTimingList&, ImageLoader::UninitedUpwards&) (in /usr/lib/dyld)
+==25157==    by 0x7FFF5FC0F968: ImageLoader::runInitializers(ImageLoader::LinkContext const&, ImageLoader::InitializerTimingList&) (in /usr/lib/dyld)
+==25157== 
+==25157== 848 (120 direct, 728 indirect) bytes in 1 blocks are definitely lost in loss record 483 of 510
+==25157==    at 0x10003A0C7: calloc (vg_replace_malloc.c:630)
+==25157==    by 0x10042EBC9: tre_compile (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x10042E075: regncomp_l (in /usr/lib/system/libsystem_c.dylib)
+==25157==    by 0x100004710: Db_data::read_file(std::vector<Db_data*, std::allocator<Db_data*> >&, char*) (db.cc:235)
+==25157==    by 0x10000BB6D: Parallel::run() (parallel.cc:43)
+==25157==    by 0x100001938: run() (main.cc:89)
+==25157==    by 0x100014847: main (main.cc:19)
+==25157== 
+==25157== LEAK SUMMARY:
+==25157==    definitely lost: 136 bytes in 2 blocks
+==25157==    indirectly lost: 728 bytes in 11 blocks
+==25157==      possibly lost: 145,106 bytes in 609 blocks
+==25157==    still reachable: 1,270,064 bytes in 312 blocks
+==25157==         suppressed: 0 bytes in 0 blocks
+==25157== Reachable blocks (those to which a pointer was found) are not shown.
+==25157== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==25157== 
+==25157== For counts of detected and suppressed errors, rerun with: -v
+==25157== Use --track-origins=yes to see where uninitialised values come from
+==25157== ERROR SUMMARY: 617 errors from 434 contexts (suppressed: 0 from 0)

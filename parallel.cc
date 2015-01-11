@@ -71,7 +71,7 @@ void Parallel::run() {
 		results[0].print(Property::outfile);
 	}
 	fprintf(stderr, "\nfinished.....");
-	for (int i = 0; i < db.size(); i++) {
+	for (unsigned int i = 0; i < db.size(); i++) {
 		delete db[i];
 	}
 	if (datap)

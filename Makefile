@@ -28,4 +28,3 @@ main :  $(OBJS)
 
 clean :
 	rm -f *.o *~ $(PROG) gmon.out cityhash/*.o
-	find . -name "*.gcda" -print0 | xargs -0 rm

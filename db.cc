@@ -74,7 +74,7 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 	unsigned long duplicatedidentifiers = 0;
 	/* check hash, fatal error if found, otherwize insert new */
 	for (int i = 0; i < Property::threads; i++) {
-		for (long j = 0; j < db[i]->sequences; j++) {
+		for (unsigned long j = 0; j < db[i]->sequences; j++) {
 			seqinfo_t *seqindex_p = &db[i]->seqindex[j];
 			unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
 			seqindex_p->hdrhash = hdrhash;
@@ -215,7 +215,7 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	/* create indices */
 	int missingabundance = 0;
 
-	int* longest_array = new int[Property::threads];
+	unsigned long * longest_array = new unsigned long[Property::threads];
 	unsigned long * sequences_array = new unsigned long[Property::threads];
 	unsigned long * nucleotides_array = new unsigned long[Property::threads];
 	long *lastabundance = new long[Property::threads];
@@ -319,12 +319,12 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 void Db_data::print_info() {
 	fprintf(stderr, "Database info:     %lu nt", nucleotides);
 	fprintf(stderr, " in %ld sequences,", sequences);
-	fprintf(stderr, " longest %d nt\n", longest);
+	fprintf(stderr, " longest %ld nt\n", longest);
 }
 
 void Db_data::qgrams_init() {
 	qgrams = new qgramvector_t[sequences];
-	for (long i = 0; i < sequences; i++) {
+	for (unsigned long i = 0; i < sequences; i++) {
 		/* find qgrams */
 		findqgrams((unsigned char*) seqindex[i].seq, seqindex[i].seqlen, qgrams[i]);
 	}
@@ -350,7 +350,7 @@ void Db_data::put_seq(long seqno) {
 
 void Db_data::print_debug() {
 	fprintf(Property::dbdebug, "\nThis is DB #%d containing %lu sequences", threadid, sequences);
-	for (long i = 0; i < sequences; i++) {
+	for (unsigned long i = 0; i < sequences; i++) {
 		if (seqindex[i].header == NULL) {
 			fatal("Sequence index header should not be null");
 		} else if (seqindex[i].abundance == 0) {

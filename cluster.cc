@@ -94,7 +94,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 
 		for (unsigned long i = 0; i < listlen; i++) {
 			unsigned poolampliconid = qgramamps[i];
-			long diff = qgramdiffs[i];
+			unsigned int diff = qgramdiffs[i];
 			amps[swarmed + i].diffestimate = diff;
 			if (diff <= Property::resolution) {
 				targetindices[targetcount] = swarmed + i;
@@ -174,7 +174,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 
 				targetcount = 0;
 				for (unsigned long i = 0; i < listlen; i++)
-					if ((long) qgramdiffs[i] <= Property::resolution) {
+					if (qgramdiffs[i] <= Property::resolution) {
 						targetindices[targetcount] = qgramindices[i];
 						targetampliconids[targetcount] = qgramamps[i];
 						targetcount++;
@@ -257,7 +257,7 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	char sep_swarms[] = "\n\n";
 
 	long previd = -1;
-	unsigned max_generation;
+	unsigned max_generation = 0;
 	for (unsigned long i = 0; i < db->sequences; i++) {
 		member_info member;
 		member.sequence = *db->get_seqinfo(amps[i].ampliconid);
@@ -288,12 +288,16 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 	fprintf(stderr, "Estimates:         %lu\n", estimates);
 	fprintf(stderr, "Searches:          %lu\n", searches);
 	fprintf(stderr, "\n");
-	if (Property::bits == 8)
+	Property::program_statistics.total_estimation += estimates;
+	if (Property::bits == 8) {
+		Property::program_statistics.total_comparison_8 += count_comparison;
 		fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparison,
 				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
-	else
+	} else {
+		Property::program_statistics.total_comparison_16 += count_comparison;
 		fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparison,
 				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
+	}
 
 	delete[] (qgramdiffs);
 	qgramdiffs = NULL;

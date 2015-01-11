@@ -51,13 +51,13 @@ void cluster_result::print(FILE * stream) {
 	while (clusters.back().erased) {
 		clusters.pop_back();
 	}
-	for (long i = 0; i < clusters.size(); i++) {
+	for (unsigned int i = 0; i < clusters.size(); i++) {
 		std::sort(clusters[i].cluster_members.begin(), clusters[i].cluster_members.end(), compare_member());
 	}
 	std::sort(clusters.begin(), clusters.end(), compare_cluster());
 	long total = 0;
-	for (long i = 0; i < clusters.size(); i++) {
-		for (long j = 0; j < clusters[i].cluster_members.size(); j++) {
+	for (unsigned int i = 0; i < clusters.size(); i++) {
+		for (unsigned int j = 0; j < clusters[i].cluster_members.size(); j++) {
 			fprintf(stream, "\n%s", clusters[i].cluster_members[j].sequence.header);
 			total++;
 		}
@@ -67,7 +67,7 @@ void cluster_result::print(FILE * stream) {
 }
 
 void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
-	for (int i = 0; i < merge->cluster_members.size(); i++) {
+	for (unsigned int i = 0; i < merge->cluster_members.size(); i++) {
 		//need to determine max generation more precisely for the merged cluster otherwise it will be difficult
 		//for second time merging (because we don't know actual max generation)
 		cluster->cluster_members.push_back(merge->cluster_members[i]);

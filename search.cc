@@ -44,9 +44,10 @@ search_result searcher::search_single(seqinfo_t * query, seqinfo_t * target) {
 //	fprintf(stderr, "Comparing %s[%lu] with %s[%lu]\n", query_t.seq, query_t.len, target_t.seq, target_t.len);
 
 	if (Property::bits == 8) {
+		Property::program_statistics.total_comparison_8++;
 		search8(search_data, targets, &results, &query_t, dirbuffersize / 8, Property::longest);
 	} else {
-
+		Property::program_statistics.total_comparison_16++;
 		search16(search_data, targets, &results, &query_t, dirbuffersize / 8, Property::longest);
 	}
 	return results[0];

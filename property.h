@@ -20,6 +20,12 @@
 #define DEFAULT_RESOLUTION 1
 #define MAX_THREADS 100
 
+typedef struct statistics {
+	unsigned long int total_estimation;
+	unsigned long int total_comparison_8;
+	unsigned long int total_comparison_16;
+} stat;
+
 class Property {
 public:
 	static void init();
@@ -51,6 +57,7 @@ public:
 	static void set_gapopen(long value);
 	static void set_gapextend(long value);
 	static void calculate_penalty();
+	static stat program_statistics;
 };
 
 #endif /* PROPERTY_H_ */

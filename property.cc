@@ -25,6 +25,7 @@ FILE * Property::debugfile;
 FILE * Property::dbdebug;
 std::string Property::databasename;
 std::string Property::outfilename;
+stat Property::program_statistics;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -36,6 +37,9 @@ void Property::init() {
 	calculate_penalty();
 	debugfile = fopen("debug.log", "w");
 	dbdebug = fopen("db.log", "w");
+	program_statistics.total_estimation = 0;
+	program_statistics.total_comparison_8 = 0;
+	program_statistics.total_comparison_16 = 0;
 }
 
 void Property::calculate_penalty() {

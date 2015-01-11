@@ -87,6 +87,13 @@ void args_init(int argc, char **argv) {
 void run() {
 	Parallel parallel;
 	parallel.run();
+	stat_show();
+}
+
+void stat_show() {
+	fprintf(stderr, "\nTotal estimation    : %ld\n", Property::program_statistics.total_estimation);
+	fprintf(stderr, "Total comparison  8 : %ld\n", Property::program_statistics.total_comparison_8);
+	fprintf(stderr, "Total comparison 16 : %ld\n", Property::program_statistics.total_comparison_16);
 }
 
 void args_show() {

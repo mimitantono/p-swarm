@@ -21,5 +21,6 @@ void destroy();
 void run();
 void args_init(int argc, char** argv);
 void args_usage();
+void stat_show();
 
 #endif /* MAIN_H_ */
