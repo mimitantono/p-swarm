@@ -27,7 +27,8 @@ void args_init(int argc, char **argv) {
 	static struct option long_options[] = { { "differences", required_argument, NULL, 'd' }, { "help", no_argument, NULL, 'h' }, {
 			"output-file", required_argument, NULL, 'o' }, { "threads", required_argument, NULL, 't' }, { "match-reward", required_argument,
 	NULL, 'm' }, { "mismatch-penalty", required_argument, NULL, 'p' }, { "gap-opening-penalty", required_argument, NULL, 'g' }, {
-			"gap-extension-penalty", required_argument, NULL, 'e' }, { 0, 0, 0, 0 } };
+			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' },
+			{ 0, 0, 0, 0 }, };
 
 	int option_index = 0;
 	int c;
@@ -62,6 +63,9 @@ void args_init(int argc, char **argv) {
 			/* gap extension penalty */
 			Property::set_gapextend(atol(optarg));
 			break;
+		case 'z':
+			Property::enable_debug = true;
+			break;
 		case 'h':
 			/* help */
 		default:
@@ -91,7 +95,8 @@ void run() {
 	double dif1 = end.tv_sec - start.tv_sec;
 	printf("\nduration %.2lf secs\n", dif1);
 	gettimeofday(&start, NULL);
-	bigmatrix.print_matrix();
+	if (Property::enable_debug)
+		bigmatrix.print_debug();
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);
@@ -189,6 +194,7 @@ void args_usage() {
 	fprintf(stderr, "  -p, --mismatch-penalty INTEGER      penalty for nucleotide mismatch (4)\n");
 	fprintf(stderr, "  -g, --gap-opening-penalty INTEGER   gap open penalty (12)\n");
 	fprintf(stderr, "  -e, --gap-extension-penalty INTEGER gap extension penalty (4)\n");
+	fprintf(stderr, "  -z, --debug                         enable detailed debug\n");
 	fprintf(stderr, "\n");
 }
 

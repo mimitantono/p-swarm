@@ -37,7 +37,7 @@ public:
 	cluster_info * new_cluster(long cluster_id);
 	long partition_id;
 	void merge_cluster(cluster_info* cluster, cluster_info* merge);
-	void print(FILE * stream);
+	void print(FILE * stream, bool sort);
 	void add_member(cluster_info * cluster, member_info member);
 	cluster_info * find_member(unsigned long int sequence_id);
 private:

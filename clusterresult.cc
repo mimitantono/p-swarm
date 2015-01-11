@@ -25,23 +25,16 @@ cluster_info * cluster_result::new_cluster(long cluster_id) {
 }
 
 struct compare_cluster {
-	inline bool operator()(const std::pair<unsigned long int, cluster_info> & struct1,
-			const std::pair<unsigned long int, cluster_info> & struct2) {
-		return (struct1.second.cluster_members.begin()->second.sequence.header
-				< struct2.second.cluster_members.begin()->second.sequence.header);
+	inline bool operator()(const std::pair<cluster_info, std::vector<member_info> > & struct1,
+			const std::pair<cluster_info, std::vector<member_info> > & struct2) {
+		return (struct1.second[0].sequence.header < struct2.second[0].sequence.header);
 	}
 };
 
 struct compare_member {
-	inline bool operator()(const std::pair<const unsigned long int, member_info> & struct1,
-			const std::pair<const unsigned long int, member_info> & struct2) {
-		return (struct1.second.sequence.header < struct2.second.sequence.header);
-	}
-};
-
-struct sort_erased {
-	inline bool operator()(const cluster_info& struct1, const cluster_info& struct2) {
-		return (struct1.erased < struct2.erased);
+	inline bool operator()(const member_info & struct1,
+			const member_info & struct2) {
+		return (struct1.sequence.header < struct2.sequence.header);
 	}
 };
 
@@ -49,26 +42,43 @@ struct sort_erased {
  * Need to print out consistent format (such as correct result will look exactly the same)
  * this will be an expensive method, turn off except for unit test
  */
-void cluster_result::print(FILE * stream) {
-//	std::sort(clusters.begin(), clusters.end(), sort_erased());
-//	while (clusters.back().erased) {
-//		clusters.pop_back();
-//	}
-	for (unsigned long i = 0; i < clusters.size(); i++) {
-//		std::sort(clusters[i].cluster_members.begin(), clusters[i].cluster_members.end(), compare_member());
-	}
-//	std::sort(clusters.begin(), clusters.end(), compare_cluster());
+void cluster_result::print(FILE * stream, bool sort) {
 	long total = 0;
 	long clust = 0;
-	for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
-		if (!cit->second.erased) {
-			for (std::map<unsigned long int, member_info>::const_iterator it = cit->second.cluster_members.begin();
-					it != cit->second.cluster_members.end(); ++it) {
-				fprintf(stream, "\n%s", it->second.sequence.header);
+	if (sort) {
+		std::vector<std::pair<cluster_info, std::vector<member_info> > > vector_clusters;
+		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
+			if (!cit->second.erased) {
+				std::pair<cluster_info, std::vector<member_info> > pair;
+				for (std::map<unsigned long int, member_info>::const_iterator it = cit->second.cluster_members.begin();
+						it != cit->second.cluster_members.end(); ++it) {
+					pair.second.push_back(it->second);
+				}
+				pair.first = cit->second;
+				std::sort(pair.second.begin(), pair.second.end(), compare_member());
+				vector_clusters.push_back(pair);
+			}
+		}
+		std::sort(vector_clusters.begin(), vector_clusters.end(), compare_cluster());
+		for (unsigned int i = 0; i < vector_clusters.size(); i++) {
+			for (unsigned int j = 0; j < vector_clusters[i].second.size(); j++) {
+				fprintf(stream, "\n%s", vector_clusters[i].second[j].sequence.header);
 				total++;
 			}
 			fprintf(stream, "\n");
 			clust++;
+		}
+	} else {
+		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
+			if (!cit->second.erased) {
+				for (std::map<unsigned long int, member_info>::const_iterator it = cit->second.cluster_members.begin();
+						it != cit->second.cluster_members.end(); ++it) {
+					fprintf(stream, "\n%s", it->second.sequence.header);
+					total++;
+				}
+				fprintf(stream, "\n");
+				clust++;
+			}
 		}
 	}
 	fprintf(stream, "\n\nTotal: %ld clusters of %ld sequences", clust, total);

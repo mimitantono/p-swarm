@@ -17,7 +17,7 @@ rm *.log
 
 make all
 
-valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 test.fas
+valgrind --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 -z test.fas
 #mv debug.log debug1.log
 #./main -t1 test.fas
 mv result.log result1.log

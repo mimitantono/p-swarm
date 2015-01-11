@@ -37,6 +37,7 @@ public:
 	static long mismatchscore;
 	static long partition;
 	static long threads;
+	static bool enable_debug;
 	static unsigned long longest;
 	static unsigned long resolution;
 	static unsigned long bits;

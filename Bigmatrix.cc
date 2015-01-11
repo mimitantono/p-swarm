@@ -9,8 +9,6 @@
 
 Bigmatrix::Bigmatrix(Db_data * db) {
 	this->db = db;
-//	search_data = new struct search_data[Property::threads];
-//	guestbook = new unsigned long int*[db->sequences];
 	scanner = new class scanner[Property::threads];
 	for (int i = 0; i < Property::threads; i++) {
 		scanner[i].set_db(db);
@@ -20,12 +18,13 @@ Bigmatrix::Bigmatrix(Db_data * db) {
 	total_match = 0;
 	total_skip = 0;
 	skip_by_guestbook = 0;
-//	guestbook.set_empty_key(a_pair(-1,-1));
+	total_qgram = 0;
+	total_scan = 0;
+	total_comparison = 0;
 }
 
 Bigmatrix::~Bigmatrix() {
 //	delete guestbook;
-//	delete matrix;
 	delete[] scanner;
 }
 
@@ -50,11 +49,11 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 		std::vector<unsigned long int> visited;
 
 		unsigned long int qgram_count = 0;
+		total_comparison += (db->sequences - i - 1);
 		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
 			bool include = true;
 			unsigned long int col = j + i + 1;
-			unsigned long int combined = (i << 32) | (col & 0xffffffff);
-			if (std::find(guestbook.begin(), guestbook.end(), combined) != guestbook.end()) {
+			if (skip_rowcol(i, col)) {
 				include = false;
 				skip_by_guestbook++;
 			}
@@ -63,6 +62,7 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 				qgram_count++;
 			}
 		}
+		total_qgram += qgram_count;
 		qgram_work_diff(i, qgram_count, qgramamps, qgramdiffs, db);
 
 		unsigned long int targetcount = 0;
@@ -72,9 +72,10 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 				targetcount++;
 			}
 			if (qgramdiffs[j] == 0) {
-				visited.push_back(qgramamps[j]);
+//				visited.push_back(qgramamps[j]);
 			}
 		}
+		total_scan += targetcount;
 		scanner[thread_id].search_do(i, targetcount, targetampliconids);
 
 		for (unsigned long j = 0; j < targetcount; j++) {
@@ -84,20 +85,21 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			}
 		}
 		if (visited.size() > 0) {
-			for (unsigned long int k = 0; k < visited.size() - 1; k++) {
-				for (unsigned long int l = k + 1; l < visited.size(); l++) {
-					if (visited[k] < visited[l] && visited[k] > i) {
-						unsigned long combined = (visited[k] << 32) | (visited[l] & 0xffffffff);
-						pthread_mutex_lock(&workmutex);
-						guestbook.insert(combined);
-						pthread_mutex_unlock(&workmutex);
-					} else if (visited[l] > i) {
-						unsigned long combined = (visited[l] << 32) | (visited[k] & 0xffffffff);
-						pthread_mutex_lock(&workmutex);
-						guestbook.insert(combined);
-						pthread_mutex_unlock(&workmutex);
-					}
-				}
+//			for (unsigned long int k = 0; k < visited.size() - 1; k++) {
+//				for (unsigned long int l = k + 1; l < visited.size(); l++) {
+//					if (visited[k] < visited[l] && visited[k] > i) {
+//						pthread_mutex_lock(&workmutex);
+//						put_rowcol(visited[k], visited[l]);
+//						pthread_mutex_unlock(&workmutex);
+//					} else if (visited[l] > i) {
+//						pthread_mutex_lock(&workmutex);
+//						put_rowcol(visited[l], visited[k]);
+//						pthread_mutex_unlock(&workmutex);
+//					}
+//				}
+//			}
+			for (unsigned int k = 0; k < visited.size(); k++) {
+				guestbook[visited[k]] = true;
 			}
 		}
 		if (thread_id == 0)
@@ -125,14 +127,16 @@ void Bigmatrix::form_clusters() {
 				member.sequence.clusterid = second;
 				member.generation = 0;
 				result.add_member(existing_first, member);
-				fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_first->cluster_id);
+				if (Property::enable_debug)
+					fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_first->cluster_id);
 			} else if (existing_first == NULL && existing_second != NULL) {
 				member_info member;
 				member.sequence = *db->get_seqinfo(first);
 				member.sequence.clusterid = first;
 				member.generation = 0;
 				result.add_member(existing_second, member);
-				fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_second->cluster_id);
+				if (Property::enable_debug)
+					fprintf(Property::dbdebug, "Add %s to cluster %ld\n", member.sequence.header, existing_second->cluster_id);
 			} else if (existing_first == NULL && existing_second == NULL) {
 				cluster_info * added = result.new_cluster(cluster_id);
 				member_info member;
@@ -145,12 +149,14 @@ void Bigmatrix::form_clusters() {
 				member1.sequence.clusterid = second;
 				member1.generation = 0;
 				result.add_member(added, member1);
-				fprintf(Property::dbdebug, "Create cluster %ld for %s and %s\n", cluster_id, member1.sequence.header,
-						member.sequence.header);
+				if (Property::enable_debug)
+					fprintf(Property::dbdebug, "Create cluster %ld for %s and %s\n", cluster_id, member1.sequence.header,
+							member.sequence.header);
 				cluster_id++;
 			} else if (existing_first != NULL && existing_second != NULL) {
 				if (existing_first->cluster_id != existing_second->cluster_id) {
-					fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
+					if (Property::enable_debug)
+						fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
 					result.merge_cluster(existing_first, existing_second);
 				}
 			}
@@ -173,79 +179,23 @@ void Bigmatrix::form_clusters() {
 	}
 }
 
-//void Bigmatrix::form_clusters() {
-//	progress_init("Forming clusters   :", db->sequences);
-//	int cluster_id = 0;
-//	bool * row_guestbook = new bool[db->sequences];
-//	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		row_guestbook[i] = false;
-//	}
-//	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		if (row_guestbook[i] == false) {
-//			if (has_match(i)) {
-//				result.new_cluster(cluster_id);
-//				member_info member;
-//				member.sequence = *db->get_seqinfo(i);
-//				member.generation = 0;
-//				result.clusters[cluster_id].cluster_members.push_back(member);
-//				crawl_row(&row_guestbook, cluster_id, i, 0);
-//				cluster_id++;
-//			}
-//		}
-//		progress_update(i);
-//	}
-//	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		if (row_guestbook[i] == false) {
-//			result.new_cluster(cluster_id);
-//			member_info member;
-//			member.sequence = *db->get_seqinfo(i);
-//			member.generation = 0;
-//			result.clusters[cluster_id].cluster_members.push_back(member);
-//			cluster_id++;
-////			fprintf(stderr, "\n%s", member.sequence.header);
-//		}
-//	}
-//	delete row_guestbook;
-//	progress_done();
-//}
-
-bool Bigmatrix::has_match(unsigned long int row_id) {
-	for (unsigned long int j = row_id + 1; j < db->sequences; j++) {
-//		if (vector_contains(&matrix, row_id, j)) {
-//			return true;
-//		}
-	}
-	return false;
-}
-
-void Bigmatrix::crawl_row(bool ** row_guestbook, unsigned long int cluster_id, unsigned long int row_id, int generation) {
-	(*row_guestbook)[row_id] = true;
-	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		if (!(*row_guestbook)[i] && vector_contains(&matrix, row_id, i)) {
-//			member_info member;
-//			member.sequence = *db->get_seqinfo(i);
-//			member.generation = generation;
-//			result.clusters[cluster_id].cluster_members.push_back(member);
-//			crawl_row(row_guestbook, cluster_id, i, generation + 1);
-//		}
-	}
-}
-
 void Bigmatrix::print_clusters() {
-	result.print(Property::outfile);
+	if (Property::enable_debug)
+		result.print(Property::outfile, true);
+	else
+		result.print(Property::outfile, false);
 }
 
-void Bigmatrix::print_matrix() {
-	fprintf(Property::dbdebug, "Total match\t: %ld\nTotal skip\t: %ld\n", total_match, total_skip);
+void Bigmatrix::print_debug() {
+	fprintf(Property::dbdebug, "Total match\t\t: %ld\nTotal skip\t\t: %ld\n", total_match, total_skip);
+	fprintf(Property::dbdebug, "Guestbook size\t\t: %ld\n", guestbook.size());
+	fprintf(Property::dbdebug, "Skipped by guestbook\t: %ld\n", skip_by_guestbook);
+	fprintf(Property::dbdebug, "Total qgram\t\t: %ld\n", total_qgram);
+	fprintf(Property::dbdebug, "Total scan\t\t: %ld\n", total_scan);
+	fprintf(Property::dbdebug, "Total comparison\t\t: %ld\n", total_comparison);
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Map [%d] size\t: %ld\n", t, matrix[t].size());
 	}
-	fprintf(Property::dbdebug, "Guestbook size\t: %ld\n", guestbook.size());
-	fprintf(Property::dbdebug, "Skipped by guestbook\t: %ld\n", skip_by_guestbook);
-}
-
-bool Bigmatrix::vector_contains(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col) {
-	return true;
 }
 
 void Bigmatrix::vector_put(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col) {
@@ -253,7 +203,22 @@ void Bigmatrix::vector_put(std::vector<unsigned long int *> * vector, unsigned l
 	item[0] = row;
 	item[1] = col;
 	vector->push_back(item);
-	fprintf(Property::dbdebug, "%s and %s are connected\n", db->get_seqinfo(row)->header, db->get_seqinfo(col)->header);
+	if (Property::enable_debug)
+		fprintf(Property::dbdebug, "%s and %s are connected\n", db->get_seqinfo(row)->header, db->get_seqinfo(col)->header);
 	total_match++;
 }
 
+unsigned long int Bigmatrix::get_combined(unsigned long int a, unsigned long int b) {
+	return (a << 32) | (b & 0xffffffff);
+}
+
+bool Bigmatrix::skip_rowcol(unsigned long int a, unsigned long int b) {
+//	return (guestbook.find(get_combined(a, b)) != guestbook.end());
+	return (guestbook.find(a) != guestbook.end()) && (guestbook.find(b) != guestbook.end());
+}
+void Bigmatrix::put_rowcol(unsigned long int a, unsigned long int b) {
+//	guestbook[get_combined(a, b)] = true;
+	guestbook[a] = true;
+	guestbook[b] = true;
+	total_skip++;
+}

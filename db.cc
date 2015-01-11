@@ -32,7 +32,7 @@ Db_data::~Db_data() {
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
-	return (unsigned char*) (qgrams + seq_no);
+	return qgrams[seq_no];
 }
 
 void Db_data::showseq(char * seq) {
