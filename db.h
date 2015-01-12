@@ -34,7 +34,7 @@ struct seqinfo_s {
 	unsigned int headeridlen;
 	unsigned int seqlen;
 	unsigned int abundance;
-	unsigned int clusterid;
+	unsigned long int clusterid;
 	unsigned int hdrhash;
 	int abundance_start;
 	int abundance_end;

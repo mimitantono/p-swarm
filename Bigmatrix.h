@@ -40,10 +40,9 @@ private:
 	unsigned long int total_skip;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
-	unsigned long int total_comparison;
 	unsigned long int skip_by_guestbook;
 	std::vector<unsigned long int *> * matrix;
-	std::map<unsigned long int, bool> guestbook;
+	unsigned long int * guestbook;
 	cluster_result result;
 	void vector_put(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col);
 	unsigned long int get_combined(unsigned long int a , unsigned long int b);
