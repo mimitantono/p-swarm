@@ -42,12 +42,11 @@ private:
 	unsigned long int total_scan;
 	unsigned long int skip_by_guestbook;
 	std::vector<unsigned long int *> * matrix;
-	unsigned long int * guestbook;
+//	unsigned long int * guestbook;
 	cluster_result result;
 	void vector_put(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col);
 	unsigned long int get_combined(unsigned long int a , unsigned long int b);
 	bool skip_rowcol(unsigned long int a, unsigned long int b);
-	void put_rowcol(unsigned long int a, unsigned long int b);
 };
 
 #endif /* BIGMATRIX_H_ */
