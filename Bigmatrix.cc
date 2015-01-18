@@ -20,15 +20,20 @@ Bigmatrix::Bigmatrix(Db_data * db) {
 	skip_by_guestbook = 0;
 	total_qgram = 0;
 	total_scan = 0;
-//	guestbook = new unsigned long int[db->sequences];
-//	for (unsigned long int i = 0; i < db->sequences; i++) {
-//		guestbook[i] = i;
-//	}
+	guestbook = new unsigned long int[db->sequences];
+	for (unsigned long int i = 0; i < db->sequences; i++) {
+		guestbook[i] = i;
+	}
 }
 
 Bigmatrix::~Bigmatrix() {
-//	delete[] guestbook;
+	delete[] guestbook;
 	delete[] scanner;
+	for (int i = 0; i < Property::threads; i++) {
+		for (unsigned int j = 0; j < matrix[i].size(); j++) {
+			delete[] matrix[i][j];
+		}
+	}
 	delete[] matrix;
 }
 
@@ -56,7 +61,7 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			unsigned long int col = j + i + 1;
 //			if (Property::enable_debug)
 //				fprintf(Property::dbdebug, "Evaluate [%ld, %ld]\n", i, col);
-			if (skip_rowcol(i, col)) {
+			if (skip_rowcol(i, col) || abs(db->get_seqinfo(i)->seqlen - db->get_seqinfo(col)->seqlen) > Property::resolution) {
 //				if (Property::enable_debug)
 //					fprintf(Property::dbdebug, "Skip [%ld, %ld]\n", i, col);
 				include = false;
@@ -87,8 +92,8 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
 				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-//				if (guestbook[targetampliconids[j]] == targetampliconids[j])
-//					guestbook[targetampliconids[j]] = i;
+				if (guestbook[targetampliconids[j]] == targetampliconids[j])
+					guestbook[targetampliconids[j]] = i;
 //			} else {
 //				if (Property::enable_debug)
 //					fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", i, targetampliconids[j],
@@ -172,7 +177,7 @@ void Bigmatrix::form_clusters() {
 //						fprintf(Property::dbdebug, "Append missing seq %ld to cluster %ld\n", i, existing->cluster_id);
 //				}
 //			} else {
-				singletons.push_back(i);
+			singletons.push_back(i);
 //			}
 		}
 	}
@@ -219,6 +224,5 @@ unsigned long int Bigmatrix::get_combined(unsigned long int a, unsigned long int
 }
 
 bool Bigmatrix::skip_rowcol(unsigned long int a, unsigned long int b) {
-//	return guestbook[a] == guestbook[b];
-	return false;
+	return guestbook[a] == guestbook[b];
 }
