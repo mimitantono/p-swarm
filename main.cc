@@ -104,10 +104,10 @@ void run() {
 	printf("\nduration %.2lf secs\n", dif2);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
-//	if (db_data[0])
-//		delete db_data[0];
-//	if (datap)
-//		free(datap);
+	if (db_data[0])
+		delete db_data[0];
+	if (datap)
+		free(datap);
 }
 
 void *init_thread(void *threadargs) {
