@@ -262,11 +262,11 @@ cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
 		member.qgrams = db->qgrams[amps[i].ampliconid];
 		if (amps[i].swarmid != previd) {
 			if (!result->clusters.empty())
-				result->clusters.back().max_generation = max_generation + 1;
+//				result->clusters.back().max_generation = max_generation + 1;
 			result->new_cluster(amps[i].swarmid);
 		}
 		max_generation = member.generation;
-		result->clusters.back().cluster_members.insert(member);
+//		result->clusters.back().cluster_members.insert(member);
 		previd = amps[i].swarmid;
 	}
 

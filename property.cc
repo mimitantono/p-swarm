@@ -20,6 +20,7 @@ long Property::penalty_factor;
 bool Property::enable_debug;
 unsigned long Property::longest;
 unsigned long Property::resolution;
+unsigned long Property::max_next;
 unsigned long Property::diff_saturation;
 unsigned long Property::bits;
 FILE * Property::outfile;
@@ -33,6 +34,7 @@ void Property::init() {
 	gapopen = DEFAULT_GAPOPEN;
 	gapextend = DEFAULT_GAPEXTEND;
 	resolution = DEFAULT_RESOLUTION;
+	max_next = 2 * resolution;
 	partition = 1;
 	threads = DEFAULT_THREADS;
 	calculate_penalty();
@@ -76,6 +78,7 @@ void Property::print() {
 
 void Property::set_resolution(long value) {
 	resolution = value;
+	max_next = resolution * 2;
 	if (resolution < 1)
 		fatal("Illegal resolution specified");
 }

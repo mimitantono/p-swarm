@@ -10,7 +10,7 @@
 *.gcda
 *.log
 *.fas
-main
+main*
 
 
 leak*

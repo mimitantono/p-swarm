@@ -27,8 +27,7 @@ void args_init(int argc, char **argv) {
 	static struct option long_options[] = { { "differences", required_argument, NULL, 'd' }, { "help", no_argument, NULL, 'h' }, {
 			"output-file", required_argument, NULL, 'o' }, { "threads", required_argument, NULL, 't' }, { "match-reward", required_argument,
 	NULL, 'm' }, { "mismatch-penalty", required_argument, NULL, 'p' }, { "gap-opening-penalty", required_argument, NULL, 'g' }, {
-			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' },
-			{ 0, 0, 0, 0 }, };
+			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' }, { 0, 0, 0, 0 }, };
 
 	int option_index = 0;
 	int c;
@@ -95,8 +94,7 @@ void run() {
 	double dif1 = end.tv_sec - start.tv_sec;
 	printf("\nduration %.2lf secs\n", dif1);
 	gettimeofday(&start, NULL);
-	if (Property::enable_debug)
-		bigmatrix.print_debug();
+	bigmatrix.print_debug();
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);

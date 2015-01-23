@@ -51,43 +51,79 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 	unsigned long int * targetampliconids = new unsigned long[db->sequences];
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", db->sequences);
-	for (unsigned long int i = thread_id; i < db->sequences; i += total_thread) {
+	for (unsigned long int row_id = thread_id; row_id < db->sequences; row_id += total_thread) {
+		std::vector<unsigned long int> temp_next;
 		unsigned long int qgram_count = 0;
-		for (unsigned long j = 0; j < db->sequences - i - 1; j++) {
-			unsigned long int col = j + i + 1;
-			if (abs(db->get_seqinfo(i)->seqlen - db->get_seqinfo(col)->seqlen) <= Property::resolution) {
-				qgramamps[qgram_count] = col;
-				qgram_count++;
+		seqinfo_t * row_sequence = db->get_seqinfo(row_id);
+		if (row_sequence->next_comparison.size() == 0) {
+			unsigned long int col_id = row_id + 1;
+			for (unsigned long j = 0; j < db->sequences - row_id - 1; j++) {
+				unsigned int diff_length = abs(row_sequence->seqlen - db->get_seqinfo(col_id)->seqlen);
+				if (diff_length <= Property::resolution) {
+					qgramamps[qgram_count] = col_id;
+					qgram_count++;
+				} else if (diff_length <= Property::max_next) {
+					temp_next.push_back(col_id);
+				}
+				col_id++;
+			}
+		} else {
+			for (unsigned int k = 0; k < row_sequence->next_comparison.size(); k++) {
+				unsigned long int col_id = row_sequence->next_comparison[k];
+				if (col_id > row_id && abs(row_sequence->seqlen - db->get_seqinfo(col_id)->seqlen) <= Property::resolution) {
+					qgramamps[qgram_count] = row_sequence->next_comparison[k];
+					qgram_count++;
+				}
 			}
 		}
 		total_qgram += qgram_count;
-		qgram_work_diff(i, qgram_count, qgramamps, qgramdiffs, db);
+		qgram_work_diff(row_id, qgram_count, qgramamps, qgramdiffs, db);
 
 		unsigned long int targetcount = 0;
 		for (unsigned long j = 0; j < qgram_count; j++) {
 			if (qgramdiffs[j] <= Property::resolution) {
 				targetampliconids[targetcount] = qgramamps[j];
 				targetcount++;
-//			} else {
-//				if (Property::enable_debug)
-//					fprintf(Property::dbdebug, "%ld and %ld has %ld different qgrams\n", i, qgramamps[j],
-//							scanner[thread_id].master_result[j].diff);
+			} else if (qgramdiffs[j] <= Property::max_next) {
+				temp_next.push_back(qgramamps[j]);
 			}
+//			if (Property::enable_debug)
+//				fprintf(Property::dbdebug, "%ld and %ld has %ld different qgrams\n", row_id, qgramamps[j], qgramdiffs[j]);
 		}
 		total_scan += targetcount;
-		scanner[thread_id].search_do(i, targetcount, targetampliconids);
+		scanner[thread_id].search_do(row_id, targetcount, targetampliconids);
 
 		for (unsigned long j = 0; j < targetcount; j++) {
 			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
-				vector_put(&matrix[thread_id], i, targetampliconids[j]);
-//			} else {
+				vector_put(&matrix[thread_id], row_id, targetampliconids[j]);
+			} else if (scanner[thread_id].master_result[j].diff <= Property::max_next) {
+				temp_next.push_back(targetampliconids[j]);
+			} else {
 //				if (Property::enable_debug)
-//					fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", i, targetampliconids[j],
+//					fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[j],
 //							scanner[thread_id].master_result[j].diff);
 			}
 		}
+		if (row_sequence->next_comparison.size() == 0) {
+			for (unsigned long j = 0; j < targetcount; j++) {
+				if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
+					if (db->get_seqinfo(targetampliconids[j])->next_comparison.size() == 0) {
+						db->get_seqinfo(targetampliconids[j])->next_comparison = temp_next;
+//						if (Property::enable_debug) {
+//							fprintf(Property::dbdebug, "%ld will only consider [", targetampliconids[j]);
+//							for (unsigned int k = 0; k < temp_next.size(); k++) {
+//								fprintf(Property::dbdebug, "%ld, ", temp_next[k]);
+//							}
+//							fprintf(Property::dbdebug, "]\n");
+//						}
+					}
+				}
+			}
+		}
+		row_sequence->next_comparison.clear();
+		temp_next.clear();
 		if (thread_id == 0)
-			progress_update(i);
+			progress_update(row_id);
 	}
 	if (thread_id == 0) {
 		progress_done();
@@ -188,8 +224,8 @@ void Bigmatrix::vector_put(std::vector<unsigned long int *> * vector, unsigned l
 	item[0] = row;
 	item[1] = col;
 	vector->push_back(item);
-//	if (Property::enable_debug)
-//		fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
+	if (Property::enable_debug)
+		fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
 	total_match++;
 }
 
