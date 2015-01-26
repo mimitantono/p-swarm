@@ -17,7 +17,6 @@ long Property::mismatchscore;
 long Property::partition;
 long Property::threads;
 long Property::penalty_factor;
-bool Property::enable_debug;
 unsigned long Property::longest;
 unsigned long Property::resolution;
 unsigned long Property::max_next;
@@ -39,7 +38,6 @@ void Property::init() {
 	threads = DEFAULT_THREADS;
 	calculate_penalty();
 	dbdebug = fopen("db.log", "w");
-	enable_debug = false;
 }
 
 void Property::calculate_penalty() {

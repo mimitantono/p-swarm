@@ -38,7 +38,7 @@ struct seqinfo_s {
 	unsigned int hdrhash;
 	int abundance_start;
 	int abundance_end;
-	std::vector<unsigned long int> next_comparison;
+	unsigned long int reference;
 };
 
 typedef struct seqinfo_s seqinfo_t;

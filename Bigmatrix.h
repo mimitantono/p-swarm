@@ -37,10 +37,14 @@ private:
 	Db_data * db;
 	class scanner * scanner;
 	unsigned long int total_match;
-	unsigned long int total_skip;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
+	unsigned long int temp_written;
+	unsigned long int temp_cleaned;
+	unsigned long int total_data;
 	std::vector<unsigned long int *> * matrix;
+	std::map<unsigned long int, std::vector<unsigned long int> > next_comparison;
+	std::map<unsigned long int, int> comparison_log;
 	cluster_result result;
 	void vector_put(std::vector<unsigned long int *> * vector, unsigned long int row, unsigned long int col);
 };

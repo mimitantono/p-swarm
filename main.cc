@@ -62,9 +62,6 @@ void args_init(int argc, char **argv) {
 			/* gap extension penalty */
 			Property::set_gapextend(atol(optarg));
 			break;
-		case 'z':
-			Property::enable_debug = true;
-			break;
 		case 'h':
 			/* help */
 		default:

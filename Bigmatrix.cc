@@ -16,20 +16,15 @@ Bigmatrix::Bigmatrix(Db_data * db) {
 	}
 	matrix = new std::vector<unsigned long int *>[Property::threads];
 	total_match = 0;
-	total_skip = 0;
 	total_qgram = 0;
 	total_scan = 0;
+	temp_cleaned = 0;
+	temp_written = 0;
 }
 
 Bigmatrix::~Bigmatrix() {
 	delete[] scanner;
 	scanner = NULL;
-//	for (int i = 0; i < Property::threads; i++) {
-//		for (unsigned int j = 0; j < matrix[i].size(); j++) {
-//			delete[] matrix[i][j];
-//		}
-//		matrix[i].clear();
-//	}
 	delete[] matrix;
 	matrix = NULL;
 }
@@ -55,9 +50,9 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 		std::vector<unsigned long int> temp_next;
 		unsigned long int qgram_count = 0;
 		seqinfo_t * row_sequence = db->get_seqinfo(row_id);
-		if (row_sequence->next_comparison.size() == 0) {
-			unsigned long int col_id = row_id + 1;
-			for (unsigned long j = 0; j < db->sequences - row_id - 1; j++) {
+		bool using_reference = false;
+		if (next_comparison.find(row_sequence->reference) == next_comparison.end()) {
+			for (unsigned long col_id = row_id + 1; col_id < db->sequences; col_id++) {
 				unsigned int diff_length = abs(row_sequence->seqlen - db->get_seqinfo(col_id)->seqlen);
 				if (diff_length <= Property::resolution) {
 					qgramamps[qgram_count] = col_id;
@@ -65,16 +60,31 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 				} else if (diff_length <= Property::max_next) {
 					temp_next.push_back(col_id);
 				}
-				col_id++;
 			}
 		} else {
-			for (unsigned int k = 0; k < row_sequence->next_comparison.size(); k++) {
-				unsigned long int col_id = row_sequence->next_comparison[k];
-				if (col_id > row_id && abs(row_sequence->seqlen - db->get_seqinfo(col_id)->seqlen) <= Property::resolution) {
-					qgramamps[qgram_count] = row_sequence->next_comparison[k];
+			using_reference = true;
+			std::vector<unsigned long int> * references = &next_comparison[row_sequence->reference];
+
+			for (unsigned int k = 0; k < references->size(); k++) {
+				unsigned long int col_id = (*references)[k];
+				if (col_id > row_id) {
+					qgramamps[qgram_count] = col_id;
 					qgram_count++;
 				}
 			}
+			int log_count = comparison_log[row_sequence->reference];
+			if (log_count <= 1) {
+				next_comparison.erase(next_comparison.find(row_sequence->reference));
+				temp_cleaned++;
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Clean next comparison %ld\n", row_sequence->reference);
+#endif
+			} else {
+				comparison_log[row_sequence->reference] = log_count - 1;
+			}
+#ifdef DEBUG
+			fprintf(Property::dbdebug, "Log count for %ld is now %d\n", row_sequence->reference, log_count - 1);
+#endif
 		}
 		total_qgram += qgram_count;
 		qgram_work_diff(row_id, qgram_count, qgramamps, qgramdiffs, db);
@@ -87,8 +97,9 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			} else if (qgramdiffs[j] <= Property::max_next) {
 				temp_next.push_back(qgramamps[j]);
 			}
-//			if (Property::enable_debug)
-//				fprintf(Property::dbdebug, "%ld and %ld has %ld different qgrams\n", row_id, qgramamps[j], qgramdiffs[j]);
+#ifdef DEBUG
+			fprintf(Property::dbdebug, "%ld and %ld has %ld different qgrams\n", row_id, qgramamps[j], qgramdiffs[j]);
+#endif
 		}
 		total_scan += targetcount;
 		scanner[thread_id].search_do(row_id, targetcount, targetampliconids);
@@ -99,29 +110,33 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			} else if (scanner[thread_id].master_result[j].diff <= Property::max_next) {
 				temp_next.push_back(targetampliconids[j]);
 			} else {
-//				if (Property::enable_debug)
-//					fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[j],
-//							scanner[thread_id].master_result[j].diff);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[j],
+						scanner[thread_id].master_result[j].diff);
+#endif
 			}
 		}
-		if (row_sequence->next_comparison.size() == 0) {
+		if (!using_reference) {
+			int log_count = 0;
 			for (unsigned long j = 0; j < targetcount; j++) {
 				if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
-					if (db->get_seqinfo(targetampliconids[j])->next_comparison.size() == 0) {
-						db->get_seqinfo(targetampliconids[j])->next_comparison = temp_next;
-//						if (Property::enable_debug) {
-//							fprintf(Property::dbdebug, "%ld will only consider [", targetampliconids[j]);
-//							for (unsigned int k = 0; k < temp_next.size(); k++) {
-//								fprintf(Property::dbdebug, "%ld, ", temp_next[k]);
-//							}
-//							fprintf(Property::dbdebug, "]\n");
-//						}
+					if (db->get_seqinfo(targetampliconids[j])->reference == targetampliconids[j]
+							&& targetampliconids[j] > row_id + Property::threads * 2) {
+						db->get_seqinfo(targetampliconids[j])->reference = row_id;
+						log_count++;
 					}
 				}
 			}
+			if (log_count > 0) {
+				total_data += temp_next.size();
+				temp_written++;
+				next_comparison[row_id] = temp_next;
+				comparison_log[row_id] = log_count;
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Create next comparison %ld Log count %d\n", row_id, log_count);
+#endif
+			}
 		}
-		row_sequence->next_comparison.clear();
-		temp_next.clear();
 		if (thread_id == 0)
 			progress_update(row_id);
 	}
@@ -134,6 +149,7 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 }
 
 void Bigmatrix::form_clusters() {
+	next_comparison.clear();
 	unsigned long int cluster_id = 1;
 	for (int t = 0; t < Property::threads; t++) {
 		while (matrix[t].size() > 0) {
@@ -148,16 +164,18 @@ void Bigmatrix::form_clusters() {
 				member.sequence.clusterid = second;
 				member.generation = 0;
 				result.add_member(existing_first, member);
-				if (Property::enable_debug)
-					fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", second, existing_first->cluster_id);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", second, existing_first->cluster_id);
+#endif
 			} else if (existing_first == NULL && existing_second != NULL) {
 				member_info member;
 				member.sequence = *db->get_seqinfo(first);
 				member.sequence.clusterid = first;
 				member.generation = 0;
 				result.add_member(existing_second, member);
-				if (Property::enable_debug)
-					fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
+#endif
 			} else if (existing_first == NULL && existing_second == NULL) {
 				cluster_info * added = result.new_cluster(cluster_id);
 				member_info member;
@@ -170,14 +188,16 @@ void Bigmatrix::form_clusters() {
 				member1.sequence.clusterid = second;
 				member1.generation = 0;
 				result.add_member(added, member1);
-				if (Property::enable_debug)
-					fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, member1.sequence.clusterid,
-							member.sequence.clusterid);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, member1.sequence.clusterid,
+						member.sequence.clusterid);
+#endif
 				cluster_id++;
 			} else if (existing_first != NULL && existing_second != NULL) {
 				if (existing_first->cluster_id != existing_second->cluster_id) {
-					if (Property::enable_debug)
-						fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
+#ifdef DEBUG
+					fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
+#endif
 					result.merge_cluster(existing_first, existing_second);
 				}
 			}
@@ -203,17 +223,20 @@ void Bigmatrix::form_clusters() {
 }
 
 void Bigmatrix::print_clusters() {
-	if (Property::enable_debug)
-		result.print(Property::outfile, true);
-	else
-		result.print(Property::outfile, false);
+#ifdef DEBUG
+	result.print(Property::outfile, true);
+#else
+	result.print(Property::outfile, false);
+#endif
 }
 
 void Bigmatrix::print_debug() {
 	fprintf(Property::dbdebug, "Total match\t\t: %ld\n", total_match);
-	fprintf(Property::dbdebug, "Total skip\t\t: %ld\n", total_skip);
 	fprintf(Property::dbdebug, "Total estimate\t\t: %ld\n", total_qgram);
 	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
+	fprintf(Property::dbdebug, "Temp written\t\t: %ld\n", temp_written);
+	fprintf(Property::dbdebug, "Temp cleaned\t\t: %ld\n", temp_cleaned);
+	fprintf(Property::dbdebug, "Total data\t\t: %ld\n", total_data);
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Map [%d] size\t: %ld\n", t, matrix[t].size());
 	}
@@ -224,8 +247,9 @@ void Bigmatrix::vector_put(std::vector<unsigned long int *> * vector, unsigned l
 	item[0] = row;
 	item[1] = col;
 	vector->push_back(item);
-	if (Property::enable_debug)
-		fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
+#ifdef DEBUG
+	fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
+#endif
 	total_match++;
 }
 

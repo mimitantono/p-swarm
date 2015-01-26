@@ -246,6 +246,7 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
+		seqindex_p->reference = i;
 
 		p += seqindex_p->headerlen + 1;
 
