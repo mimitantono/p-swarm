@@ -29,17 +29,6 @@ Bigmatrix::~Bigmatrix() {
 	matrix = NULL;
 }
 
-void Bigmatrix::init_partition(int thread_id, int total_thread) {
-	if (thread_id == 0)
-		progress_init("Initialize matrix  :", db->sequences);
-	for (unsigned long int i = thread_id; i < db->sequences; i += total_thread) {
-		if (thread_id == 0)
-			progress_update(i);
-	}
-	if (thread_id == 0)
-		progress_done();
-}
-
 void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mutex_t workmutex) {
 	unsigned long int * qgramamps = new unsigned long int[db->sequences];
 	unsigned long int * qgramdiffs = new unsigned long int[db->sequences];
@@ -74,13 +63,17 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			}
 			int log_count = comparison_log[row_sequence->reference];
 			if (log_count <= 1) {
+				pthread_mutex_lock(&workmutex);
 				next_comparison.erase(next_comparison.find(row_sequence->reference));
+				pthread_mutex_unlock(&workmutex);
 				temp_cleaned++;
 #ifdef DEBUG
 				fprintf(Property::dbdebug, "Clean next comparison %ld\n", row_sequence->reference);
 #endif
 			} else {
+				pthread_mutex_lock(&workmutex);
 				comparison_log[row_sequence->reference] = log_count - 1;
+				pthread_mutex_unlock(&workmutex);
 			}
 #ifdef DEBUG
 			fprintf(Property::dbdebug, "Log count for %ld is now %d\n", row_sequence->reference, log_count - 1);
@@ -130,8 +123,10 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 			if (log_count > 0) {
 				total_data += temp_next.size();
 				temp_written++;
+				pthread_mutex_lock(&workmutex);
 				next_comparison[row_id] = temp_next;
 				comparison_log[row_id] = log_count;
+				pthread_mutex_unlock(&workmutex);
 #ifdef DEBUG
 				fprintf(Property::dbdebug, "Create next comparison %ld Log count %d\n", row_id, log_count);
 #endif
@@ -149,7 +144,6 @@ void Bigmatrix::calculate_partition(int thread_id, int total_thread, pthread_mut
 }
 
 void Bigmatrix::form_clusters() {
-	next_comparison.clear();
 	unsigned long int cluster_id = 1;
 	for (int t = 0; t < Property::threads; t++) {
 		while (matrix[t].size() > 0) {

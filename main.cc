@@ -105,12 +105,6 @@ void run() {
 		free(datap);
 }
 
-void *init_thread(void *threadargs) {
-	thread_data *my_data = (thread_data*) threadargs;
-	my_data->bigmatrix->init_partition(my_data->thread_id, Property::threads);
-	pthread_exit(NULL);
-}
-
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
 	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads, my_data->workmutex);
@@ -118,41 +112,25 @@ void *run_thread(void *threadargs) {
 }
 
 void calculate_matrix(class Bigmatrix *bigmatrix) {
-	pthread_t threads_init[Property::threads];
 	pthread_attr_t attr;
 	int rc;
-	long t;
 	void *status;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	thread_data *thread_data_array = new thread_data[Property::threads];
 
+	pthread_t threads[Property::threads];
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
 		thread_data_array[i].bigmatrix = bigmatrix;
 		pthread_mutex_init(&thread_data_array[i].workmutex, NULL);
-		rc = pthread_create(&threads_init[i], &attr, init_thread, (void *) &thread_data_array[i]);
-		if (rc) {
-			fprintf(stderr, "Error: unable to create thread, %d", rc);
-			exit(-1);
-		}
-	}
-	for (t = 0; t < Property::threads; t++) {
-		rc = pthread_join(threads_init[t], &status);
-		if (rc) {
-			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
-			exit(-1);
-		}
-	}
-	pthread_t threads[Property::threads];
-	for (long i = 0; i < Property::threads; i++) {
 		rc = pthread_create(&threads[i], &attr, run_thread, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
 			exit(-1);
 		}
 	}
-	for (t = 0; t < Property::threads; t++) {
+	for (long t = 0; t < Property::threads; t++) {
 		rc = pthread_join(threads[t], &status);
 		if (rc) {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);

@@ -31,7 +31,6 @@ public:
 	void print_debug();
 	void print_clusters();
 	void calculate_partition(int thread_id, int total_thread, pthread_mutex_t workmutex);
-	void init_partition(int thread_id, int total_thread);
 private:
 //	struct search_data * search_data;
 	Db_data * db;
