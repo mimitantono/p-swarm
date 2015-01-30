@@ -58,14 +58,12 @@ int compare_abundance(const void * a, const void * b) {
 		return 0;
 }
 
-bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
+bool Db_data::detect_duplicates() {
 	/* set up hash to check for unique headers */
 
 	unsigned long hdrhashsize = 0;
 
-	for (int i = 0; i < Property::partition; i++) {
-		hdrhashsize += db[i]->sequences;
-	}
+	hdrhashsize += sequences;
 	hdrhashsize *= 2;
 
 	seqinfo_t ** hdrhashtable = new seqinfo_t*[hdrhashsize];
@@ -73,28 +71,26 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 
 	unsigned long duplicatedidentifiers = 0;
 	/* check hash, fatal error if found, otherwize insert new */
-	for (int i = 0; i < Property::partition; i++) {
-		for (unsigned long j = 0; j < db[i]->sequences; j++) {
-			seqinfo_t *seqindex_p = &db[i]->seqindex[j];
-			unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
-			seqindex_p->hdrhash = hdrhash;
-			unsigned long hashindex = hdrhash % hdrhashsize;
+	for (unsigned long j = 0; j < sequences; j++) {
+		seqinfo_t *seqindex_p = &seqindex[j];
+		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
+		seqindex_p->hdrhash = hdrhash;
+		unsigned long hashindex = hdrhash % hdrhashsize;
 
-			seqinfo_t * found;
+		seqinfo_t * found;
 
-			while ((found = hdrhashtable[hashindex])) {
-				if ((found->hdrhash == hdrhash) && (found->headeridlen == seqindex_p->headeridlen)
-						&& (strncmp(found->header, seqindex_p->header, found->headeridlen) == 0))
-					break;
-				hashindex = (hashindex + 1) % hdrhashsize;
-				found = hdrhashtable[hashindex];
-			}
-			if (found) {
-				duplicatedidentifiers++;
-				fprintf(stderr, "Duplicated sequence identifier: %s\n", seqindex_p->header);
-			}
-			hdrhashtable[hashindex] = seqindex_p;
+		while ((found = hdrhashtable[hashindex])) {
+			if ((found->hdrhash == hdrhash) && (found->headeridlen == seqindex_p->headeridlen)
+					&& (strncmp(found->header, seqindex_p->header, found->headeridlen) == 0))
+				break;
+			hashindex = (hashindex + 1) % hdrhashsize;
+			found = hdrhashtable[hashindex];
 		}
+		if (found) {
+			duplicatedidentifiers++;
+			fprintf(stderr, "Duplicated sequence identifier: %s\n", seqindex_p->header);
+		}
+		hdrhashtable[hashindex] = seqindex_p;
 	}
 
 	delete[] (hdrhashtable);
@@ -105,16 +101,11 @@ bool Db_data::detect_duplicates(std::vector<Db_data*>& db) {
 	return false;
 }
 
-char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
-	for (int i = 0; i < Property::partition; i++) {
-		db.push_back(new Db_data());
-	}
+char * Db_data::read_file(char* datap) {
 	/* allocate space */
 
 	unsigned long dataalloc = MEMCHUNK;
 	unsigned long datalen = 0;
-
-	unsigned long sequences = 0;
 
 	FILE * fp = NULL;
 	if (Property::databasename.c_str()) {
@@ -215,19 +206,8 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 	/* create indices */
 	int missingabundance = 0;
 
-	unsigned long * longest_array = new unsigned long[Property::partition];
-	unsigned long * sequences_array = new unsigned long[Property::partition];
-	unsigned long * nucleotides_array = new unsigned long[Property::partition];
-	long *lastabundance = new long[Property::partition];
-	int *presorted = new int[Property::partition];
-
-	for (int threadid = 0; threadid < Property::partition; threadid++) {
-		longest_array[threadid] = 0;
-		sequences_array[threadid] = 0;
-		nucleotides_array[threadid] = 0;
-		lastabundance[threadid] = -1;
-		presorted[threadid] = 1;
-	}
+	long lastabundance = -1;
+	int presorted = 1;
 
 	regex_t db_regexp;
 	regmatch_t pmatch[4];
@@ -237,12 +217,9 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 
 	char * p = datap;
 	for (unsigned long i = 0; i < sequences; i++) {
-		int threadid = i * Property::partition / sequences;
-//		int threadid = i % Property::threads;
-		sequences_array[threadid]++;
 		seqinfo_t seqinfo;
-		db[threadid]->seqindex.push_back(seqinfo);
-		seqinfo_t * seqindex_p = &(db[threadid]->seqindex.back());
+		seqindex.push_back(seqinfo);
+		seqinfo_t * seqindex_p = &(seqindex.back());
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
@@ -264,18 +241,18 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		if (seqindex_p->abundance < 1)
 			missingabundance++;
 
-		if (lastabundance[threadid] > 0 && seqindex_p->abundance > lastabundance[threadid])
-			presorted[threadid] = 0;
+		if (lastabundance > 0 && seqindex_p->abundance > lastabundance)
+			presorted = 0;
 
-		lastabundance[threadid] = seqindex_p->abundance;
+		lastabundance = seqindex_p->abundance;
 
 		seqindex_p->seq = p;
 		seqindex_p->seqlen = strlen(p);
 
-		if (seqindex_p->seqlen > longest_array[threadid]) {
-			longest_array[threadid] = seqindex_p->seqlen;
+		if (seqindex_p->seqlen > longest) {
+			longest = seqindex_p->seqlen;
 		}
-		nucleotides_array[threadid] += seqindex_p->seqlen;
+		nucleotides += seqindex_p->seqlen;
 
 		p += seqindex_p->seqlen + 1;
 	}
@@ -286,34 +263,17 @@ char * Db_data::read_file(std::vector<Db_data*>& db, char* datap) {
 		fatal(msg);
 	}
 
-	for (int threadid = 0; threadid < Property::partition; threadid++) {
-		if (!presorted[threadid]) {
-			fatal("Input file was not presorted.\n");
-		}
-		db[threadid]->nucleotides = nucleotides_array[threadid];
-		db[threadid]->longest = longest_array[threadid];
-		db[threadid]->sequences = sequences_array[threadid];
-		db[threadid]->threadid = threadid;
-		db[threadid]->qgrams_init();
-		db[threadid]->print_info();
-		if (db[threadid]->longest > Property::longest) {
-			Property::longest = db[threadid]->longest;
-		}
+	if (!presorted) {
+		fatal("Input file was not presorted.\n");
 	}
+	qgrams_init();
+	print_info();
+	Property::longest = longest;
 
-	if (detect_duplicates(db))
+	if (detect_duplicates())
 		fatal("There are duplicates in input file.");
 
-	delete[] longest_array;
-	longest_array = NULL;
-	delete[] presorted;
-	presorted = NULL;
-	delete[] sequences_array;
-	sequences_array = NULL;
-	delete[] nucleotides_array;
-	nucleotides_array = NULL;
-	delete[] lastabundance;
-	lastabundance = NULL;
+	regfree(&db_regexp);
 
 	return datap;
 }

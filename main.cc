@@ -9,10 +9,10 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+	Property::init();
 	Matrix::score_matrix_init();
 	CPU_Info::cpu_features_detect();
 	CPU_Info::cpu_features_show();
-	Property::init();
 	args_init(argc, argv);
 	run();
 	destroy();
@@ -82,10 +82,9 @@ void args_init(int argc, char **argv) {
 void run() {
 	timeval start, end;
 	gettimeofday(&start, NULL);
-	std::vector<Db_data*> db_data;
 	char * datap = (char *) xmalloc(MEMCHUNK);
-	datap = Db_data::read_file(db_data, datap);
-	class Bigmatrix bigmatrix(db_data[0]);
+	Property::db_data.read_file(datap);
+	class Bigmatrix bigmatrix;
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);
 	double dif1 = end.tv_sec - start.tv_sec;
@@ -99,15 +98,13 @@ void run() {
 	printf("\nduration %.2lf secs\n", dif2);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
-	if (db_data[0])
-		delete db_data[0];
 	if (datap)
 		free(datap);
 }
 
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads, my_data->workmutex);
+	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads);
 	pthread_exit(NULL);
 }
 
@@ -123,7 +120,6 @@ void calculate_matrix(class Bigmatrix *bigmatrix) {
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
 		thread_data_array[i].bigmatrix = bigmatrix;
-		pthread_mutex_init(&thread_data_array[i].workmutex, NULL);
 		rc = pthread_create(&threads[i], &attr, run_thread, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
@@ -136,7 +132,6 @@ void calculate_matrix(class Bigmatrix *bigmatrix) {
 			fprintf(stderr, "ERROR; return code from pthread_join() is %d\n", rc);
 			exit(-1);
 		}
-		pthread_mutex_destroy(&thread_data_array[t].workmutex);
 	}
 	pthread_attr_destroy(&attr);
 	delete[] thread_data_array;

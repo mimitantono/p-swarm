@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <string>
 #include "util.h"
+#include "db.h"
 
 #define DEFAULT_GAPOPEN 12
 #define DEFAULT_GAPEXTEND 4
@@ -35,13 +36,13 @@ public:
 	static long gapopenextend;
 	static long matchscore;
 	static long mismatchscore;
-	static long partition;
 	static long threads;
 	static unsigned long longest;
 	static unsigned long resolution;
 	static unsigned long bits;
 	static unsigned long diff_saturation;
 	static unsigned long max_next;
+	static class Db_data db_data;
 	static FILE* outfile;
 	static FILE* debugfile;
 	static FILE* dbdebug;

@@ -11,18 +11,16 @@
 #include "db.h"
 #include "matrix.h"
 #include "property.h"
-#include "cluster.h"
 #include <getopt.h>
-#include "parallel.h"
 #include <sys/time.h>
 #include "stdlib.h"
-#include "Bigmatrix.h"
+#include "property.h"
 
+#include "cluster.h"
 
 typedef struct thread_data {
 	unsigned long thread_id;
 	class Bigmatrix *bigmatrix;
-	pthread_mutex_t workmutex;
 } thread_data;
 
 void destroy();

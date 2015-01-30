@@ -17,24 +17,21 @@ cluster_result::~cluster_result() {
 cluster_info * cluster_result::new_cluster(long cluster_id) {
 	cluster_info info;
 	info.cluster_id = cluster_id;
-	info.max_generation = 1;
 	info.erased = false;
-	info.expired = true;
 	clusters[cluster_id] = info;
 	return &clusters[cluster_id];
 }
 
 struct compare_cluster {
-	inline bool operator()(const std::pair<cluster_info, std::vector<member_info> > & struct1,
-			const std::pair<cluster_info, std::vector<member_info> > & struct2) {
-		return (struct1.second[0].sequence.header < struct2.second[0].sequence.header);
+	inline bool operator()(const std::pair<cluster_info, std::vector<unsigned long int> > & struct1,
+			const std::pair<cluster_info, std::vector<unsigned long int> > & struct2) {
+		return (Property::db_data.get_seqinfo(struct1.second[0])->header < Property::db_data.get_seqinfo(struct2.second[0])->header);
 	}
 };
 
 struct compare_member {
-	inline bool operator()(const member_info & struct1,
-			const member_info & struct2) {
-		return (struct1.sequence.header < struct2.sequence.header);
+	inline bool operator()(const unsigned long int id1, unsigned long int id2) {
+		return (Property::db_data.get_seqinfo(id1)->header < Property::db_data.get_seqinfo(id2)->header);
 	}
 };
 
@@ -46,13 +43,12 @@ void cluster_result::print(FILE * stream, bool sort) {
 	long total = 0;
 	long clust = 0;
 	if (sort) {
-		std::vector<std::pair<cluster_info, std::vector<member_info> > > vector_clusters;
+		std::vector<std::pair<cluster_info, std::vector<unsigned long int> > > vector_clusters;
 		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
 			if (!cit->second.erased) {
-				std::pair<cluster_info, std::vector<member_info> > pair;
-				for (std::map<unsigned long int, member_info>::const_iterator it = cit->second.cluster_members.begin();
-						it != cit->second.cluster_members.end(); ++it) {
-					pair.second.push_back(it->second);
+				std::pair<cluster_info, std::vector<unsigned long int> > pair;
+				for (unsigned long i = 0; i < cit->second.cluster_members.size(); i++) {
+					pair.second.push_back(cit->second.cluster_members[i]);
 				}
 				pair.first = cit->second;
 				std::sort(pair.second.begin(), pair.second.end(), compare_member());
@@ -62,7 +58,7 @@ void cluster_result::print(FILE * stream, bool sort) {
 		std::sort(vector_clusters.begin(), vector_clusters.end(), compare_cluster());
 		for (unsigned int i = 0; i < vector_clusters.size(); i++) {
 			for (unsigned int j = 0; j < vector_clusters[i].second.size(); j++) {
-				fprintf(stream, "\n%s", vector_clusters[i].second[j].sequence.header);
+				fprintf(stream, "\n%s", Property::db_data.get_seqinfo(vector_clusters[i].second[j])->header);
 				total++;
 			}
 			fprintf(stream, "\n");
@@ -71,9 +67,8 @@ void cluster_result::print(FILE * stream, bool sort) {
 	} else {
 		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
 			if (!cit->second.erased) {
-				for (std::map<unsigned long int, member_info>::const_iterator it = cit->second.cluster_members.begin();
-						it != cit->second.cluster_members.end(); ++it) {
-					fprintf(stream, "\n%s", it->second.sequence.header);
+				for (unsigned long int i = 0; i < cit->second.cluster_members.size(); i++) {
+					fprintf(stream, "\n%s", Property::db_data.get_seqinfo(cit->second.cluster_members[i])->header);
 					total++;
 				}
 				fprintf(stream, "\n");
@@ -85,12 +80,10 @@ void cluster_result::print(FILE * stream, bool sort) {
 }
 
 void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
-	for (std::map<unsigned long int, member_info>::const_iterator it = merge->cluster_members.begin(); it != merge->cluster_members.end();
-			++it) {
-		add_member(cluster, it->second);
+	for (unsigned long int i = 0; i < merge->cluster_members.size(); i++) {
+		add_member(cluster, merge->cluster_members[i]);
 	}
 	merge->erased = true;
-	cluster->max_generation += merge->max_generation * 2;
 }
 
 cluster_info * cluster_result::find_member(unsigned long int sequence_id) {
@@ -100,7 +93,7 @@ cluster_info * cluster_result::find_member(unsigned long int sequence_id) {
 	return NULL;
 }
 
-void cluster_result::add_member(cluster_info* cluster, member_info member) {
-	cluster->cluster_members[member.sequence.clusterid] = member;
-	member_stat[member.sequence.clusterid] = cluster->cluster_id;
+void cluster_result::add_member(cluster_info* cluster, unsigned long int id) {
+	cluster->cluster_members.push_back(id);
+	member_stat[id] = cluster->cluster_id;
 }

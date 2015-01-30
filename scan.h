@@ -19,7 +19,6 @@ class scanner {
 public:
 	scanner();
 	virtual ~scanner();
-	void set_db(Db_data * db);
 	void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets);
 	void search_begin();
 	queryinfo_t query;
@@ -29,13 +28,9 @@ private:
 	class searcher searcher;
 	unsigned long dirbufferbytes;
 	unsigned long * master_targets;
-	Db_data * db;
-	void search_alloc();
-	void search_delete();
 	void search_init();
 	void search_chunk();
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
-	void master_dump();
 	void search_worker_core();
 };
 

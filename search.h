@@ -38,14 +38,11 @@ class searcher {
 public:
 	searcher();
 	virtual ~searcher();
-	static struct search_data * search_data;
 	static void search8(struct search_data *sd, std::vector<queryinfo_t> targets, std::vector<search_result> *result, queryinfo_t * query,
 			unsigned long dirbuffersize, long longest);
 
 	static void search16(struct search_data *sd, std::vector<queryinfo_t> targets, std::vector<search_result> *result, queryinfo_t * query,
 			unsigned long dirbuffersize, long longest);
-
-	static search_result search_single(seqinfo_t * query, seqinfo_t * target, struct search_data * search_data);
 };
 
 #endif /* SEARCH_H_ */

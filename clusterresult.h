@@ -14,19 +14,9 @@
 #include<algorithm>
 #include "db.h"
 
-typedef struct member_info {
-	seqinfo_t sequence;
-	unsigned qgram_diff;
-	unsigned generation;
-	unsigned radius;
-	unsigned char * qgrams;
-} member_info;
-
 typedef struct cluster_info {
 	unsigned long int cluster_id;
-	unsigned max_generation;
-	std::map<unsigned long int, member_info> cluster_members;
-	bool expired;
+	std::vector<unsigned long int> cluster_members;
 	bool erased;
 } cluster_info;
 
@@ -38,7 +28,7 @@ public:
 	long partition_id;
 	void merge_cluster(cluster_info* cluster, cluster_info* merge);
 	void print(FILE * stream, bool sort);
-	void add_member(cluster_info * cluster, member_info member);
+	void add_member(cluster_info * cluster, unsigned long int id);
 	cluster_info * find_member(unsigned long int sequence_id);
 private:
 	std::map<unsigned long int, cluster_info> clusters;

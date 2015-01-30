@@ -1,305 +1,237 @@
+/*
+ * Bigmatrix.cc
+ *
+ *  Created on: Dec 24, 2014
+ *      Author: mimitantono
+ */
+
 #include "cluster.h"
 
-cluster_job::cluster_job(Db_data * db) {
-	this->db = db;
-	scanner.set_db(db);
-	scanner.search_begin();
-}
-
-cluster_job::~cluster_job() {
-}
-
-cluster_result * cluster_job::algo_run(int threadid, cluster_result * result) {
-	fprintf(stderr, "\nRunning thread #%d for %lu sequences", threadid, db->sequences);
-
-	unsigned long swarmed;
-	unsigned long seeded;
-	unsigned long count_comparison = 0;
-
-	unsigned long targetcount;
-	unsigned long * targetindices = new unsigned long[db->sequences];
-	unsigned long * targetampliconids = new unsigned long[db->sequences];
-	unsigned long * qgramamps = new unsigned long[db->sequences];
-	unsigned long * qgramdiffs = new unsigned long[db->sequences];
-	unsigned long * qgramindices = new unsigned long[db->sequences];
-	unsigned long * hits = new unsigned long[db->sequences];
-
-	unsigned long searches = 0;
-	unsigned long estimates = 0;
-
-	unsigned long largestswarm = 0;
-	unsigned long swarmsize = 0;
-
-	unsigned long maxgenerations = 0;
-
-	ampliconinfo_s * amps = new ampliconinfo_s[db->sequences];
-
-	/* set ampliconid for all */
-	for (unsigned long i = 0; i < db->sequences; i++) {
-		amps[i].ampliconid = i;
+Bigmatrix::Bigmatrix() {
+	targetampliconids = new unsigned long*[Property::threads];
+	scanner = new class scanner[Property::threads];
+	for (int i = 0; i < Property::threads; i++) {
+		scanner[i].search_begin();
+		targetampliconids[i] = new unsigned long[Property::db_data.sequences / 4];
 	}
+	matrix_x = new std::vector<unsigned long int>[Property::threads];
+	matrix_y = new std::vector<unsigned long int>[Property::threads];
+	total_match = 0;
+	total_qgram = 0;
+	total_scan = 0;
+	temp_cleaned = 0;
+	temp_written = 0;
+	total_data = 0;
+	pthread_mutex_init(&workmutex, NULL);
+}
 
-	/* always search in 8 bit mode unless resolution is very high */
+Bigmatrix::~Bigmatrix() {
+	delete[] scanner;
+	scanner = NULL;
+	delete[] matrix_x;
+	matrix_x = NULL;
+	delete[] matrix_y;
+	matrix_y = NULL;
+	for (int i = 0; i < Property::threads; i++) {
+		delete[] targetampliconids[i];
+	}
+	delete[] targetampliconids;
 
-	seeded = 0;
-	swarmed = 0;
+	pthread_mutex_destroy(&workmutex);
+}
 
-	unsigned long swarmid = 0;
-
-	progress_init("Clustering:       ", db->sequences);
-	while (seeded < db->sequences) {
-
-		/* process each initial seed */
-
-		swarmid++;
-
-		unsigned long amplicons_copies = 0;
-		unsigned long singletons = 0;
-		unsigned long hitcount = 0;
-		unsigned long diffsum = 0;
-		unsigned long maxradius = 0;
-		unsigned long maxgen = 0;
-		unsigned long seedindex;
-
-		seedindex = seeded;
-		seeded++;
-
-		amps[seedindex].swarmid = swarmid;
-		amps[seedindex].generation = 0;
-		amps[seedindex].radius = 0;
-
-		unsigned long seedampliconid = amps[seedindex].ampliconid;
-		hits[hitcount++] = seedampliconid;
-
-		unsigned long abundance = db->get_seqinfo(seedampliconid)->abundance;
-		amplicons_copies += abundance;
-		if (abundance == 1)
-			singletons++;
-
-		swarmsize = 1;
-		swarmed++;
-
-		/* find diff estimates between seed and each amplicon in pool */
-
-		targetcount = 0;
-
-		unsigned long listlen = db->sequences - swarmed;
-
-		for (unsigned long i = 0; i < listlen; i++)
-			qgramamps[i] = amps[swarmed + i].ampliconid;
-
-		qgram_work_diff(seedampliconid, listlen, qgramamps, qgramdiffs, db);
-
-		estimates += listlen;
-
-		for (unsigned long i = 0; i < listlen; i++) {
-			amps[swarmed + i].diffestimate = qgramdiffs[i];
-			if (qgramdiffs[i] <= Property::resolution) {
-				targetindices[targetcount] = swarmed + i;
-				targetampliconids[targetcount] = qgramamps[i];
-				targetcount++;
-			}
-		}
-
-		if (targetcount > 0) {
-			scanner.search_do(seedampliconid, targetcount, targetampliconids);
-			searches++;
-
-			count_comparison += targetcount;
-
-			for (unsigned long t = 0; t < targetcount; t++) {
-				unsigned diff = scanner.master_result[t].diff;
-
-				if (diff <= (unsigned long) Property::resolution) {
-					unsigned i = targetindices[t];
-
-					/* move the target (i) to the position (swarmed)
-					 of the first unswarmed amplicon in the pool */
-
-					if (swarmed < i) {
-						struct ampliconinfo_s temp = amps[i];
-						for (unsigned j = i; j > swarmed; j--) {
-							amps[j] = amps[j - 1];
-						}
-						amps[swarmed] = temp;
-					}
-
-					amps[swarmed].swarmid = swarmid;
-					amps[swarmed].generation = 1;
-					if (maxgen < 1)
-						maxgen = 1;
-					amps[swarmed].radius = diff;
-					if (diff > maxradius)
-						maxradius = diff;
-
-					unsigned poolampliconid = amps[swarmed].ampliconid;
-					hits[hitcount++] = poolampliconid;
-
-					diffsum += diff;
-
-					abundance = db->get_seqinfo(poolampliconid)->abundance;
-					amplicons_copies += abundance;
-					if (abundance == 1)
-						singletons++;
-
-					swarmsize++;
-
-					swarmed++;
-				}
-			}
-
-			while (seeded < swarmed) {
-
-				/* process each subseed */
-
-				unsigned long subseedindex = seeded;
-
-				seeded++;
-
-				unsigned long listlen = 0;
-				for (unsigned long i = swarmed; i < db->sequences; i++) {
-					unsigned long targetampliconid = amps[i].ampliconid;
-					if (amps[i].diffestimate <= amps[subseedindex].radius + Property::resolution) {
-						qgramamps[listlen] = targetampliconid;
-						qgramindices[listlen] = i;
-						listlen++;
-					}
-				}
-
-				qgram_work_diff(amps[subseedindex].ampliconid, listlen, qgramamps, qgramdiffs, db);
-
-				estimates += listlen;
-
-				targetcount = 0;
-				for (unsigned long i = 0; i < listlen; i++)
-					if ((long) qgramdiffs[i] <= Property::resolution) {
-						targetindices[targetcount] = qgramindices[i];
-						targetampliconids[targetcount] = qgramamps[i];
+void Bigmatrix::calculate_partition(int thread_id, int total_thread) {
+	if (thread_id == 0)
+		progress_init("Calculating matrix :", Property::db_data.sequences);
+	unsigned long int max_targetcount = 0;
+	unsigned long int max_qgramcount = 0;
+	for (unsigned long int row_id = thread_id; row_id < Property::db_data.sequences; row_id += total_thread) {
+		std::vector<unsigned long int> temp_next;
+		seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
+		bool using_reference = false;
+		unsigned long int targetcount = 0;
+		if (next_comparison.find(row_sequence->reference) == next_comparison.end()) {
+			for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
+				unsigned int diff_length = abs(row_sequence->seqlen - Property::db_data.get_seqinfo(col_id)->seqlen);
+				if (diff_length <= Property::resolution) {
+					unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
+							Property::db_data.get_qgram_vector(col_id));
+					if (qgramdiff <= Property::resolution) {
+						targetampliconids[thread_id][targetcount] = col_id;
 						targetcount++;
+					} else if (qgramdiff <= Property::max_next) {
+						temp_next.push_back(col_id);
 					}
+				} else if (diff_length <= Property::max_next) {
+					temp_next.push_back(col_id);
+				}
+			}
+		} else {
+			using_reference = true;
+			std::vector<unsigned long int> * references = &next_comparison[row_sequence->reference];
 
-				if (targetcount > 0) {
-					scanner.search_do(amps[subseedindex].ampliconid, targetcount, targetampliconids);
-					searches++;
-
-					count_comparison += targetcount;
-
-					for (unsigned long t = 0; t < targetcount; t++) {
-						if (scanner.master_result[t].diff <= Property::resolution) {
-							unsigned i = targetindices[t];
-
-							/* find correct position in list */
-
-							/* move the target (i) to the position (swarmed)
-							 of the first unswarmed amplicon in the pool
-							 then move the target further into the swarmed
-							 but unseeded part of the list, so that the
-							 swarmed amplicons are ordered by id */
-
-							unsigned long targetampliconid = amps[i].ampliconid;
-							unsigned pos = swarmed;
-
-							while ((pos > seeded) && (amps[pos - 1].ampliconid > targetampliconid)
-									&& (amps[pos - 1].generation > amps[subseedindex].generation))
-								pos--;
-
-							if (pos < i) {
-								struct ampliconinfo_s temp = amps[i];
-								for (unsigned j = i; j > pos; j--) {
-									amps[j] = amps[j - 1];
-								}
-								amps[pos] = temp;
-							}
-
-							amps[pos].swarmid = swarmid;
-							amps[pos].generation = amps[subseedindex].generation + 1;
-							if (maxgen < amps[pos].generation)
-								maxgen = amps[pos].generation;
-							amps[pos].radius = amps[subseedindex].radius + scanner.master_result[t].diff;
-							if (amps[pos].radius > maxradius)
-								maxradius = amps[pos].radius;
-
-							unsigned poolampliconid = amps[pos].ampliconid;
-							hits[hitcount++] = poolampliconid;
-							diffsum += scanner.master_result[t].diff;
-
-							abundance = db->get_seqinfo(poolampliconid)->abundance;
-							amplicons_copies += abundance;
-							if (abundance == 1)
-								singletons++;
-
-							swarmsize++;
-
-							swarmed++;
-						}
+			for (unsigned int k = 0; k < references->size(); k++) {
+				unsigned long int col_id = (*references)[k];
+				if (col_id > row_id) {
+					unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
+							Property::db_data.get_qgram_vector(col_id));
+					if (qgramdiff <= Property::resolution) {
+						targetampliconids[thread_id][targetcount] = col_id;
+						targetcount++;
+					} else if (qgramdiff <= Property::max_next) {
+						temp_next.push_back(col_id);
 					}
 				}
 			}
+			int log_count = comparison_log[row_sequence->reference];
+			if (log_count <= 1) {
+				pthread_mutex_lock(&workmutex);
+				next_comparison.erase(next_comparison.find(row_sequence->reference));
+				pthread_mutex_unlock(&workmutex);
+				temp_cleaned++;
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Clean next comparison %ld\n", row_sequence->reference);
+#endif
+			} else {
+				pthread_mutex_lock(&workmutex);
+				comparison_log[row_sequence->reference] = log_count - 1;
+				pthread_mutex_unlock(&workmutex);
+			}
+#ifdef DEBUG
+			fprintf(Property::dbdebug, "Log count for %ld is now %d\n", row_sequence->reference, log_count - 1);
+#endif
 		}
+		total_scan += targetcount;
 
-		if (swarmsize > largestswarm)
-			largestswarm = swarmsize;
+		if (targetcount > max_targetcount)
+			max_targetcount = targetcount;
 
-		if (maxgen > maxgenerations)
-			maxgenerations = maxgen;
+		scanner[thread_id].search_do(row_id, targetcount, targetampliconids[thread_id]);
 
-		progress_update(seeded);
-	}
-	progress_done();
-
-	/* output results */
-
-	result->partition_id = threadid + 1;
-
-	long previd = -1;
-	unsigned max_generation;
-	for (unsigned long i = 0; i < db->sequences; i++) {
-		member_info member;
-		member.sequence = *db->get_seqinfo(amps[i].ampliconid);
-		member.generation = amps[i].generation;
-		member.radius = amps[i].radius;
-		member.qgram_diff = amps[i].diffestimate;
-		member.qgrams = db->qgrams[amps[i].ampliconid];
-		if (amps[i].swarmid != previd) {
-			if (!result->clusters.empty())
-//				result->clusters.back().max_generation = max_generation + 1;
-			result->new_cluster(amps[i].swarmid);
+		for (unsigned long j = 0; j < targetcount; j++) {
+			if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
+				vector_put(thread_id, row_id, targetampliconids[thread_id][j]);
+			} else if (scanner[thread_id].master_result[j].diff <= Property::max_next) {
+				temp_next.push_back(targetampliconids[thread_id][j]);
+			} else {
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[j],
+						scanner[thread_id].master_result[j].diff);
+#endif
+			}
 		}
-		max_generation = member.generation;
-//		result->clusters.back().cluster_members.insert(member);
-		previd = amps[i].swarmid;
+		if (!using_reference) {
+			int log_count = 0;
+			for (unsigned long j = 0; j < targetcount; j++) {
+				if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
+					if (Property::db_data.get_seqinfo(targetampliconids[thread_id][j])->reference == targetampliconids[thread_id][j]
+							&& targetampliconids[thread_id][j] > row_id + Property::threads * 2) {
+						Property::db_data.get_seqinfo(targetampliconids[thread_id][j])->reference = row_id;
+						log_count++;
+					}
+				}
+			}
+			if (log_count > 0) {
+				total_data += temp_next.size();
+				temp_written++;
+				pthread_mutex_lock(&workmutex);
+//				next_comparison[row_id] = temp_next;
+//				comparison_log[row_id] = log_count;
+				pthread_mutex_unlock(&workmutex);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Create next comparison %ld Log count %d\n", row_id, log_count);
+#endif
+			}
+		}
+		if (thread_id == 0)
+			progress_update(row_id);
+	}
+	if (thread_id == 0) {
+		progress_done();
 	}
 
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Number of swarms:  %lu\n", swarmid);
-	fprintf(stderr, "Largest swarm:     %lu\n", largestswarm);
-	fprintf(stderr, "Max generations:   %lu\n", maxgenerations);
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Estimates:         %lu\n", estimates);
-	fprintf(stderr, "Searches:          %lu\n", searches);
-	fprintf(stderr, "\n");
-	if (Property::bits == 8)
-		fprintf(stderr, "Comparisons (8b):  %lu (%.2lf%%)\n", count_comparison,
-				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
-	else
-		fprintf(stderr, "Comparisons (16b): %lu (%.2lf%%)\n", count_comparison,
-				(200.0 * count_comparison / db->sequences / (db->sequences + 1)));
+	fprintf(Property::dbdebug, "Max qgram count\t\t: %ld\n", max_qgramcount);
+	fprintf(Property::dbdebug, "Max target count\t\t: %ld\n", max_targetcount);
+}
 
-	delete[] (qgramdiffs);
-	qgramdiffs = NULL;
-	delete[] (qgramamps);
-	qgramamps = NULL;
-	delete[] (qgramindices);
-	qgramindices = NULL;
-	delete[] (hits);
-	hits = NULL;
-	delete[] (targetindices);
-	targetindices = NULL;
-	delete[] (targetampliconids);
-	targetampliconids = NULL;
-	delete[] (amps);
-	amps = NULL;
+void Bigmatrix::form_clusters() {
+	unsigned long int cluster_id = 1;
+	for (int t = 0; t < Property::threads; t++) {
+		while (matrix_x[t].size() > 0) {
+			unsigned long int first = matrix_x[t].back();
+			unsigned long int second = matrix_y[t].back();
+			cluster_info * existing_first = result.find_member(first);
+			cluster_info * existing_second = result.find_member(second);
+			if (existing_first != NULL && existing_second == NULL) {
+				result.add_member(existing_first, second);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", second, existing_first->cluster_id);
+#endif
+			} else if (existing_first == NULL && existing_second != NULL) {
+				result.add_member(existing_second, first);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
+#endif
+			} else if (existing_first == NULL && existing_second == NULL) {
+				cluster_info * added = result.new_cluster(cluster_id);
+				result.add_member(added, first);
+				result.add_member(added, second);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, member1.id,
+						member.id);
+#endif
+				cluster_id++;
+			} else if (existing_first != NULL && existing_second != NULL) {
+				if (existing_first->cluster_id != existing_second->cluster_id) {
+#ifdef DEBUG
+					fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
+#endif
+					result.merge_cluster(existing_first, existing_second);
+				}
+			}
+			matrix_x[t].pop_back();
+			matrix_y[t].pop_back();
+		}
+	}
+	std::vector<unsigned long int> singletons;
+	for (unsigned long int i = 0; i < Property::db_data.sequences; i++) {
+		if (result.find_member(i) == NULL) {
+			singletons.push_back(i);
+		}
+	}
+	for (unsigned long int i = 0; i < singletons.size(); i++) {
+		cluster_info * added = result.new_cluster(cluster_id);
+		result.add_member(added, singletons[i]);
+		cluster_id++;
+	}
+}
 
-	return result;
+void Bigmatrix::print_clusters() {
+#ifdef DEBUG
+	result.print(Property::outfile, true);
+#else
+	result.print(Property::outfile, false);
+#endif
+}
+
+void Bigmatrix::print_debug() {
+	fprintf(Property::dbdebug, "Total match\t\t: %ld\n", total_match);
+	fprintf(Property::dbdebug, "Total estimate\t\t: %ld\n", total_qgram);
+	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
+	fprintf(Property::dbdebug, "Temp written\t\t: %ld\n", temp_written);
+	fprintf(Property::dbdebug, "Temp cleaned\t\t: %ld\n", temp_cleaned);
+	fprintf(Property::dbdebug, "Total data\t\t: %ld\n", total_data);
+	for (int t = 0; t < Property::threads; t++) {
+		fprintf(Property::dbdebug, "Map [%d] size\t: %ld\n", t, matrix_x[t].size());
+	}
+}
+
+void Bigmatrix::vector_put(int thread_id, unsigned long int row, unsigned long int col) {
+	matrix_x[thread_id].push_back(row);
+	matrix_y[thread_id].push_back(col);
+#ifdef DEBUG
+	fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
+#endif
+	total_match++;
 }
 

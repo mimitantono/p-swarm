@@ -50,7 +50,7 @@ private:
 	std::vector<seqinfo_t> seqindex;
 	void qgrams_init();
 	bool process_line(long line);
-	static bool detect_duplicates(std::vector<Db_data*>& db);
+	bool detect_duplicates();
 public:
 	qgramvector_t * qgrams;
 	unsigned long sequences;
@@ -58,7 +58,7 @@ public:
 	unsigned long longest;
 	int threadid;
 
-	static char* read_file(std::vector<Db_data*> &db, char * datap);
+	char* read_file(char * datap);
 
 	Db_data();
 	virtual ~Db_data();

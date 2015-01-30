@@ -15,7 +15,7 @@ function compareResult() {
 make clean
 rm *.log
 
-make test
+make all
 
 valgrind --tool=memcheck --dsymutil=yes --leak-check=yes --log-file=leak --show-possibly-lost=no ./main -t 1 test.fas
 #mv debug.log debug1.log

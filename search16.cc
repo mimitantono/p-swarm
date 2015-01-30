@@ -3,6 +3,12 @@
 #define CHANNELS 8
 #define CDEPTH 4
 
+searcher::searcher() {
+}
+
+searcher::~searcher(){
+}
+
 void dprofile_dump16(WORD * dprofile) {
 	char * s = sym_nt;
 	printf("\ndprofile:\n");
