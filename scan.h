@@ -32,6 +32,7 @@ private:
 	void search_chunk();
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
 	void search_worker_core();
+	void master_dump();
 };
 
 #endif /* SCAN_H_ */
