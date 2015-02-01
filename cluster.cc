@@ -56,12 +56,16 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", Property::db_data.sequences);
 	for (unsigned long int row_id = thread_id; row_id < Property::db_data.sequences; row_id += total_thread) {
-		process_row(true, thread_id, row_id);
-		for (unsigned long int next_row = 0; next_row < next_step[thread_id].size(); next_row++) {
-			process_row(false, thread_id, next_step[thread_id][next_row]);
+		if (Property::enable_flag) {
+			process_row(true, false, thread_id, row_id);
+			for (unsigned long int next_row = 0; next_row < next_step[thread_id].size(); next_row++) {
+				process_row(false, true, thread_id, next_step[thread_id][next_row]);
+			}
+			std::vector<unsigned long int>().swap(next_comparison[thread_id]);
+			std::vector<unsigned long int>().swap(next_step[thread_id]);
+		} else {
+			process_row(false, false, thread_id, row_id);
 		}
-		std::vector<unsigned long int>().swap(next_comparison[thread_id]);
-		std::vector<unsigned long int>().swap(next_step[thread_id]);
 	}
 	if (thread_id == 0) {
 		progress_done();
@@ -75,7 +79,7 @@ void Cluster::run_thread(int thread_id, int total_thread) {
  * If write_reference is false, it means that this step will use the list of sequences that was calculated before and do not
  * need to write information for next_step.
  */
-void Cluster::process_row(bool write_reference, int thread_id, unsigned long int row_id) {
+void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id) {
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
 	if (row_sequence->visited) {
 		return;
@@ -84,7 +88,7 @@ void Cluster::process_row(bool write_reference, int thread_id, unsigned long int
 		row_sequence->visited = true;
 	}
 	unsigned long int targetcount = 0;
-	if (write_reference) {
+	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
 			unsigned int diff_length = abs(row_sequence->seqlen - Property::db_data.get_seqinfo(col_id)->seqlen);
@@ -136,11 +140,8 @@ void Cluster::process_row(bool write_reference, int thread_id, unsigned long int
 #endif
 		}
 	}
-	if (write_reference) {
-//			std::unique(next_comparison[thread_id].begin(), next_comparison[thread_id].end());
-		if (thread_id == 0)
-			progress_update(row_id);
-	}
+	if (thread_id == 0)
+		progress_update(row_full + row_reference);
 }
 
 void Cluster::form_clusters() {

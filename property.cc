@@ -28,6 +28,7 @@ std::string Property::outfilename;
 Db_data Property::db_data;
 BYTE Property::byte_penalty_gapextend;
 BYTE Property::byte_penalty_gapopen_gapextend;
+bool Property::enable_flag;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -37,6 +38,7 @@ void Property::init() {
 	resolution = DEFAULT_RESOLUTION;
 	max_next = 2 * resolution;
 	threads = DEFAULT_THREADS;
+	enable_flag = false;
 	calculate_penalty();
 	dbdebug = fopen("db.log", "w");
 }

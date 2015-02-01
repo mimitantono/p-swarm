@@ -39,6 +39,7 @@ public:
 	static long threads;
 	static BYTE byte_penalty_gapextend;
 	static BYTE byte_penalty_gapopen_gapextend;
+	static bool enable_flag;
 	static unsigned long longest;
 	static unsigned long resolution;
 	static unsigned long bits;

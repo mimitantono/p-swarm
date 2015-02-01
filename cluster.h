@@ -48,7 +48,7 @@ private:
 	std::vector<unsigned long int> * next_comparison;
 	cluster_result result;
 	void vector_put(int thread_id, unsigned long int row, unsigned long int col);
-	void process_row(bool write_reference, int thread_id, unsigned long int row_id);
+	void process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id);
 };
 
 #endif /* CLUSTER_H_ */

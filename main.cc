@@ -62,6 +62,9 @@ void args_init(int argc, char **argv) {
 			/* gap extension penalty */
 			Property::set_gapextend(atol(optarg));
 			break;
+		case 'z':
+			Property::enable_flag = true;
+			break;
 		case 'h':
 			/* help */
 		default:
@@ -98,8 +101,6 @@ void run() {
 	printf("\nduration %.2lf secs\n", dif2);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
-	if (datap)
-		free(datap);
 }
 
 void *run_thread(void *threadargs) {
@@ -163,7 +164,7 @@ void args_usage() {
 	fprintf(stderr, "  -p, --mismatch-penalty INTEGER      penalty for nucleotide mismatch (4)\n");
 	fprintf(stderr, "  -g, --gap-opening-penalty INTEGER   gap open penalty (12)\n");
 	fprintf(stderr, "  -e, --gap-extension-penalty INTEGER gap extension penalty (4)\n");
-	fprintf(stderr, "  -z, --debug                         enable detailed debug\n");
+	fprintf(stderr, "  -z, --debug                         enable alternative algorithms\n");
 	fprintf(stderr, "\n");
 }
 
