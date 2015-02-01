@@ -27,8 +27,8 @@ Db_data::Db_data() {
 }
 
 Db_data::~Db_data() {
-	delete[] (qgrams);
-	qgrams = NULL;
+	if (qgrams)
+		delete[] qgrams;
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -93,7 +93,8 @@ bool Db_data::detect_duplicates() {
 		hdrhashtable[hashindex] = seqindex_p;
 	}
 
-	delete[] (hdrhashtable);
+	if (hdrhashtable)
+		delete[] hdrhashtable;
 
 	if (duplicatedidentifiers)
 		return true;
@@ -223,7 +224,7 @@ char * Db_data::read_file(char* datap) {
 		seqindex_p->header = p;
 		seqindex_p->headerlen = strlen(seqindex_p->header);
 		seqindex_p->headeridlen = seqindex_p->headerlen;
-		seqindex_p->reference = i;
+		seqindex_p->visited = false;
 
 		p += seqindex_p->headerlen + 1;
 
@@ -296,7 +297,7 @@ seqinfo_t * Db_data::get_seqinfo(unsigned long seqno) {
 	return &seqindex[seqno];
 }
 
-queryinfo_t Db_data::get_sequence_and_length(unsigned long seqno) {
+queryinfo_t Db_data::get_queryinfo(unsigned long seqno) {
 	queryinfo_t query;
 	query.seq = seqindex[seqno].seq;
 	query.len = (long) (seqindex[seqno].seqlen);
@@ -305,7 +306,7 @@ queryinfo_t Db_data::get_sequence_and_length(unsigned long seqno) {
 }
 
 void Db_data::put_seq(long seqno) {
-	queryinfo_t query = get_sequence_and_length(seqno);
+	queryinfo_t query = get_queryinfo(seqno);
 	for (int i = 0; i < query.len; i++)
 		putchar(sym_nt[(int) (query.seq[i])]);
 }

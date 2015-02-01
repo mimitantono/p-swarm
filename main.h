@@ -20,13 +20,13 @@
 
 typedef struct thread_data {
 	unsigned long thread_id;
-	class Bigmatrix *bigmatrix;
+	class Cluster *bigmatrix;
 } thread_data;
 
 void destroy();
 void run();
 void args_init(int argc, char** argv);
 void args_usage();
-void calculate_matrix(class Bigmatrix *bigmatrix);
+void calculate_matrix(class Cluster *bigmatrix);
 
 #endif /* MAIN_H_ */

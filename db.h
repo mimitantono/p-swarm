@@ -38,7 +38,7 @@ struct seqinfo_s {
 	unsigned int hdrhash;
 	int abundance_start;
 	int abundance_end;
-	unsigned long int reference;
+	bool visited;
 };
 
 typedef struct seqinfo_s seqinfo_t;
@@ -65,7 +65,7 @@ public:
 	void print_debug();
 	unsigned char * get_qgram_vector(unsigned long seq_no);
 	seqinfo_t * get_seqinfo(unsigned long seqno);
-	queryinfo_t get_sequence_and_length(unsigned long seqno);
+	queryinfo_t get_queryinfo(unsigned long seqno);
 	void show_sequence(unsigned long seqno);
 	void show_all();
 	void print_info();

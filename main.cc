@@ -84,7 +84,7 @@ void run() {
 	gettimeofday(&start, NULL);
 	char * datap = (char *) xmalloc(MEMCHUNK);
 	Property::db_data.read_file(datap);
-	class Bigmatrix bigmatrix;
+	class Cluster bigmatrix;
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);
 	double dif1 = end.tv_sec - start.tv_sec;
@@ -104,11 +104,11 @@ void run() {
 
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	my_data->bigmatrix->calculate_partition(my_data->thread_id, Property::threads);
+	my_data->bigmatrix->run_thread(my_data->thread_id, Property::threads);
 	pthread_exit(NULL);
 }
 
-void calculate_matrix(class Bigmatrix *bigmatrix) {
+void calculate_matrix(class Cluster *bigmatrix) {
 	pthread_attr_t attr;
 	int rc;
 	void *status;
@@ -134,7 +134,8 @@ void calculate_matrix(class Bigmatrix *bigmatrix) {
 		}
 	}
 	pthread_attr_destroy(&attr);
-	delete[] thread_data_array;
+	if (thread_data_array)
+		delete[] thread_data_array;
 	thread_data_array = NULL;
 }
 

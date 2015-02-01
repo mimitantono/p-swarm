@@ -43,6 +43,7 @@ void cluster_result::print(FILE * stream, bool sort) {
 	long total = 0;
 	long clust = 0;
 	if (sort) {
+		fprintf(stderr, "\nResult will be sorted alphabetically\n");
 		std::vector<std::pair<cluster_info, std::vector<unsigned long int> > > vector_clusters;
 		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
 			if (!cit->second.erased) {

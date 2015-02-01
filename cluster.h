@@ -23,14 +23,14 @@ struct eqstr {
 	}
 };
 
-class Bigmatrix {
+class Cluster {
 public:
-	Bigmatrix();
-	virtual ~Bigmatrix();
+	Cluster();
+	virtual ~Cluster();
 	void form_clusters();
 	void print_debug();
 	void print_clusters();
-	void calculate_partition(int thread_id, int total_thread);
+	void run_thread(int thread_id, int total_thread);
 private:
 	pthread_mutex_t workmutex;
 	class scanner * scanner;
@@ -38,15 +38,17 @@ private:
 	unsigned long int total_match;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
-	unsigned long int temp_written;
-	unsigned long int temp_cleaned;
+	unsigned long int row_full;
+	unsigned long int row_reference;
 	unsigned long int total_data;
+	unsigned long int * row_stat;
 	std::vector<unsigned long int> * matrix_x;
 	std::vector<unsigned long int> * matrix_y;
-	std::map<unsigned long int, std::vector<unsigned long int> > next_comparison;
-	std::map<unsigned long int, int> comparison_log;
+	std::vector<unsigned long int> * next_step;
+	std::vector<unsigned long int> * next_comparison;
 	cluster_result result;
 	void vector_put(int thread_id, unsigned long int row, unsigned long int col);
+	void process_row(bool write_reference, int thread_id, unsigned long int row_id);
 };
 
 #endif /* CLUSTER_H_ */

@@ -31,6 +31,7 @@ private:
 	void search_init();
 	void search_chunk();
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
+	void master_dump();
 	void search_worker_core();
 };
 

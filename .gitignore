@@ -2,6 +2,7 @@
 /Release/
 .idea
 *.o
+*.s
 .settings/
 .project
 .cproject
@@ -12,10 +13,9 @@
 *.fas
 main*
 
-
 leak*
 
-main.dSYM/Contents/Info.plist
+*.dSYM/*
 
 .suppressed
 
@@ -24,3 +24,5 @@ temp2
 temp3
 
 *.aa
+
+test

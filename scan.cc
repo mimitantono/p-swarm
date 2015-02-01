@@ -7,13 +7,20 @@ scanner::scanner() {
 }
 
 scanner::~scanner() {
-	delete[] (sd->qtable);
-	delete[] (sd->qtable_w);
-	delete[] (sd->dprofile);
-	delete[] (sd->dprofile_w);
-	delete[] (sd->hearray);
-	delete[] (sd->dir_array);
-	delete sd;
+	if (sd->qtable)
+		delete[] (sd->qtable);
+	if (sd->qtable_w)
+		delete[] (sd->qtable_w);
+	if (sd->dprofile)
+		delete[] (sd->dprofile);
+	if (sd->dprofile_w)
+		delete[] (sd->dprofile_w);
+	if (sd->hearray)
+		delete[] (sd->hearray);
+	if (sd->dir_array)
+		delete[] (sd->dir_array);
+	if (sd)
+		delete sd;
 }
 
 void scanner::search_init() {
@@ -29,13 +36,13 @@ void scanner::search_chunk() {
 
 	std::vector<queryinfo_t> targets;
 	for (unsigned long i = 0; i < sd->target_count; i++) {
-		targets.push_back(Property::db_data.get_sequence_and_length(master_targets[i]));
+		targets.push_back(Property::db_data.get_queryinfo(master_targets[i]));
 	}
 
 	if (Property::bits == 16)
-		searcher.search16(sd, targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
+		searcher.search16(sd, &targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
 	else
-		searcher.search8(sd, targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
+		searcher.search8(sd, &targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
 }
 
 void scanner::master_dump() {
@@ -47,7 +54,7 @@ void scanner::master_dump() {
 }
 
 void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets) {
-	query = Property::db_data.get_sequence_and_length(query_no);
+	query = Property::db_data.get_queryinfo(query_no);
 
 	master_targets = targets;
 

@@ -723,7 +723,7 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 	return aligned - matches;
 }
 
-void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> targets, std::vector<search_result> *result, queryinfo_t *query,
+void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> * targets, std::vector<search_result> *result, queryinfo_t *query,
 		unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
@@ -747,8 +747,8 @@ void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> targets
 	unsigned long done;
 
 	T0 = _mm_set_epi8(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff);
-	Q = _mm_set1_epi8((BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend);
-	R = _mm_set1_epi8((BYTE) Property::penalty_gapextend);
+	Q = _mm_set1_epi8(Property::byte_penalty_gapopen_gapextend);
+	R = _mm_set1_epi8(Property::byte_penalty_gapextend);
 
 	zero = 0;
 	done = 0;
@@ -847,15 +847,15 @@ void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> targets
 						// get next sequence
 						seq_id[c] = next_id;
 
-						d_address[c] = (BYTE*) targets[next_id].seq;
-						d_length[c] = targets[next_id].len;
-						d_begin[c] = (unsigned char*) targets[next_id].seq;
-						d_end[c] = (unsigned char*) targets[next_id].seq + targets[next_id].len;
+						d_address[c] = (BYTE*) (*targets)[next_id].seq;
+						d_length[c] = (*targets)[next_id].len;
+						d_begin[c] = (unsigned char*) (*targets)[next_id].seq;
+						d_end[c] = (unsigned char*) (*targets)[next_id].seq + (*targets)[next_id].len;
 						d_offset[c] = dir - sd->dir_array;
 						next_id++;
 
 						((BYTE*) &H0)[c] = 0;
-						((BYTE*) &F0)[c] = (BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend;
+						((BYTE*) &F0)[c] = Property::byte_penalty_gapopen_gapextend;
 
 						// fill channel
 						for (int j = 0; j < CDEPTH; j++) {

@@ -26,6 +26,8 @@ FILE * Property::dbdebug;
 std::string Property::databasename;
 std::string Property::outfilename;
 Db_data Property::db_data;
+BYTE Property::byte_penalty_gapextend;
+BYTE Property::byte_penalty_gapopen_gapextend;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -52,6 +54,8 @@ void Property::calculate_penalty() {
 	penalty_mismatch /= penalty_factor;
 	penalty_gapopen /= penalty_factor;
 	diff_saturation = MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
+	byte_penalty_gapextend = (BYTE) penalty_gapextend;
+	byte_penalty_gapopen_gapextend = (BYTE) penalty_gapopen + (BYTE) penalty_gapextend;
 	if (Property::resolution <= diff_saturation)
 		bits = 8;
 	else

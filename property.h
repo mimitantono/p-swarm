@@ -37,6 +37,8 @@ public:
 	static long matchscore;
 	static long mismatchscore;
 	static long threads;
+	static BYTE byte_penalty_gapextend;
+	static BYTE byte_penalty_gapopen_gapextend;
 	static unsigned long longest;
 	static unsigned long resolution;
 	static unsigned long bits;

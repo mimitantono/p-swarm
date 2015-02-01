@@ -480,7 +480,7 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 	return aligned - matches;
 }
 
-void searcher::search16(struct search_data* sd, std::vector<queryinfo_t> targets, std::vector<search_result> *result, queryinfo_t * query,
+void searcher::search16(struct search_data* sd, std::vector<queryinfo_t> * targets, std::vector<search_result> *result, queryinfo_t * query,
 		unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
@@ -505,8 +505,8 @@ void searcher::search16(struct search_data* sd, std::vector<queryinfo_t> targets
 	unsigned long done;
 
 	T0 = _mm_set_epi16(0, 0, 0, 0, 0, 0, 0, 0xffff);
-	Q = _mm_set1_epi16((BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend);
-	R = _mm_set1_epi16((BYTE) Property::penalty_gapextend);
+	Q = _mm_set1_epi16(Property::byte_penalty_gapopen_gapextend);
+	R = _mm_set1_epi16(Property::byte_penalty_gapextend);
 
 	zero = 0;
 	done = 0;
@@ -608,17 +608,17 @@ void searcher::search16(struct search_data* sd, std::vector<queryinfo_t> targets
 						seq_id[c] = next_id;
 
 						// printf("Seqno: %ld Address: %p\n", seqno, address);
-						d_address[c] = (BYTE*) targets[next_id].seq;
-						d_length[c] = targets[next_id].len;
+						d_address[c] = (BYTE*) (*targets)[next_id].seq;
+						d_length[c] = (*targets)[next_id].len;
 
-						d_begin[c] = (unsigned char*) targets[next_id].seq;
-						d_end[c] = (unsigned char*) targets[next_id].seq + targets[next_id].len;
+						d_begin[c] = (unsigned char*) (*targets)[next_id].seq;
+						d_end[c] = (unsigned char*) (*targets)[next_id].seq + (*targets)[next_id].len;
 
 						d_offset[c] = dir - sd->dir_array;
 						next_id++;
 
 						((WORD*) &H0)[c] = 0;
-						((WORD*) &F0)[c] = (BYTE) Property::penalty_gapopen + (BYTE) Property::penalty_gapextend;
+						((WORD*) &F0)[c] = Property::byte_penalty_gapopen_gapextend;
 
 						// fill channel
 						for (int j = 0; j < CDEPTH; j++) {
