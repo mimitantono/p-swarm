@@ -34,14 +34,15 @@ public:
 private:
 	pthread_mutex_t workmutex;
 	class scanner * scanner;
+	unsigned long int row_id_dispenser();
 	unsigned long int ** targetampliconids;
 	unsigned long int total_match;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
 	unsigned long int row_full;
 	unsigned long int row_reference;
-	unsigned long int total_data;
 	unsigned long int * row_stat;
+	unsigned long int row_id_status;
 	std::vector<unsigned long int> * matrix_x;
 	std::vector<unsigned long int> * matrix_y;
 	std::vector<unsigned long int> * next_step;

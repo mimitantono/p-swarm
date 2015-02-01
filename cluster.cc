@@ -25,7 +25,7 @@ Cluster::Cluster() {
 	total_scan = 0;
 	row_reference = 0;
 	row_full = 0;
-	total_data = 0;
+	row_id_status = 1;
 	pthread_mutex_init(&workmutex, NULL);
 }
 
@@ -52,10 +52,23 @@ Cluster::~Cluster() {
 	pthread_mutex_destroy(&workmutex);
 }
 
+unsigned long int Cluster::row_id_dispenser() {
+	unsigned long int return_row = 0;
+	pthread_mutex_lock(&workmutex);
+	if (row_id_status <= Property::db_data.sequences) {
+		return_row = row_id_status;
+		row_id_status++;
+	}
+	pthread_mutex_unlock(&workmutex);
+	return return_row;
+}
+
 void Cluster::run_thread(int thread_id, int total_thread) {
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", Property::db_data.sequences);
-	for (unsigned long int row_id = thread_id; row_id < Property::db_data.sequences; row_id += total_thread) {
+	unsigned long int row_id = row_id_dispenser();
+	while (row_id > 0) {
+		row_id--; //0 means that loop should be finished
 		if (Property::enable_flag) {
 			process_row(true, false, thread_id, row_id);
 			for (unsigned long int next_row = 0; next_row < next_step[thread_id].size(); next_row++) {
@@ -66,19 +79,13 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 		} else {
 			process_row(false, false, thread_id, row_id);
 		}
+		row_id = row_id_dispenser();
 	}
 	if (thread_id == 0) {
 		progress_done();
 	}
 }
 
-/**
- * Excluding sequences with distance more than twice of resolution for the next connection must be every each row
- * If write_reference is true it means that this step will calculate distance with all columns and write a list of sequences
- * to be considered next step.
- * If write_reference is false, it means that this step will use the list of sequences that was calculated before and do not
- * need to write information for next_step.
- */
 void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id) {
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
 	if (row_sequence->visited) {
@@ -91,21 +98,15 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
-			unsigned int diff_length = abs(row_sequence->seqlen - Property::db_data.get_seqinfo(col_id)->seqlen);
-			if (diff_length <= Property::resolution) {
-				unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
-						Property::db_data.get_qgram_vector(col_id));
-				total_qgram++;
-				if (qgramdiff <= Property::resolution) {
-					targetampliconids[thread_id][targetcount] = col_id;
-					targetcount++;
-				} else if (write_reference && qgramdiff <= Property::max_next) {
-					next_comparison[thread_id].push_back(col_id);
-				}
-			} else if (write_reference && diff_length <= Property::max_next) {
+			unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id), Property::db_data.get_qgram_vector(col_id));
+			if (qgramdiff <= Property::resolution) {
+				targetampliconids[thread_id][targetcount] = col_id;
+				targetcount++;
+			} else if (write_reference && qgramdiff <= Property::max_next) {
 				next_comparison[thread_id].push_back(col_id);
 			}
 		}
+		total_qgram += Property::db_data.sequences - row_id;
 	} else {
 		row_reference++;
 		for (unsigned int k = 0; k < next_comparison[thread_id].size(); k++) {
@@ -113,13 +114,13 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 			if (col_id > row_id) {
 				unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
 						Property::db_data.get_qgram_vector(col_id));
-				total_qgram++;
 				if (qgramdiff <= Property::resolution) {
 					targetampliconids[thread_id][targetcount] = col_id;
 					targetcount++;
 				}
 			}
 		}
+		total_qgram += next_comparison[thread_id].size();
 	}
 	total_scan += targetcount;
 
@@ -167,7 +168,7 @@ void Cluster::form_clusters() {
 				result.add_member(added, first);
 				result.add_member(added, second);
 #ifdef DEBUG
-				fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id,first,second);
+				fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, first, second);
 #endif
 				cluster_id++;
 			} else if (existing_first != NULL && existing_second != NULL) {
@@ -209,9 +210,8 @@ void Cluster::print_debug() {
 	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
 	fprintf(Property::dbdebug, "Full calculation\t: %ld\n", row_full);
 	fprintf(Property::dbdebug, "Referenced calculation\t: %ld\n", row_reference);
-	fprintf(Property::dbdebug, "Total data\t\t: %ld\n", total_data);
 	for (int t = 0; t < Property::threads; t++) {
-		fprintf(Property::dbdebug, "Map [%d] size\t: %ld\n", t, matrix_x[t].size());
+		fprintf(Property::dbdebug, "Pair match[%d]\t: %ld\n", t, matrix_x[t].size());
 	}
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Row stat [%d]\t: %ld\n", t, row_stat[t]);
