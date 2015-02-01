@@ -33,6 +33,7 @@ private:
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
 	void master_dump();
 	void search_worker_core();
+	void master_dump();
 };
 
 #endif /* SCAN_H_ */
