@@ -24,11 +24,14 @@ Db_data::Db_data() {
 	sequences = 0;
 	nucleotides = 0;
 	threadid = 0;
+	datap = (char *) xmalloc(MEMCHUNK);
 }
 
 Db_data::~Db_data() {
 	if (qgrams)
 		delete[] qgrams;
+	if (datap)
+		free(datap);
 }
 
 unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
@@ -102,9 +105,8 @@ bool Db_data::detect_duplicates() {
 	return false;
 }
 
-char * Db_data::read_file(char* datap) {
+void Db_data::read_file() {
 	/* allocate space */
-
 	unsigned long dataalloc = MEMCHUNK;
 	unsigned long datalen = 0;
 
@@ -275,8 +277,6 @@ char * Db_data::read_file(char* datap) {
 		fatal("There are duplicates in input file.");
 
 	regfree(&db_regexp);
-
-	return datap;
 }
 
 void Db_data::print_info() {

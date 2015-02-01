@@ -85,8 +85,7 @@ void args_init(int argc, char **argv) {
 void run() {
 	timeval start, end;
 	gettimeofday(&start, NULL);
-	char * datap = (char *) xmalloc(MEMCHUNK);
-	Property::db_data.read_file(datap);
+	Property::db_data.read_file();
 	class Cluster bigmatrix;
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);

@@ -51,6 +51,7 @@ private:
 	void qgrams_init();
 	bool process_line(long line);
 	bool detect_duplicates();
+	char * datap;
 public:
 	qgramvector_t * qgrams;
 	unsigned long sequences;
@@ -58,7 +59,7 @@ public:
 	unsigned long longest;
 	int threadid;
 
-	char* read_file(char * datap);
+	void read_file();
 
 	Db_data();
 	virtual ~Db_data();
