@@ -32,10 +32,11 @@ public:
 	void print_clusters();
 	void run_thread(int thread_id, int total_thread);
 private:
-	pthread_mutex_t workmutex;
+	pthread_mutex_t row_id_mutex;
+	pthread_mutex_t result_mutex;
 	class scanner * scanner;
 	unsigned long int row_id_dispenser();
-	unsigned long int ** targetampliconids;
+	std::vector<queryinfo_t> * targetampliconids;
 	unsigned long int total_match;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
@@ -43,8 +44,7 @@ private:
 	unsigned long int row_reference;
 	unsigned long int * row_stat;
 	unsigned long int row_id_status;
-	std::vector<unsigned long int> * matrix_x;
-	std::vector<unsigned long int> * matrix_y;
+	unsigned long int cluster_id;
 	std::vector<unsigned long int> * next_step;
 	std::vector<unsigned long int> * next_comparison;
 	cluster_result result;

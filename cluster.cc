@@ -8,16 +8,15 @@
 #include "cluster.h"
 
 Cluster::Cluster() {
-	targetampliconids = new unsigned long*[Property::threads];
+	targetampliconids = new std::vector<queryinfo_t>[Property::threads];
 	scanner = new class scanner[Property::threads];
 	row_stat = new unsigned long int[Property::threads];
 	for (int i = 0; i < Property::threads; i++) {
 		scanner[i].search_begin();
-		targetampliconids[i] = new unsigned long[Property::db_data.sequences / 4];
 		row_stat[i] = 0;
 	}
-	matrix_x = new std::vector<unsigned long int>[Property::threads];
-	matrix_y = new std::vector<unsigned long int>[Property::threads];
+//	matrix_x = new std::vector<unsigned long int>[Property::threads];
+//	matrix_y = new std::vector<unsigned long int>[Property::threads];
 	next_step = new std::vector<unsigned long int>[Property::threads];
 	next_comparison = new std::vector<unsigned long int>[Property::threads];
 	total_match = 0;
@@ -26,40 +25,39 @@ Cluster::Cluster() {
 	row_reference = 0;
 	row_full = 0;
 	row_id_status = 1;
-	pthread_mutex_init(&workmutex, NULL);
+	cluster_id = 1;
+	pthread_mutex_init(&result_mutex, NULL);
+	pthread_mutex_init(&row_id_mutex, NULL);
 }
 
 Cluster::~Cluster() {
 	if (scanner)
 		delete[] scanner;
-	if (matrix_x)
-		delete[] matrix_x;
-	if (matrix_y)
-		delete[] matrix_y;
+//	if (matrix_x)
+//		delete[] matrix_x;
+//	if (matrix_y)
+//		delete[] matrix_y;
 	if (next_step)
 		delete[] next_step;
 	if (next_comparison)
 		delete[] next_comparison;
 	if (row_stat)
 		delete[] row_stat;
-	for (int i = 0; i < Property::threads; i++) {
-		if (targetampliconids[i])
-			delete[] targetampliconids[i];
-	}
 	if (targetampliconids)
 		delete[] targetampliconids;
 
-	pthread_mutex_destroy(&workmutex);
+	pthread_mutex_destroy(&result_mutex);
+	pthread_mutex_destroy(&row_id_mutex);
 }
 
 unsigned long int Cluster::row_id_dispenser() {
 	unsigned long int return_row = 0;
-	pthread_mutex_lock(&workmutex);
+	pthread_mutex_lock(&row_id_mutex);
 	if (row_id_status <= Property::db_data.sequences) {
 		return_row = row_id_status;
 		row_id_status++;
 	}
-	pthread_mutex_unlock(&workmutex);
+	pthread_mutex_unlock(&row_id_mutex);
 	return return_row;
 }
 
@@ -88,20 +86,18 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 
 void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id) {
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
-	if (row_sequence->visited) {
+	if (!use_reference && row_sequence->visited) {
 		return;
 	} else {
 		row_stat[thread_id]++;
 		row_sequence->visited = true;
 	}
-	unsigned long int targetcount = 0;
 	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
 			unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id), Property::db_data.get_qgram_vector(col_id));
 			if (qgramdiff <= Property::resolution) {
-				targetampliconids[thread_id][targetcount] = col_id;
-				targetcount++;
+				targetampliconids[thread_id].push_back(Property::db_data.get_queryinfo(col_id));
 			} else if (write_reference && qgramdiff <= Property::max_next) {
 				next_comparison[thread_id].push_back(col_id);
 			}
@@ -115,25 +111,26 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 				unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
 						Property::db_data.get_qgram_vector(col_id));
 				if (qgramdiff <= Property::resolution) {
-					targetampliconids[thread_id][targetcount] = col_id;
-					targetcount++;
+					targetampliconids[thread_id].push_back(Property::db_data.get_queryinfo(col_id));
 				}
 			}
 		}
 		total_qgram += next_comparison[thread_id].size();
 	}
-	total_scan += targetcount;
+	total_scan += targetampliconids[thread_id].size();
 
-	scanner[thread_id].search_do(row_id, targetcount, targetampliconids[thread_id]);
+	scanner[thread_id].search_do(row_id, &targetampliconids[thread_id]);
 
-	for (unsigned long j = 0; j < targetcount; j++) {
+	for (unsigned long j = 0; j < targetampliconids[thread_id].size(); j++) {
 		if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
-			vector_put(thread_id, row_id, targetampliconids[thread_id][j]);
-			if (write_reference) {
-				next_step[thread_id].push_back(targetampliconids[thread_id][j]);
+			unsigned long int col_id = targetampliconids[thread_id][j].qno;
+			vector_put(thread_id, row_id, col_id);
+			if (write_reference && !Property::db_data.get_seqinfo(col_id)->visited) {
+				Property::db_data.get_seqinfo(col_id)->visited = true;
+				next_step[thread_id].push_back(col_id);
 			}
 		} else if (write_reference && scanner[thread_id].master_result[j].diff <= Property::max_next) {
-			next_comparison[thread_id].push_back(targetampliconids[thread_id][j]);
+			next_comparison[thread_id].push_back(targetampliconids[thread_id][j].qno);
 		} else {
 #ifdef DEBUG
 			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[thread_id][j],
@@ -141,58 +138,18 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 #endif
 		}
 	}
+	std::vector<queryinfo_t>().swap(targetampliconids[thread_id]);
 	if (thread_id == 0)
 		progress_update(row_full + row_reference);
 }
 
 void Cluster::form_clusters() {
-	unsigned long int cluster_id = 1;
-	for (int t = 0; t < Property::threads; t++) {
-		while (matrix_x[t].size() > 0) {
-			unsigned long int first = matrix_x[t].back();
-			unsigned long int second = matrix_y[t].back();
-			cluster_info * existing_first = result.find_member(first);
-			cluster_info * existing_second = result.find_member(second);
-			if (existing_first != NULL && existing_second == NULL) {
-				result.add_member(existing_first, second);
-#ifdef DEBUG
-				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", second, existing_first->cluster_id);
-#endif
-			} else if (existing_first == NULL && existing_second != NULL) {
-				result.add_member(existing_second, first);
-#ifdef DEBUG
-				fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
-#endif
-			} else if (existing_first == NULL && existing_second == NULL) {
-				cluster_info * added = result.new_cluster(cluster_id);
-				result.add_member(added, first);
-				result.add_member(added, second);
-#ifdef DEBUG
-				fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, first, second);
-#endif
-				cluster_id++;
-			} else if (existing_first != NULL && existing_second != NULL) {
-				if (existing_first->cluster_id != existing_second->cluster_id) {
-#ifdef DEBUG
-					fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
-#endif
-					result.merge_cluster(existing_first, existing_second);
-				}
-			}
-			matrix_x[t].pop_back();
-			matrix_y[t].pop_back();
-		}
-	}
-	std::vector<unsigned long int> singletons;
 	for (unsigned long int i = 0; i < Property::db_data.sequences; i++) {
 		if (result.find_member(i) == NULL) {
-			singletons.push_back(i);
+			cluster_info * added = result.new_cluster(cluster_id);
+			result.add_member(added, i);
+			cluster_id++;
 		}
-	}
-	for (unsigned long int i = 0; i < singletons.size(); i++) {
-		cluster_info * added = result.new_cluster(cluster_id);
-		result.add_member(added, singletons[i]);
-		cluster_id++;
 	}
 }
 
@@ -210,20 +167,48 @@ void Cluster::print_debug() {
 	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
 	fprintf(Property::dbdebug, "Full calculation\t: %ld\n", row_full);
 	fprintf(Property::dbdebug, "Referenced calculation\t: %ld\n", row_reference);
-	for (int t = 0; t < Property::threads; t++) {
-		fprintf(Property::dbdebug, "Pair match[%d]\t: %ld\n", t, matrix_x[t].size());
-	}
+//	for (int t = 0; t < Property::threads; t++) {
+//		fprintf(Property::dbdebug, "Pair match[%d]\t: %ld\n", t, matrix_x[t].size());
+//	}
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Row stat [%d]\t: %ld\n", t, row_stat[t]);
 	}
 }
 
-void Cluster::vector_put(int thread_id, unsigned long int row, unsigned long int col) {
-	matrix_x[thread_id].push_back(row);
-	matrix_y[thread_id].push_back(col);
+void Cluster::vector_put(int thread_id, unsigned long int first, unsigned long int second) {
+	pthread_mutex_lock(&result_mutex);
+	cluster_info * existing_first = result.find_member(first);
+	cluster_info * existing_second = result.find_member(second);
+	if (existing_first != NULL && existing_second == NULL) {
+		result.add_member(existing_first, second);
 #ifdef DEBUG
-	fprintf(Property::dbdebug, "%ld and %ld are connected\n", row, col);
+		fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", second, existing_first->cluster_id);
 #endif
+	} else if (existing_first == NULL && existing_second != NULL) {
+		result.add_member(existing_second, first);
+#ifdef DEBUG
+		fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
+#endif
+	} else if (existing_first == NULL && existing_second == NULL) {
+		cluster_info * added = result.new_cluster(cluster_id);
+		result.add_member(added, first);
+		result.add_member(added, second);
+#ifdef DEBUG
+		fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", cluster_id, first, second);
+#endif
+		cluster_id++;
+	} else if (existing_first != NULL && existing_second != NULL) {
+		if (existing_first->cluster_id != existing_second->cluster_id) {
+#ifdef DEBUG
+			fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
+#endif
+			result.merge_cluster(existing_first, existing_second);
+		}
+	}
+#ifdef DEBUG
+	fprintf(Property::dbdebug, "%ld and %ld are connected\n", first, second);
+#endif
+	pthread_mutex_unlock(&result_mutex);
 	total_match++;
 }
 

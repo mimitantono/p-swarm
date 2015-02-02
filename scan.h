@@ -19,7 +19,7 @@ class scanner {
 public:
 	scanner();
 	virtual ~scanner();
-	void search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets);
+	void search_do(unsigned long query_no, std::vector<queryinfo_t>* targets);
 	void search_begin();
 	queryinfo_t query;
 	std::vector<search_result> master_result;
@@ -27,12 +27,10 @@ public:
 private:
 	class searcher searcher;
 	unsigned long dirbufferbytes;
-	unsigned long * master_targets;
 	void search_init();
-	void search_chunk();
+	void search_chunk(std::vector<queryinfo_t>* targets);
 	int search_getwork(unsigned long * countref, unsigned long * firstref);
 	void search_worker_core();
-	void master_dump();
 };
 
 #endif /* SCAN_H_ */

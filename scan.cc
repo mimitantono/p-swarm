@@ -2,7 +2,6 @@
 
 scanner::scanner() {
 	sd = new struct search_data;
-	master_targets = 0;
 	dirbufferbytes = 0;
 }
 
@@ -30,38 +29,23 @@ void scanner::search_init() {
 	}
 }
 
-void scanner::search_chunk() {
+void scanner::search_chunk(std::vector<queryinfo_t>* targets) {
 	if (sd->target_count == 0)
 		return;
 
-	std::vector<queryinfo_t> targets;
-	for (unsigned long i = 0; i < sd->target_count; i++) {
-		targets.push_back(Property::db_data.get_queryinfo(master_targets[i]));
-	}
-
 	if (Property::bits == 16)
-		searcher.search16(sd, &targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
+		searcher.search16(sd, targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
 	else
-		searcher.search8(sd, &targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
+		searcher.search8(sd, targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
 }
 
-void scanner::master_dump() {
-	printf("master_dump\n");
-	printf("   i    t    s    d\n");
-	for (unsigned long i = 0; i < 1403; i++) {
-		printf("%4lu %4lu %4lu %4lu\n", i, master_targets[i], master_result[i].score, master_result[i].diff);
-	}
-}
-
-void scanner::search_do(unsigned long query_no, unsigned long listlength, unsigned long * targets) {
+void scanner::search_do(unsigned long query_no, std::vector<queryinfo_t>* targets) {
 	query = Property::db_data.get_queryinfo(query_no);
 
-	master_targets = targets;
-
-	sd->target_count = listlength;
+	sd->target_count = targets->size();
 
 	search_init();
-	search_chunk();
+	search_chunk(targets);
 }
 
 void scanner::search_begin() {
