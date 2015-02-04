@@ -36,7 +36,7 @@ private:
 	pthread_mutex_t result_mutex;
 	class scanner * scanner;
 	unsigned long int row_id_dispenser();
-	std::vector<queryinfo_t> * targetampliconids;
+	std::vector<unsigned long int> * targetampliconids;
 	unsigned long int total_match;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;

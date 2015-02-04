@@ -8,15 +8,13 @@
 #include "cluster.h"
 
 Cluster::Cluster() {
-	targetampliconids = new std::vector<queryinfo_t>[Property::threads];
+	targetampliconids = new std::vector<unsigned long int>[Property::threads];
 	scanner = new class scanner[Property::threads];
 	row_stat = new unsigned long int[Property::threads];
 	for (int i = 0; i < Property::threads; i++) {
 		scanner[i].search_begin();
 		row_stat[i] = 0;
 	}
-//	matrix_x = new std::vector<unsigned long int>[Property::threads];
-//	matrix_y = new std::vector<unsigned long int>[Property::threads];
 	next_step = new std::vector<unsigned long int>[Property::threads];
 	next_comparison = new std::vector<unsigned long int>[Property::threads];
 	total_match = 0;
@@ -33,10 +31,6 @@ Cluster::Cluster() {
 Cluster::~Cluster() {
 	if (scanner)
 		delete[] scanner;
-//	if (matrix_x)
-//		delete[] matrix_x;
-//	if (matrix_y)
-//		delete[] matrix_y;
 	if (next_step)
 		delete[] next_step;
 	if (next_comparison)
@@ -97,12 +91,12 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
 			unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id), Property::db_data.get_qgram_vector(col_id));
 			if (qgramdiff <= Property::resolution) {
-				targetampliconids[thread_id].push_back(Property::db_data.get_queryinfo(col_id));
+				targetampliconids[thread_id].push_back(col_id);
 			} else if (write_reference && qgramdiff <= Property::max_next) {
 				next_comparison[thread_id].push_back(col_id);
 			}
 		}
-		total_qgram += Property::db_data.sequences - row_id;
+		total_qgram = total_qgram + Property::db_data.sequences - row_id - 1;
 	} else {
 		row_reference++;
 		for (unsigned int k = 0; k < next_comparison[thread_id].size(); k++) {
@@ -111,26 +105,26 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 				unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
 						Property::db_data.get_qgram_vector(col_id));
 				if (qgramdiff <= Property::resolution) {
-					targetampliconids[thread_id].push_back(Property::db_data.get_queryinfo(col_id));
+					targetampliconids[thread_id].push_back(col_id);
 				}
 			}
 		}
-		total_qgram += next_comparison[thread_id].size();
+		total_qgram = total_qgram + next_comparison[thread_id].size();
 	}
 	total_scan += targetampliconids[thread_id].size();
 
 	scanner[thread_id].search_do(row_id, &targetampliconids[thread_id]);
 
 	for (unsigned long j = 0; j < targetampliconids[thread_id].size(); j++) {
+		unsigned long int col_id = targetampliconids[thread_id][j];
 		if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
-			unsigned long int col_id = targetampliconids[thread_id][j].qno;
 			vector_put(thread_id, row_id, col_id);
 			if (write_reference && !Property::db_data.get_seqinfo(col_id)->visited) {
 				Property::db_data.get_seqinfo(col_id)->visited = true;
 				next_step[thread_id].push_back(col_id);
 			}
 		} else if (write_reference && scanner[thread_id].master_result[j].diff <= Property::max_next) {
-			next_comparison[thread_id].push_back(targetampliconids[thread_id][j].qno);
+			next_comparison[thread_id].push_back(col_id);
 		} else {
 #ifdef DEBUG
 			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[thread_id][j],
@@ -138,7 +132,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 #endif
 		}
 	}
-	std::vector<queryinfo_t>().swap(targetampliconids[thread_id]);
+	std::vector<unsigned long int>().swap(targetampliconids[thread_id]);
 	if (thread_id == 0)
 		progress_update(row_full + row_reference);
 }
@@ -167,9 +161,6 @@ void Cluster::print_debug() {
 	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
 	fprintf(Property::dbdebug, "Full calculation\t: %ld\n", row_full);
 	fprintf(Property::dbdebug, "Referenced calculation\t: %ld\n", row_reference);
-//	for (int t = 0; t < Property::threads; t++) {
-//		fprintf(Property::dbdebug, "Pair match[%d]\t: %ld\n", t, matrix_x[t].size());
-//	}
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Row stat [%d]\t: %ld\n", t, row_stat[t]);
 	}

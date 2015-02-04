@@ -29,7 +29,7 @@ void scanner::search_init() {
 	}
 }
 
-void scanner::search_chunk(std::vector<queryinfo_t>* targets) {
+void scanner::search_chunk(std::vector<unsigned long int>* targets) {
 	if (sd->target_count == 0)
 		return;
 
@@ -39,7 +39,7 @@ void scanner::search_chunk(std::vector<queryinfo_t>* targets) {
 		searcher.search8(sd, targets, &master_result, &query, dirbufferbytes / 8, Property::db_data.longest);
 }
 
-void scanner::search_do(unsigned long query_no, std::vector<queryinfo_t>* targets) {
+void scanner::search_do(unsigned long query_no, std::vector<unsigned long int>* targets) {
 	query = Property::db_data.get_queryinfo(query_no);
 
 	sd->target_count = targets->size();

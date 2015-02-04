@@ -723,8 +723,8 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 	return aligned - matches;
 }
 
-void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> * targets, std::vector<search_result> *result, queryinfo_t *query,
-		unsigned long dirbuffersize, long longest) {
+void searcher::search8(struct search_data * sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result,
+		queryinfo_t *query, unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -847,10 +847,11 @@ void searcher::search8(struct search_data * sd, std::vector<queryinfo_t> * targe
 						// get next sequence
 						seq_id[c] = next_id;
 
-						d_address[c] = (BYTE*) (*targets)[next_id].seq;
-						d_length[c] = (*targets)[next_id].len;
-						d_begin[c] = (unsigned char*) (*targets)[next_id].seq;
-						d_end[c] = (unsigned char*) (*targets)[next_id].seq + (*targets)[next_id].len;
+						seqinfo_t * seqinfo = Property::db_data.get_seqinfo((*targets)[next_id]);
+						d_address[c] = (BYTE*) seqinfo->seq;
+						d_length[c] = seqinfo->seqlen;
+						d_begin[c] = (unsigned char*) seqinfo->seq;
+						d_end[c] = (unsigned char*) seqinfo->seq + seqinfo->seqlen;
 						d_offset[c] = dir - sd->dir_array;
 						next_id++;
 

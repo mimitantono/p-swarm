@@ -17,7 +17,6 @@
 typedef struct cluster_info {
 	unsigned long int cluster_id;
 	std::vector<unsigned long int> cluster_members;
-	bool erased;
 } cluster_info;
 
 class cluster_result {
