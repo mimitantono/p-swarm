@@ -133,6 +133,6 @@ unsigned long qgram_diff(qgramvector_t a, qgramvector_t b){
 
 void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist) {
 	for (unsigned long i = 0; i < listlen; i++)
-		difflist[i] = qgram_diff(Property::db_data.get_qgram_vector(seed), Property::db_data.get_qgram_vector(amplist[i]));
+		difflist[i] = qgram_diff(Property::db_data.get_seqinfo(seed)->qgram, Property::db_data.get_seqinfo(amplist[i])->qgram);
 }
 

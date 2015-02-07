@@ -27,33 +27,29 @@
 #include <string>
 #include <vector>
 
+typedef struct seqinfo_s seqinfo_t;
+typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
+
 struct seqinfo_s {
 	char * header;
 	char * seq;
 	unsigned int headerlen;
-	unsigned int headeridlen;
 	unsigned int seqlen;
 	unsigned int abundance;
-	unsigned long int clusterid;
 	unsigned int hdrhash;
-	int abundance_start;
-	int abundance_end;
+	qgramvector_t qgram;
 	bool visited;
 };
 
-typedef struct seqinfo_s seqinfo_t;
-typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
 
 class Db_data {
 private:
 	void showseq(char * seq);
 	std::vector<seqinfo_t> seqindex;
 	void qgrams_init();
-	bool process_line(long line);
 	bool detect_duplicates();
 	char * datap;
 public:
-	qgramvector_t * qgrams;
 	unsigned long sequences;
 	unsigned long nucleotides;
 	unsigned long longest;
@@ -64,7 +60,6 @@ public:
 	Db_data();
 	virtual ~Db_data();
 	void print_debug();
-	unsigned char * get_qgram_vector(unsigned long seq_no);
 	seqinfo_t * get_seqinfo(unsigned long seqno);
 	queryinfo_t get_queryinfo(unsigned long seqno);
 	void show_sequence(unsigned long seqno);

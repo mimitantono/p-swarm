@@ -89,7 +89,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
-			unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id), Property::db_data.get_qgram_vector(col_id));
+			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, Property::db_data.get_seqinfo(col_id)->qgram);
 			if (qgramdiff <= Property::resolution) {
 				targetampliconids[thread_id].push_back(col_id);
 			} else if (write_reference && qgramdiff <= Property::max_next) {
@@ -102,8 +102,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 		for (unsigned int k = 0; k < next_comparison[thread_id].size(); k++) {
 			unsigned long int col_id = next_comparison[thread_id][k];
 			if (col_id > row_id) {
-				unsigned long qgramdiff = qgram_diff(Property::db_data.get_qgram_vector(row_id),
-						Property::db_data.get_qgram_vector(col_id));
+				unsigned long qgramdiff = qgram_diff(row_sequence->qgram, Property::db_data.get_seqinfo(col_id)->qgram);
 				if (qgramdiff <= Property::resolution) {
 					targetampliconids[thread_id].push_back(col_id);
 				}

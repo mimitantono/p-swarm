@@ -19,7 +19,6 @@ char map_hex[256] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 
 Db_data::Db_data() {
-	qgrams = 0;
 	longest = 0;
 	sequences = 0;
 	nucleotides = 0;
@@ -28,14 +27,8 @@ Db_data::Db_data() {
 }
 
 Db_data::~Db_data() {
-	if (qgrams)
-		delete[] qgrams;
 	if (datap)
 		free(datap);
-}
-
-unsigned char * Db_data::get_qgram_vector(unsigned long seq_no) {
-	return qgrams[seq_no];
 }
 
 void Db_data::showseq(char * seq) {
@@ -76,15 +69,15 @@ bool Db_data::detect_duplicates() {
 	/* check hash, fatal error if found, otherwize insert new */
 	for (unsigned long j = 0; j < sequences; j++) {
 		seqinfo_t *seqindex_p = &seqindex[j];
-		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headeridlen);
+		unsigned long hdrhash = HASH((unsigned char*) seqindex_p->header, seqindex_p->headerlen);
 		seqindex_p->hdrhash = hdrhash;
 		unsigned long hashindex = hdrhash % hdrhashsize;
 
 		seqinfo_t * found;
 
 		while ((found = hdrhashtable[hashindex])) {
-			if ((found->hdrhash == hdrhash) && (found->headeridlen == seqindex_p->headeridlen)
-					&& (strncmp(found->header, seqindex_p->header, found->headeridlen) == 0))
+			if ((found->hdrhash == hdrhash) && (found->headerlen == seqindex_p->headerlen)
+					&& (strncmp(found->header, seqindex_p->header, found->headerlen) == 0))
 				break;
 			hashindex = (hashindex + 1) % hdrhashsize;
 			found = hdrhashtable[hashindex];
@@ -219,45 +212,37 @@ void Db_data::read_file() {
 		fatal("Regular expression compilation failed");
 
 	char * p = datap;
+	std::vector<seqinfo_t>(sequences).swap(seqindex);
 	for (unsigned long i = 0; i < sequences; i++) {
-		seqinfo_t seqinfo;
-		seqindex.push_back(seqinfo);
-		seqinfo_t * seqindex_p = &(seqindex.back());
-		seqindex_p->header = p;
-		seqindex_p->headerlen = strlen(seqindex_p->header);
-		seqindex_p->headeridlen = seqindex_p->headerlen;
-		seqindex_p->visited = false;
+		seqindex[i].header = p;
+		seqindex[i].headerlen = strlen(seqindex[i].header);
+		seqindex[i].visited = false;
 
-		p += seqindex_p->headerlen + 1;
+		p += seqindex[i].headerlen + 1;
 
 		/* get amplicon abundance */
-		seqindex_p->abundance = 0;
-		if (!regexec(&db_regexp, seqindex_p->header, 4, pmatch, 0)) {
-			seqindex_p->abundance = atol(seqindex_p->header + pmatch[2].rm_so);
-			seqindex_p->abundance_start = pmatch[0].rm_so;
-			seqindex_p->abundance_end = pmatch[0].rm_eo;
-		} else {
-			seqindex_p->abundance_start = 0;
-			seqindex_p->abundance_end = 0;
+		seqindex[i].abundance = 0;
+		if (!regexec(&db_regexp, seqindex[i].header, 4, pmatch, 0)) {
+			seqindex[i].abundance = atol(seqindex[i].header + pmatch[2].rm_so);
 		}
 
-		if (seqindex_p->abundance < 1)
+		if (seqindex[i].abundance < 1)
 			missingabundance++;
 
-		if (lastabundance > 0 && seqindex_p->abundance > lastabundance)
+		if (lastabundance > 0 && seqindex[i].abundance > lastabundance)
 			presorted = 0;
 
-		lastabundance = seqindex_p->abundance;
+		lastabundance = seqindex[i].abundance;
 
-		seqindex_p->seq = p;
-		seqindex_p->seqlen = strlen(p);
+		seqindex[i].seq = p;
+		seqindex[i].seqlen = strlen(p);
 
-		if (seqindex_p->seqlen > longest) {
-			longest = seqindex_p->seqlen;
+		if (seqindex[i].seqlen > longest) {
+			longest = seqindex[i].seqlen;
 		}
-		nucleotides += seqindex_p->seqlen;
+		nucleotides += seqindex[i].seqlen;
 
-		p += seqindex_p->seqlen + 1;
+		p += seqindex[i].seqlen + 1;
 	}
 
 	if (missingabundance) {
@@ -286,10 +271,9 @@ void Db_data::print_info() {
 }
 
 void Db_data::qgrams_init() {
-	qgrams = new qgramvector_t[sequences];
 	for (unsigned long i = 0; i < sequences; i++) {
 		/* find qgrams */
-		findqgrams((unsigned char*) seqindex[i].seq, seqindex[i].seqlen, qgrams[i]);
+		findqgrams((unsigned char*) seqindex[i].seq, seqindex[i].seqlen, seqindex[i].qgram);
 	}
 }
 
