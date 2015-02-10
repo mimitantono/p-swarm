@@ -15,8 +15,9 @@ Cluster::Cluster() {
 		scanner[i].search_begin();
 		row_stat[i] = 0;
 	}
-	next_step = new std::vector<unsigned long int>[Property::threads];
-	next_comparison = new std::vector<unsigned long int>[Property::threads];
+	next_step = new std::queue<unsigned long int>[Property::threads];
+	next_step_level = new std::queue<unsigned int>[Property::threads];
+	next_comparison = new std::vector<struct id_distance>[Property::threads];
 	total_match = 0;
 	total_qgram = 0;
 	total_scan = 0;
@@ -55,6 +56,12 @@ unsigned long int Cluster::row_id_dispenser() {
 	return return_row;
 }
 
+struct compare_id_distance {
+	inline bool operator()(const id_distance struct1, id_distance struct2) {
+		return (struct1.distance < struct2.distance);
+	}
+};
+
 void Cluster::run_thread(int thread_id, int total_thread) {
 	if (thread_id == 0)
 		progress_init("Calculating matrix :", Property::db_data.sequences);
@@ -62,14 +69,16 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 	while (row_id > 0) {
 		row_id--; //0 means that loop should be finished
 		if (Property::enable_flag) {
-			process_row(true, false, thread_id, row_id);
-			for (unsigned long int next_row = 0; next_row < next_step[thread_id].size(); next_row++) {
-				process_row(false, true, thread_id, next_step[thread_id][next_row]);
+			process_row(true, false, thread_id, row_id, 1);
+			while (next_step[thread_id].size() > 0) {
+				std::sort(next_comparison[thread_id].begin(), next_comparison[thread_id].end(), compare_id_distance());
+				process_row(false, true, thread_id, next_step[thread_id].front(), next_step_level[thread_id].front());
+				next_step[thread_id].pop();
+				next_step_level[thread_id].pop();
 			}
-			std::vector<unsigned long int>().swap(next_comparison[thread_id]);
-			std::vector<unsigned long int>().swap(next_step[thread_id]);
+			std::vector<struct id_distance>().swap(next_comparison[thread_id]);
 		} else {
-			process_row(false, false, thread_id, row_id);
+			process_row(false, false, thread_id, row_id, 0);
 		}
 		row_id = row_id_dispenser();
 	}
@@ -78,7 +87,8 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 	}
 }
 
-void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id) {
+void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id, unsigned int iteration) {
+	std::vector<id_distance> temp;
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
 	if (!use_reference && row_sequence->visited) {
 		return;
@@ -89,26 +99,41 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
-			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, Property::db_data.get_seqinfo(col_id)->qgram);
+			seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
+			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 			if (qgramdiff <= Property::resolution) {
 				targetampliconids[thread_id].push_back(col_id);
 			} else if (write_reference && qgramdiff <= Property::max_next) {
-				next_comparison[thread_id].push_back(col_id);
+				write_next_comparison(thread_id, col_id, qgramdiff);
 			}
 		}
 		total_qgram = total_qgram + Property::db_data.sequences - row_id - 1;
-	} else {
+	} else if (use_reference) {
 		row_reference++;
+		unsigned int max_next = iteration * Property::resolution;
 		for (unsigned int k = 0; k < next_comparison[thread_id].size(); k++) {
-			unsigned long int col_id = next_comparison[thread_id][k];
+			unsigned long int col_id = next_comparison[thread_id][k].seq_id;
 			if (col_id > row_id) {
-				unsigned long qgramdiff = qgram_diff(row_sequence->qgram, Property::db_data.get_seqinfo(col_id)->qgram);
-				if (qgramdiff <= Property::resolution) {
-					targetampliconids[thread_id].push_back(col_id);
+				unsigned int distance = next_comparison[thread_id][k].distance;
+				if (distance <= max_next) {
+					seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
+					unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
+					if (qgramdiff <= Property::resolution) {
+						targetampliconids[thread_id].push_back(col_id);
+					} else {
+						temp.push_back(next_comparison[thread_id][k]);
+					}
+				} else {
+					total_qgram += k;
+					for (unsigned int l = k; l < next_comparison[thread_id].size(); l++) {
+						temp.push_back(next_comparison[thread_id][l]);
+					}
+					k = next_comparison[thread_id].size();
 				}
+			} else {
+				temp.push_back(next_comparison[thread_id][k]);
 			}
 		}
-		total_qgram = total_qgram + next_comparison[thread_id].size();
 	}
 	total_scan += targetampliconids[thread_id].size();
 
@@ -116,20 +141,29 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 
 	for (unsigned long j = 0; j < targetampliconids[thread_id].size(); j++) {
 		unsigned long int col_id = targetampliconids[thread_id][j];
-		if (scanner[thread_id].master_result[j].diff <= Property::resolution) {
+		unsigned long int diff = scanner[thread_id].master_result[j].diff;
+		if (diff <= Property::resolution) {
 			vector_put(thread_id, row_id, col_id);
-			if (write_reference && !Property::db_data.get_seqinfo(col_id)->visited) {
+			if (Property::enable_flag && !Property::db_data.get_seqinfo(col_id)->visited && iteration < 9) {
 				Property::db_data.get_seqinfo(col_id)->visited = true;
-				next_step[thread_id].push_back(col_id);
+				next_step[thread_id].push(col_id);
+				next_step_level[thread_id].push(iteration + 1);
 			}
-		} else if (write_reference && scanner[thread_id].master_result[j].diff <= Property::max_next) {
-			next_comparison[thread_id].push_back(col_id);
-		} else {
+		} else if (write_reference && diff < Property::max_next) {
+			write_next_comparison(thread_id, col_id, diff);
 #ifdef DEBUG
-			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, targetampliconids[thread_id][j],
-					scanner[thread_id].master_result[j].diff);
+			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, diff);
 #endif
+		} else if (use_reference) {
+			struct id_distance struct1;
+			struct1.distance = scanner[thread_id].master_result[j].diff;
+			struct1.seq_id = targetampliconids[thread_id][j];
+			temp.push_back(struct1);
 		}
+	}
+	if (use_reference) {
+		temp.swap(next_comparison[thread_id]);
+		std::vector<struct id_distance>().swap(temp);
 	}
 	std::vector<unsigned long int>().swap(targetampliconids[thread_id]);
 	if (thread_id == 0)
@@ -155,13 +189,13 @@ void Cluster::print_clusters() {
 }
 
 void Cluster::print_debug() {
-	fprintf(Property::dbdebug, "Total match\t\t: %ld\n", total_match);
-	fprintf(Property::dbdebug, "Total estimate\t\t: %ld\n", total_qgram);
-	fprintf(Property::dbdebug, "Total search\t\t: %ld\n", total_scan);
-	fprintf(Property::dbdebug, "Full calculation\t: %ld\n", row_full);
-	fprintf(Property::dbdebug, "Referenced calculation\t: %ld\n", row_reference);
+	fprintf(Property::dbdebug, "Total match\t\t: %13ld\n", total_match);
+	fprintf(Property::dbdebug, "Total estimate\t\t: %13ld\n", total_qgram);
+	fprintf(Property::dbdebug, "Total search\t\t: %13ld\n", total_scan);
+	fprintf(Property::dbdebug, "Full calculation\t: %13ld\n", row_full);
+	fprintf(Property::dbdebug, "Referenced calculation\t: %13ld\n", row_reference);
 	for (int t = 0; t < Property::threads; t++) {
-		fprintf(Property::dbdebug, "Row stat [%d]\t: %ld\n", t, row_stat[t]);
+		fprintf(Property::dbdebug, "Row stat [%d]\t\t: %13ld\n", t, row_stat[t]);
 	}
 }
 
@@ -200,5 +234,12 @@ void Cluster::vector_put(int thread_id, unsigned long int first, unsigned long i
 #endif
 	pthread_mutex_unlock(&result_mutex);
 	total_match++;
+}
+
+void Cluster::write_next_comparison(int thread_id, unsigned long int col_id, unsigned int distance) {
+	struct id_distance push;
+	push.seq_id = col_id;
+	push.distance = distance;
+	next_comparison[thread_id].push_back(push);
 }
 

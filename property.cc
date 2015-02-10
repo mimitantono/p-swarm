@@ -36,7 +36,7 @@ void Property::init() {
 	gapopen = DEFAULT_GAPOPEN;
 	gapextend = DEFAULT_GAPEXTEND;
 	resolution = DEFAULT_RESOLUTION;
-	max_next = 2 * resolution;
+	max_next = 10 * resolution;
 	threads = DEFAULT_THREADS;
 	enable_flag = false;
 	calculate_penalty();

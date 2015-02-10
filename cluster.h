@@ -11,16 +11,18 @@
 #include <vector>
 #include <map>
 #include <pthread.h>
+#include <queue>
 #include "qgram.h"
 #include "scan.h"
 #include "db.h"
 #include "clusterresult.h"
 #include "util.h"
+#include "shd/vector_filter.h"
+#include <locale.h>
 
-struct eqstr {
-	bool operator()(unsigned long int s1, unsigned long int s2) const {
-		return s1 == s2;
-	}
+struct id_distance {
+	unsigned long int seq_id;
+	unsigned int distance;
 };
 
 class Cluster {
@@ -34,9 +36,10 @@ public:
 private:
 	pthread_mutex_t row_id_mutex;
 	pthread_mutex_t result_mutex;
+
+	cluster_result result;
 	class scanner * scanner;
-	unsigned long int row_id_dispenser();
-	std::vector<unsigned long int> * targetampliconids;
+
 	unsigned long int total_match;
 	unsigned long int total_qgram;
 	unsigned long int total_scan;
@@ -45,11 +48,16 @@ private:
 	unsigned long int * row_stat;
 	unsigned long int row_id_status;
 	unsigned long int cluster_id;
-	std::vector<unsigned long int> * next_step;
-	std::vector<unsigned long int> * next_comparison;
-	cluster_result result;
+
+	std::vector<unsigned long int> * targetampliconids;
+	std::queue<unsigned long int> * next_step;
+	std::queue<unsigned int> * next_step_level;
+	std::vector<struct id_distance> * next_comparison;
+
+	unsigned long int row_id_dispenser();
 	void vector_put(int thread_id, unsigned long int row, unsigned long int col);
-	void process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id);
+	void process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id, unsigned int iteration);
+	void write_next_comparison(int thread_id, unsigned long int col, unsigned int distance);
 };
 
 #endif /* CLUSTER_H_ */
