@@ -217,6 +217,9 @@ void Db_data::read_file() {
 		seqindex[i].header = p;
 		seqindex[i].headerlen = strlen(seqindex[i].header);
 		seqindex[i].visited = false;
+#ifdef DEBUG
+		fprintf(Property::dbdebug, "%s[%ld]\n", seqindex[i].header, i);
+#endif
 
 		p += seqindex[i].headerlen + 1;
 
