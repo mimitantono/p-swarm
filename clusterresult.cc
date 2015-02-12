@@ -73,6 +73,8 @@ void cluster_result::print(FILE * stream, bool sort) {
 		}
 	}
 	fprintf(stream, "\n\nTotal: %ld clusters of %ld sequences", clust, total);
+	fprintf(stderr, "Total cluster      : %ld\n", clust);
+	fprintf(stderr, "Total sequence     : %ld\n", total);
 }
 
 void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {

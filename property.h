@@ -40,6 +40,7 @@ public:
 	static BYTE byte_penalty_gapextend;
 	static BYTE byte_penalty_gapopen_gapextend;
 	static bool enable_flag;
+	static unsigned int depth;
 	static unsigned long longest;
 	static unsigned long resolution;
 	static unsigned long bits;
@@ -56,7 +57,7 @@ public:
 	static void set_mismatchscore(long value);
 	static void set_gapopen(long value);
 	static void set_gapextend(long value);
-	static void calculate_penalty();
+	static void recalculate();
 };
 
 #endif /* PROPERTY_H_ */

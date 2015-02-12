@@ -9,6 +9,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
+	dup2(1,2);
 	Property::init();
 	Matrix::score_matrix_init();
 	CPU_Info::cpu_features_detect();
@@ -22,12 +23,13 @@ void args_init(int argc, char **argv) {
 	/* Set defaults */
 	opterr = 1;
 
-	char short_options[] = "d:ho:t:vm:p:g:e:s:u:braz";
+	char short_options[] = "d:ho:t:y:vm:p:g:e:s:u:braz";
 
 	static struct option long_options[] = { { "differences", required_argument, NULL, 'd' }, { "help", no_argument, NULL, 'h' }, {
 			"output-file", required_argument, NULL, 'o' }, { "threads", required_argument, NULL, 't' }, { "match-reward", required_argument,
 	NULL, 'm' }, { "mismatch-penalty", required_argument, NULL, 'p' }, { "gap-opening-penalty", required_argument, NULL, 'g' }, {
-			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' }, { 0, 0, 0, 0 }, };
+			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' }, { "depth",
+	required_argument, NULL, 'y' }, { 0, 0, 0, 0 }, };
 
 	int option_index = 0;
 	int c;
@@ -65,6 +67,9 @@ void args_init(int argc, char **argv) {
 		case 'z':
 			Property::enable_flag = true;
 			break;
+		case 'y':
+			Property::depth = atol(optarg);
+			break;
 		case 'h':
 			/* help */
 		default:
@@ -79,6 +84,7 @@ void args_init(int argc, char **argv) {
 
 	if (!Property::outfile)
 		Property::set_outfile("result.log");
+	Property::recalculate();
 	Property::print();
 }
 
@@ -90,14 +96,14 @@ void run() {
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);
 	double dif1 = end.tv_sec - start.tv_sec;
-	printf("\nduration %.2lf secs\n", dif1);
+	fprintf(stderr, "Time calculation   : %.2lf\n", dif1);
 	gettimeofday(&start, NULL);
 	bigmatrix.print_debug();
 	bigmatrix.form_clusters();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);
 	double dif2 = end.tv_sec - start.tv_sec;
-	printf("\nduration %.2lf secs\n", dif2);
+	fprintf(stderr, "Time clean up      : %.2lf\n", dif2);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
 }
@@ -164,6 +170,7 @@ void args_usage() {
 	fprintf(stderr, "  -g, --gap-opening-penalty INTEGER   gap open penalty (12)\n");
 	fprintf(stderr, "  -e, --gap-extension-penalty INTEGER gap extension penalty (4)\n");
 	fprintf(stderr, "  -z, --debug                         enable alternative algorithms\n");
+	fprintf(stderr, "  -y, --depth                         depth for alternative algorithms\n");
 	fprintf(stderr, "\n");
 }
 

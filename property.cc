@@ -21,6 +21,7 @@ unsigned long Property::resolution;
 unsigned long Property::max_next;
 unsigned long Property::diff_saturation;
 unsigned long Property::bits;
+unsigned int Property::depth = 2;
 FILE * Property::outfile;
 FILE * Property::dbdebug;
 std::string Property::databasename;
@@ -36,14 +37,13 @@ void Property::init() {
 	gapopen = DEFAULT_GAPOPEN;
 	gapextend = DEFAULT_GAPEXTEND;
 	resolution = DEFAULT_RESOLUTION;
-	max_next = 10 * resolution;
 	threads = DEFAULT_THREADS;
 	enable_flag = false;
-	calculate_penalty();
+	recalculate();
 	dbdebug = fopen("db.log", "w");
 }
 
-void Property::calculate_penalty() {
+void Property::recalculate() {
 	if ((gapopen + gapextend) < 1)
 		fatal("Illegal gap penalties specified");
 	penalty_mismatch = 2 * matchscore - 2 * mismatchscore;
@@ -58,6 +58,7 @@ void Property::calculate_penalty() {
 	diff_saturation = MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
 	byte_penalty_gapextend = (BYTE) penalty_gapextend;
 	byte_penalty_gapopen_gapextend = (BYTE) penalty_gapopen + (BYTE) penalty_gapextend;
+	max_next = depth * resolution;
 	if (Property::resolution <= diff_saturation)
 		bits = 8;
 	else
@@ -80,7 +81,6 @@ void Property::print() {
 
 void Property::set_resolution(long value) {
 	resolution = value;
-	max_next = resolution * 2;
 	if (resolution < 1)
 		fatal("Illegal resolution specified");
 }

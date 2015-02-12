@@ -17,13 +17,7 @@
 #include "db.h"
 #include "clusterresult.h"
 #include "util.h"
-#include "shd/vector_filter.h"
 #include <locale.h>
-
-struct id_distance {
-	unsigned long int seq_id;
-	unsigned int distance;
-};
 
 class Cluster {
 public:
@@ -52,7 +46,8 @@ private:
 	std::vector<unsigned long int> * targetampliconids;
 	std::queue<unsigned long int> * next_step;
 	std::queue<unsigned int> * next_step_level;
-	std::vector<struct id_distance> * next_comparison;
+	std::vector<unsigned long int> ** next_comparison;
+	std::map<unsigned long int, bool> * match_statistics;
 
 	unsigned long int row_id_dispenser();
 	void vector_put(int thread_id, unsigned long int row, unsigned long int col);
