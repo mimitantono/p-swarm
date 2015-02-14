@@ -23,7 +23,7 @@ class cluster_result {
 public:
 	cluster_result();
 	virtual ~cluster_result();
-	cluster_info * new_cluster(long cluster_id);
+	cluster_info * new_cluster(unsigned long int cluster_id);
 	long partition_id;
 	void merge_cluster(cluster_info* cluster, cluster_info* merge);
 	void print(FILE * stream, bool sort);
@@ -31,7 +31,7 @@ public:
 	cluster_info * find_member(unsigned long int sequence_id);
 private:
 	std::map<unsigned long int, cluster_info> clusters;
-	std::map<unsigned long int, unsigned long int> member_stat;
+	unsigned long int * member_stat;
 };
 
 #endif /* CLUSTERRESULT_H_ */
