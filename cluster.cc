@@ -139,37 +139,26 @@ void Cluster::qgram_diff_full_row(unsigned long int row_id, int thread_id, bool 
 #endif
 	++row_full;
 	for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; ++col_id) {
-		seqinfo_t* col_sequence = Property::db_data.get_seqinfo(col_id);
-		unsigned long qgramdiff = qgram_diff(Property::db_data.get_seqinfo(row_id)->qgram, col_sequence->qgram);
+		unsigned long qgramdiff = qgram_diff_by_id(row_id, col_id);
 		if (qgramdiff <= Property::resolution) {
 			targetampliconids[thread_id].push_back(col_id);
 		} else {
 			write_next_comparison(thread_id, col_id, qgramdiff);
 		}
-#ifdef DEBUG
-		fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, qgramdiff);
-#endif
 	}
 	qgram_performed = qgram_performed + Property::db_data.sequences - row_id - 1;
 }
 
 void Cluster::prepare_alignment(unsigned long int col_id, unsigned long int row_id, int thread_id) {
 	if (col_id > row_id) {
-		unsigned long qgramdiff = qgram_diff(Property::db_data.get_seqinfo(row_id)->qgram, Property::db_data.get_seqinfo(col_id)->qgram);
-		if (qgramdiff <= Property::resolution) {
+		if (qgram_diff_by_id(row_id, col_id) <= Property::resolution) {
 			targetampliconids[thread_id].push_back(col_id);
-#ifdef DEBUG
-			fprintf(Property::dbdebug, "targetampliconids[%d] push = %ld\n", 0, col_id);
-#endif
 		} else {
 			next_comparison[thread_id][0].push(col_id);
 #ifdef DEBUG
 			fprintf(Property::dbdebug, "next_comparison[%d] push = %ld\n", 0, col_id);
 #endif
 		}
-#ifdef DEBUG
-		fprintf(Property::dbdebug, "%ld and %ld are estimated far away by %ld\n", row_id, col_id, qgramdiff);
-#endif
 		++qgram_performed;
 	} else {
 		next_comparison[thread_id][0].push(col_id);
@@ -183,7 +172,6 @@ void Cluster::walkthrough_row_by_reference(unsigned int iteration, int thread_id
 	++row_reference;
 	for (unsigned int j = 0; j < iteration; j += iteration - 1) {
 		unsigned long int size = next_comparison[thread_id][j].size();
-		fprintf(Property::dbdebug, "next_comparison[%d] = %ld\n", j, size);
 		for (unsigned int k = 0; k < size; ++k) {
 			unsigned long int col_id = next_comparison[thread_id][j].front();
 #ifdef DEBUG
