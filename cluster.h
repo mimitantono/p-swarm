@@ -43,22 +43,24 @@ private:
 	unsigned long int current_row_id;
 	unsigned long int current_cluster_id;
 	unsigned long int * row_stat_by_thread;
+	unsigned long int * row_stat_by_iteration;
+	unsigned long int * max_next;
 
 	//temp variables (flags and etc)
 	std::vector<unsigned long int> * targetampliconids;
 	std::queue<unsigned long int> * next_step;
 	std::queue<unsigned int> * next_step_level;
-	std::vector<unsigned long int> ** next_comparison;
-	bool ** match_statistics;
+	std::vector<std::queue<unsigned long int> > * next_comparison;
 	bool * row_visited;
 
-	unsigned long int get_next_row_id();
+	unsigned long int get_next_row_id(int thread_id);
 	void add_match_to_cluster(int thread_id, unsigned long int row, unsigned long int col);
 	void process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id, unsigned int iteration);
 	inline void write_next_comparison(int thread_id, unsigned long int col, unsigned int distance);
 	void reset_flags(int thread_id);
-	void qgram_diff_full_row(unsigned long int row_id, int thread_id, bool write_reference, seqinfo_t* row_sequence);
-	void walkthrough_row_by_reference(unsigned int iteration, int thread_id, unsigned long int row_id, seqinfo_t* row_sequence);
+	void qgram_diff_full_row(unsigned long int row_id, int thread_id, bool write_reference);
+	void walkthrough_row_by_reference(unsigned int iteration, int thread_id, unsigned long int row_id);
+	void prepare_alignment(unsigned long int col_id, unsigned long int row_id, int thread_id);
 };
 
 #endif /* CLUSTER_H_ */

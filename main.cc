@@ -25,11 +25,18 @@ void args_init(int argc, char **argv) {
 
 	char short_options[] = "d:ho:t:y:vm:p:g:e:s:u:braz";
 
-	static struct option long_options[] = { { "differences", required_argument, NULL, 'd' }, { "help", no_argument, NULL, 'h' }, {
-			"output-file", required_argument, NULL, 'o' }, { "threads", required_argument, NULL, 't' }, { "match-reward", required_argument,
-	NULL, 'm' }, { "mismatch-penalty", required_argument, NULL, 'p' }, { "gap-opening-penalty", required_argument, NULL, 'g' }, {
-			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' }, { "depth",
-	required_argument, NULL, 'y' }, { 0, 0, 0, 0 }, };
+	static struct option long_options[] = {
+											{ "differences", required_argument, NULL, 'd' },
+											{ "help", no_argument, NULL, 'h' },
+											{ "output-file", required_argument, NULL, 'o' },
+											{ "threads", required_argument, NULL, 't' },
+											{ "match-reward", required_argument, NULL, 'm' },
+											{ "mismatch-penalty", required_argument, NULL, 'p' },
+											{ "gap-opening-penalty", required_argument, NULL, 'g' },
+											{ "gap-extension-penalty", required_argument, NULL, 'e' },
+											{ "debug", required_argument, NULL, 'z' },
+											{ "depth", required_argument, NULL, 'y' },
+											{ 0, 0, 0, 0 }, };
 
 	int option_index = 0;
 	int c;
