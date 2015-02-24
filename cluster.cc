@@ -93,6 +93,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 		row_stat[thread_id]++;
 		row_sequence->visited = true;
 	}
+	fprintf(Property::dbdebug, "Calculate row %ld iteration %d\n", row_id, iteration);
 	if (!use_reference) {
 		row_full++;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
@@ -100,8 +101,12 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 			if (qgramdiff <= Property::resolution) {
 				targetampliconids[thread_id].push_back(col_id);
-			} else if (write_reference && qgramdiff <= Property::max_next) {
+			}
+			if (write_reference && qgramdiff <= Property::max_next) {
 				next_comparison[thread_id][qgramdiff].push_back(col_id);
+#ifdef DEBUG
+				fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, qgramdiff);
+#endif
 			}
 		}
 		total_qgram = total_qgram + Property::db_data.sequences - row_id - 1;
@@ -109,7 +114,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 		row_reference++;
 		unsigned int max_next = iteration * Property::resolution;
 		unsigned int min_next = (iteration - 1) * Property::resolution;
-		for (unsigned int j = min_next; j <= max_next; j++) {
+		for (unsigned int j = 0; j <= max_next; j++) {
 			for (unsigned int k = 0; k < next_comparison[thread_id][j].size(); k++) {
 				unsigned long int col_id = next_comparison[thread_id][j][k];
 				if (col_id > row_id && match_statistics[thread_id].find(col_id) == match_statistics[thread_id].end()) {
@@ -137,11 +142,6 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 				next_step[thread_id].push(col_id);
 				next_step_level[thread_id].push(iteration + 1);
 			}
-		} else if (write_reference && diff <= Property::max_next) {
-			next_comparison[thread_id][diff].push_back(col_id);
-#ifdef DEBUG
-			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, diff);
-#endif
 		}
 	}
 	std::vector<unsigned long int>().swap(targetampliconids[thread_id]);
