@@ -37,8 +37,8 @@ struct seqinfo_s {
 	unsigned int seqlen;
 	unsigned int abundance;
 	unsigned int hdrhash;
-	qgramvector_t qgram;
 	bool visited;
+	qgramvector_t qgram;
 };
 
 

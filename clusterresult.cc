@@ -9,12 +9,15 @@
 
 cluster_result::cluster_result() {
 	partition_id = -1;
+	member_stat = new unsigned long int [Property::db_data.sequences];
+	memset(member_stat, 0, Property::db_data.sequences * sizeof(unsigned long int));
 }
 
 cluster_result::~cluster_result() {
+	delete[] member_stat;
 }
 
-cluster_info * cluster_result::new_cluster(long cluster_id) {
+cluster_info * cluster_result::new_cluster(unsigned long int cluster_id) {
 	cluster_info info;
 	info.cluster_id = cluster_id;
 	clusters[cluster_id] = info;
@@ -86,13 +89,13 @@ void cluster_result::merge_cluster(cluster_info* cluster, cluster_info* merge) {
 }
 
 cluster_info * cluster_result::find_member(unsigned long int sequence_id) {
-	if (member_stat.find(sequence_id) != member_stat.end()) {
+	if (member_stat[sequence_id] > 0) {
 		return &(clusters[member_stat[sequence_id]]);
 	}
 	return NULL;
 }
 
-void cluster_result::add_member(cluster_info* cluster, unsigned long int id) {
-	cluster->cluster_members.push_back(id);
-	member_stat[id] = cluster->cluster_id;
+void cluster_result::add_member(cluster_info* cluster, unsigned long int sequence_id) {
+	cluster->cluster_members.push_back(sequence_id);
+	member_stat[sequence_id] = cluster->cluster_id;
 }

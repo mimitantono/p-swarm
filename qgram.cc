@@ -125,10 +125,17 @@ unsigned long compareqgramvectors(unsigned char * a, unsigned char * b) {
 		return compareqgramvectors_128(a, b);
 }
 
-unsigned long qgram_diff(qgramvector_t a, qgramvector_t b){
+unsigned long qgram_diff_by_id(unsigned long int a, unsigned long int b) {
+	unsigned long diff = qgram_diff(Property::db_data.get_seqinfo(a)->qgram, Property::db_data.get_seqinfo(b)->qgram);
+#ifdef DEBUG
+	fprintf(Property::dbdebug, "%ld and %ld are estimated far away by %ld\n", a, b, diff);
+#endif
+	return diff;
+}
+
+unsigned long qgram_diff(qgramvector_t a, qgramvector_t b) {
 	unsigned long diffqgrams = compareqgramvectors(a, b);
-	unsigned long mindiff = (diffqgrams + 2 * QGRAMLENGTH - 1) / (2 * QGRAMLENGTH);
-	return mindiff;
+	return (diffqgrams + 2 * QGRAMLENGTH - 1) / (2 * QGRAMLENGTH);
 }
 
 void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist) {

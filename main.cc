@@ -9,7 +9,7 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-	dup2(1,2);
+	dup2(1, 2);
 	Property::init();
 	Matrix::score_matrix_init();
 	CPU_Info::cpu_features_detect();
@@ -25,11 +25,18 @@ void args_init(int argc, char **argv) {
 
 	char short_options[] = "d:ho:t:y:vm:p:g:e:s:u:braz";
 
-	static struct option long_options[] = { { "differences", required_argument, NULL, 'd' }, { "help", no_argument, NULL, 'h' }, {
-			"output-file", required_argument, NULL, 'o' }, { "threads", required_argument, NULL, 't' }, { "match-reward", required_argument,
-	NULL, 'm' }, { "mismatch-penalty", required_argument, NULL, 'p' }, { "gap-opening-penalty", required_argument, NULL, 'g' }, {
-			"gap-extension-penalty", required_argument, NULL, 'e' }, { "debug", required_argument, NULL, 'z' }, { "depth",
-	required_argument, NULL, 'y' }, { 0, 0, 0, 0 }, };
+	static struct option long_options[] = {
+											{ "differences", required_argument, NULL, 'd' },
+											{ "help", no_argument, NULL, 'h' },
+											{ "output-file", required_argument, NULL, 'o' },
+											{ "threads", required_argument, NULL, 't' },
+											{ "match-reward", required_argument, NULL, 'm' },
+											{ "mismatch-penalty", required_argument, NULL, 'p' },
+											{ "gap-opening-penalty", required_argument, NULL, 'g' },
+											{ "gap-extension-penalty", required_argument, NULL, 'e' },
+											{ "debug", required_argument, NULL, 'z' },
+											{ "depth", required_argument, NULL, 'y' },
+											{ 0, 0, 0, 0 }, };
 
 	int option_index = 0;
 	int c;
@@ -95,15 +102,16 @@ void run() {
 	class Cluster bigmatrix;
 	calculate_matrix(&bigmatrix);
 	gettimeofday(&end, NULL);
-	double dif1 = end.tv_sec - start.tv_sec;
-	fprintf(stderr, "Time calculation   : %.2lf\n", dif1);
+	double dif1 = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
 	gettimeofday(&start, NULL);
 	bigmatrix.print_debug();
-	bigmatrix.form_clusters();
+	bigmatrix.find_and_add_singletons();
 	bigmatrix.print_clusters();
 	gettimeofday(&end, NULL);
-	double dif2 = end.tv_sec - start.tv_sec;
-	fprintf(stderr, "Time clean up      : %.2lf\n", dif2);
+	double dif2 = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
+	fprintf(stderr, "Time calculation   : %.2lf\n", dif1 / 1000);
+	fprintf(stderr, "Time singletons    : %.2lf\n", dif2 / 1000);
+	fprintf(stderr, "Total time         : %.2lf\n", (dif1 + dif2) / 1000);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
 }
