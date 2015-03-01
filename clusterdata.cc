@@ -18,8 +18,8 @@ cluster_data::cluster_data() {
 	row_full = 0;
 	row_reference = 0;
 	row_stat = 0;
-//	match_statistics = new bool[Property::db_data.sequences];
-//	memset(match_statistics, 0, Property::db_data.sequences * sizeof(bool));
+	match_statistics = new bool[Property::db_data.sequences];
+	memset(match_statistics, 0, Property::db_data.sequences * sizeof(bool));
 	scanner.search_begin();
 }
 
@@ -32,7 +32,12 @@ void cluster_data::reset() {
 	for (unsigned int i = 0; i < Property::max_next + 1; i++) {
 		std::vector<unsigned long int>().swap(next_comparison[i]);
 	}
-	std::map<unsigned long int, bool>().swap(match_statistics);
-//	memset(match_statistics, 0, Property::db_data.sequences * sizeof(bool));
+//	std::map<unsigned long int, bool>().swap(match_statistics);
+	memset(match_statistics, 0, Property::db_data.sequences * sizeof(bool));
+}
+
+void cluster_data::write_next_comparison(unsigned long int col_id, unsigned int distance) {
+	if (distance <= Property::max_next)
+		next_comparison[distance].push_back(col_id);
 }
 

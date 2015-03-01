@@ -79,9 +79,6 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 			}
 			if (write_reference && qgramdiff <= Property::max_next) {
 				data->next_comparison[qgramdiff].push_back(col_id);
-#ifdef DEBUG
-				fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, qgramdiff);
-#endif
 			}
 		}
 		data->qgram_performed += Property::db_data.sequences - row_id - 1;
@@ -91,7 +88,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 		for (unsigned int j = 0; j <= max_next; j++) {
 			for (unsigned int k = 0; k < data->next_comparison[j].size(); k++) {
 				unsigned long int col_id = data->next_comparison[j][k];
-				if (col_id > row_id && data->match_statistics.find(col_id) == data->match_statistics.end()) {
+				if (col_id > row_id && !data->match_statistics[col_id]) {
 					seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
 					unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 					if (qgramdiff <= Property::resolution) {
@@ -189,7 +186,11 @@ void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first,
 #ifdef DEBUG
 			fprintf(Property::dbdebug, "Merge cluster %ld with %ld\n", existing_first->cluster_id, existing_second->cluster_id);
 #endif
-			result.merge_cluster(existing_first, existing_second);
+			if (existing_first->cluster_members.size() > existing_second->cluster_members.size()) {
+				result.merge_cluster(existing_first, existing_second);
+			} else {
+				result.merge_cluster(existing_second, existing_first);
+			}
 		}
 	}
 #ifdef DEBUG
@@ -197,10 +198,5 @@ void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first,
 #endif
 	pthread_mutex_unlock(&result_mutex);
 	data->matches_found++;
-}
-
-void Cluster::write_next_comparison(cluster_data * data, unsigned long int col_id, unsigned int distance) {
-	if (distance <= Property::max_next)
-		data->next_comparison[distance].push_back(col_id);
 }
 

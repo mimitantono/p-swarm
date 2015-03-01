@@ -35,7 +35,6 @@ private:
 	void add_match_to_cluster(cluster_data * cluster_data, unsigned long int row, unsigned long int col);
 	void process_row(bool write_reference, bool use_reference, cluster_data * cluster_data, unsigned long int row_id,
 			unsigned int iteration);
-	inline void write_next_comparison(cluster_data * cluster_data, unsigned long int col, unsigned int distance);
 	void qgram_diff_full_row(unsigned long int row_id, cluster_data * cluster_data, bool write_reference);
 	void walkthrough_row_by_reference(unsigned int iteration, cluster_data * cluster_data, unsigned long int row_id);
 	void prepare_alignment(unsigned long int col_id, unsigned long int row_id, cluster_data * cluster_data);

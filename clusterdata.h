@@ -32,9 +32,9 @@ public:
 	std::queue<unsigned long int> next_step;
 	std::queue<unsigned int> next_step_level;
 	std::vector<unsigned long int> * next_comparison;
-//	bool* match_statistics;
-	std::map<unsigned long int, bool> match_statistics;
+	bool* match_statistics;
 
+	void write_next_comparison(unsigned long int col, unsigned int distance);
 	void reset();
 };
 
