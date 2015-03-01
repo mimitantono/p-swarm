@@ -1,4 +1,9 @@
 #include "scan.h"
+#include "property.h"
+#include "util.h"
+#include "matrix.h"
+#include "db.h"
+#include <string.h>
 
 scanner::scanner() {
 	sd = new struct search_data;

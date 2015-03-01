@@ -8,11 +8,9 @@
 #ifndef CLUSTERRESULT_H_
 #define CLUSTERRESULT_H_
 
-#include<vector>
 #include<map>
 #include<string>
-#include<algorithm>
-#include "db.h"
+#include<vector>
 
 typedef struct cluster_info {
 	unsigned long int cluster_id;

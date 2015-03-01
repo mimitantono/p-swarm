@@ -1,4 +1,10 @@
 #include "qgram.h"
+#include "property.h"
+#include <stdio.h>
+#include <emmintrin.h>
+#include <string.h>
+#include "cpu_info.h"
+#include "db.h"
 
 void printqgrams(unsigned char * qgramvector) {
 	/* print qgramvector */

@@ -1,4 +1,12 @@
 #include "db.h"
+#include "qgram.h"
+#include "matrix.h"
+#include <stdio.h>
+#include <limits.h>
+#include <regex.h>
+#include <string>
+#include "property.h"
+#include <string.h>
 
 char map_nt[256] = {
 						-1,
@@ -712,7 +720,6 @@ void Db_data::read_file() {
 	char * p = datap;
 	std::vector<seqinfo_t>(sequences).swap(seqindex);
 	for (unsigned long i = 0; i < sequences; i++) {
-		seqindex[i].visited = false;
 		seqindex[i].header = p;
 		seqindex[i].headerlen = strlen(seqindex[i].header);
 #ifdef DEBUG

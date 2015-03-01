@@ -1,4 +1,5 @@
 #include "cpu_info.h"
+#include <stdio.h>
 
 long CPU_Info::mmx_present;
 long CPU_Info::sse_present;

@@ -1,4 +1,9 @@
 #include "search.h"
+#include "matrix.h"
+#include "cpu_info.h"
+#include "tmmintrin.h"
+#include "db.h"
+#include "property.h"
 
 #define CHANNELS 8
 #define CDEPTH 4

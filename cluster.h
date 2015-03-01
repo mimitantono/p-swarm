@@ -12,12 +12,7 @@
 #include <map>
 #include <pthread.h>
 #include <queue>
-#include "qgram.h"
-#include "scan.h"
-#include "db.h"
 #include "clusterresult.h"
-#include "util.h"
-#include <locale.h>
 
 class Cluster {
 public:
@@ -44,7 +39,6 @@ private:
 	unsigned long int current_cluster_id;
 	unsigned long int * row_stat_by_thread;
 	unsigned long int * row_stat_by_iteration;
-	unsigned long int * max_next;
 
 	//temp variables (flags and etc)
 	std::vector<unsigned long int> * targetampliconids;

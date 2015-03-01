@@ -6,6 +6,10 @@
  */
 
 #include "clusterresult.h"
+#include "property.h"
+#include<algorithm>
+#include "db.h"
+#include <string.h>
 
 cluster_result::cluster_result() {
 	partition_id = -1;

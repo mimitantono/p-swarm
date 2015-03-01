@@ -6,6 +6,13 @@
  */
 
 #include "cluster.h"
+#include "qgram.h"
+#include "scan.h"
+#include "db.h"
+#include "util.h"
+#include <locale.h>
+#include "seqinfo.h"
+#include "property.h"
 
 Cluster::Cluster() {
 	targetampliconids = new std::vector<unsigned long int>[Property::threads];
@@ -93,11 +100,11 @@ void Cluster::run_thread(int thread_id, int total_thread) {
 
 void Cluster::process_row(bool write_reference, bool use_reference, int thread_id, unsigned long int row_id, unsigned int iteration) {
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
-	if (!use_reference && row_sequence->visited) {
+	if (!use_reference && row_sequence->is_visited()) {
 		return;
 	} else {
 		row_stat_by_thread[thread_id]++;
-		row_sequence->visited = true;
+		row_sequence->set_visited();
 	}
 	fprintf(Property::dbdebug, "Calculate row %ld iteration %d\n", row_id, iteration);
 	if (!use_reference) {
@@ -143,16 +150,11 @@ void Cluster::process_row(bool write_reference, bool use_reference, int thread_i
 		if (diff <= Property::resolution) {
 			add_match_to_cluster(thread_id, row_id, col_id);
 			match_statistics[thread_id][col_id] = true;
-			if (Property::enable_flag && !Property::db_data.get_seqinfo(col_id)->visited && iteration < Property::depth) {
-				Property::db_data.get_seqinfo(col_id)->visited = true;
+			if (Property::enable_flag && !Property::db_data.get_seqinfo(col_id)->is_visited() && iteration < Property::depth) {
+				Property::db_data.get_seqinfo(col_id)->set_visited();
 				next_step[thread_id].push(col_id);
 				next_step_level[thread_id].push(iteration + 1);
 			}
-//		} else if (write_reference && diff <= Property::max_next) {
-//			next_comparison[thread_id][diff].push_back(col_id);
-//#ifdef DEBUG
-//			fprintf(Property::dbdebug, "%ld and %ld are far away by %ld\n", row_id, col_id, diff);
-//#endif
 		}
 	}
 	std::vector<unsigned long int>().swap(targetampliconids[thread_id]);

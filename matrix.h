@@ -8,11 +8,6 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "util.h"
-#include "property.h"
-
 extern char sym_nt[];
 
 class Matrix {

@@ -8,10 +8,8 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
-#include "cpu_info.h"
-#include "tmmintrin.h"
 #include "util.h"
-#include "db.h"
+#include<vector>
 
 struct search_data {
 	BYTE ** qtable;
@@ -38,11 +36,11 @@ class searcher {
 public:
 	searcher();
 	virtual ~searcher();
-	static void search8(struct search_data *sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result, queryinfo_t * query,
-			unsigned long dirbuffersize, long longest);
+	static void search8(struct search_data *sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result,
+			queryinfo_t * query, unsigned long dirbuffersize, long longest);
 
-	static void search16(struct search_data *sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result, queryinfo_t * query,
-			unsigned long dirbuffersize, long longest);
+	static void search16(struct search_data *sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result,
+			queryinfo_t * query, unsigned long dirbuffersize, long longest);
 };
 
 #endif /* SEARCH_H_ */

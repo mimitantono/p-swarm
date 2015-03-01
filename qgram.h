@@ -1,12 +1,6 @@
 #ifndef QGRAM_H_
 #define QGRAM_H_
 
-#include <stdio.h>
-#include <emmintrin.h>
-#include <string.h>
-#include "cpu_info.h"
-#include "db.h"
-
 void findqgrams(unsigned char * seq, unsigned long seqlen, unsigned char * qgramvector);
 void qgram_work_diff(unsigned long seed, unsigned long listlen, unsigned long * amplist, unsigned long * difflist);
 unsigned long qgram_diff_by_id(unsigned long int a, unsigned long int b);

@@ -8,8 +8,6 @@
 #ifndef CPU_INFO_H_
 #define CPU_INFO_H_
 
-#include <stdio.h>
-
 #define cpuid(f1, f2, a, b, c, d)                                       \
   __asm__ __volatile__ ("cpuid"                                         \
                         : "=a" (a), "=b" (b), "=c" (c), "=d" (d)        \

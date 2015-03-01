@@ -8,12 +8,7 @@
 #ifndef SCAN_H_
 #define SCAN_H_
 
-#include <pthread.h>
-#include "property.h"
-#include "util.h"
-#include "matrix.h"
 #include "search.h"
-#include "db.h"
 
 class scanner {
 public:

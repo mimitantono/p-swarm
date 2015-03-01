@@ -8,19 +8,11 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#include "db.h"
-#include "matrix.h"
-#include "property.h"
-#include <getopt.h>
-#include <sys/time.h>
-#include "stdlib.h"
-#include "property.h"
-
 #include "cluster.h"
 
 typedef struct thread_data {
 	unsigned long thread_id;
-	class Cluster *bigmatrix;
+	class Cluster *cluster;
 } thread_data;
 
 void destroy();

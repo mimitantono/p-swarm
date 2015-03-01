@@ -8,10 +8,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <city.h>
 
 #define MIN(x,y) ((x)<(y)?(x):(y))
 

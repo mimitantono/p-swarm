@@ -22,6 +22,9 @@
  */
 
 #include "util.h"
+#include <stdio.h>
+#include <string.h>
+#include <city.h>
 
 static const char * progress_prompt;
 static unsigned long progress_next;

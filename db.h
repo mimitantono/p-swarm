@@ -14,33 +14,9 @@
 #define MEMCHUNK 1048576
 #define LINEALLOC LINE_MAX
 
-#define QGRAMLENGTH 4
-#define QGRAMVECTORBITS (1<<(2*QGRAMLENGTH))
-#define QGRAMVECTORBYTES (QGRAMVECTORBITS/8)
-
-#include "qgram.h"
-#include "matrix.h"
-#include "util.h"
-#include <stdio.h>
-#include <limits.h>
-#include <regex.h>
-#include <string>
 #include <vector>
-
-typedef struct seqinfo_s seqinfo_t;
-typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
-
-struct seqinfo_s {
-	char * header;
-	char * seq;
-	unsigned int headerlen;
-	unsigned int seqlen;
-	unsigned int abundance;
-	unsigned int hdrhash;
-	bool visited;
-	qgramvector_t qgram;
-};
-
+#include "seqinfo.h"
+#include "util.h"
 
 class Db_data {
 private:

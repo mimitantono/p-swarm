@@ -5,6 +5,14 @@
  *      Author: mimitantono
  */
 #include "main.h"
+#include "cpu_info.h"
+#include "db.h"
+#include "matrix.h"
+#include "property.h"
+#include <getopt.h>
+#include <sys/time.h>
+#include "stdlib.h"
+#include "property.h"
 
 using namespace std;
 
@@ -118,7 +126,7 @@ void run() {
 
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	my_data->bigmatrix->run_thread(my_data->thread_id, Property::threads);
+	my_data->cluster->run_thread(my_data->thread_id, Property::threads);
 	pthread_exit(NULL);
 }
 
@@ -133,7 +141,7 @@ void calculate_matrix(class Cluster *bigmatrix) {
 	pthread_t threads[Property::threads];
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
-		thread_data_array[i].bigmatrix = bigmatrix;
+		thread_data_array[i].cluster = bigmatrix;
 		rc = pthread_create(&threads[i], &attr, run_thread, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
