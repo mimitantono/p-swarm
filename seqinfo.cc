@@ -7,6 +7,8 @@
 
 #include "seqinfo.h"
 
+pthread_mutex_t seqinfo_t::mutex;
+
 seqinfo_t::seqinfo_t() {
 	header = 0;
 	seq = 0;
@@ -15,11 +17,9 @@ seqinfo_t::seqinfo_t() {
 	seqlen = 0;
 	abundance = 0;
 	visited = false;
-	pthread_mutex_init(&mutex, NULL);
 }
 
 seqinfo_t::~seqinfo_t() {
-	pthread_mutex_destroy(&mutex);
 }
 
 bool seqinfo_t::is_visited() {

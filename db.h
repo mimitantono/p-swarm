@@ -17,6 +17,7 @@
 #include <vector>
 #include "seqinfo.h"
 #include "util.h"
+#include "seqinfo.h"
 
 class Db_data {
 private:

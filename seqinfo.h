@@ -18,7 +18,7 @@ typedef unsigned char qgramvector_t[QGRAMVECTORBYTES];
 
 class seqinfo_t {
 private:
-	pthread_mutex_t mutex;
+	static pthread_mutex_t mutex;
 	bool visited;
 public:
 	seqinfo_t();

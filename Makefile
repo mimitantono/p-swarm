@@ -5,11 +5,11 @@ FLAGS = -c $(INCLUDES)
 CXXFLAGS=$(COMPILEOPT) $(COMMON) -O3
 OBJS=main.o matrix.o cpu_info.o qgram.o cityhash/city.o \
 	util.o db.o scan.o search8.o search16.o property.o \
-	clusterresult.o cluster.o seqinfo.o \
+	clusterresult.o cluster.o seqinfo.o clusterdata.o \
 #	shd/vector_filter.o shd/mask.o shd/bit_convert.o shd/popcount.o 
 OBJS_TEST=main.s matrix.s cpu_info.s qgram.s cityhash/city.s \
 	util.s db.s scan.s search8.s search16.s property.s \
-	clusterresult.s cluster.s seqinfo.s \
+	clusterresult.s cluster.s seqinfo.s clusterdata.s \
 #	shd/vector_filter.s shd/mask.s shd/bit_convert.s shd/popcount.s 
 LINKFLAGS=-g 
 LIBS=-lpthread

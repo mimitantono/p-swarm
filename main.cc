@@ -107,14 +107,15 @@ void run() {
 	timeval start, end;
 	gettimeofday(&start, NULL);
 	Property::db_data.read_file();
-	class Cluster bigmatrix;
-	calculate_matrix(&bigmatrix);
+	class Cluster cluster;
+	cluster_data * cluster_data= new class cluster_data[Property::threads];
+	calculate_matrix(&cluster, &cluster_data);
 	gettimeofday(&end, NULL);
 	double dif1 = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
 	gettimeofday(&start, NULL);
-	bigmatrix.print_debug();
-	bigmatrix.find_and_add_singletons();
-	bigmatrix.print_clusters();
+	cluster.print_debug(&cluster_data);
+	cluster.find_and_add_singletons();
+	cluster.print_clusters();
 	gettimeofday(&end, NULL);
 	double dif2 = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
 	fprintf(stderr, "Time calculation   : %.2lf\n", dif1 / 1000);
@@ -122,15 +123,16 @@ void run() {
 	fprintf(stderr, "Total time         : %.2lf\n", (dif1 + dif2) / 1000);
 	fprintf(Property::outfile, "\nCalculate matrix duration %.2lf secs", dif1);
 	fprintf(Property::outfile, "\nForm cluster duration %.2lf secs\n", dif2);
+	delete[] cluster_data;
 }
 
 void *run_thread(void *threadargs) {
 	thread_data *my_data = (thread_data*) threadargs;
-	my_data->cluster->run_thread(my_data->thread_id, Property::threads);
+	my_data->cluster->run_thread(my_data->cluster_data, Property::threads);
 	pthread_exit(NULL);
 }
 
-void calculate_matrix(class Cluster *bigmatrix) {
+void calculate_matrix(class Cluster *cluster, class cluster_data ** cluster_data) {
 	pthread_attr_t attr;
 	int rc;
 	void *status;
@@ -141,7 +143,9 @@ void calculate_matrix(class Cluster *bigmatrix) {
 	pthread_t threads[Property::threads];
 	for (long i = 0; i < Property::threads; i++) {
 		thread_data_array[i].thread_id = (unsigned long) i;
-		thread_data_array[i].cluster = bigmatrix;
+		thread_data_array[i].cluster = cluster;
+		thread_data_array[i].cluster_data = &((*cluster_data)[i]);
+		thread_data_array[i].cluster_data->thread_id = i;
 		rc = pthread_create(&threads[i], &attr, run_thread, (void *) &thread_data_array[i]);
 		if (rc) {
 			fprintf(stderr, "Error: unable to create thread, %d", rc);
