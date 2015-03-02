@@ -8,10 +8,7 @@
 #ifndef CLUSTER_H_
 #define CLUSTER_H_
 
-#include <vector>
-#include <map>
 #include <pthread.h>
-#include <queue>
 #include "clusterresult.h"
 #include "clusterdata.h"
 

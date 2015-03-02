@@ -51,7 +51,7 @@ void cluster_result::print(FILE * stream, bool sort) {
 	if (sort) {
 		fprintf(stderr, "\nResult will be sorted alphabetically\n");
 		std::vector<std::pair<cluster_info, std::vector<unsigned long int> > > vector_clusters;
-		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
+		for (boost::unordered_map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
 			std::pair<cluster_info, std::vector<unsigned long int> > pair;
 			for (unsigned long i = 0; i < cit->second.cluster_members.size(); i++) {
 				pair.second.push_back(cit->second.cluster_members[i]);
@@ -70,7 +70,7 @@ void cluster_result::print(FILE * stream, bool sort) {
 			clust++;
 		}
 	} else {
-		for (std::map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
+		for (boost::unordered_map<unsigned long int, cluster_info>::const_iterator cit = clusters.begin(); cit != clusters.end(); ++cit) {
 			for (unsigned long int i = 0; i < cit->second.cluster_members.size(); i++) {
 				fprintf(stream, "\n%s", Property::db_data.get_seqinfo(cit->second.cluster_members[i])->header);
 				total++;

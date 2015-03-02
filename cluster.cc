@@ -30,8 +30,7 @@ unsigned long int Cluster::get_next_row_id() {
 	unsigned long int return_row = 0;
 	pthread_mutex_lock(&row_id_mutex);
 	if (current_row_id <= Property::db_data.sequences) {
-		return_row = current_row_id;
-		current_row_id++;
+		return_row = current_row_id++;
 	}
 	pthread_mutex_unlock(&row_id_mutex);
 	return return_row;
@@ -67,11 +66,11 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 		return;
 	}
 	row_sequence->set_visited();
-	data->row_stat++;
+	++data->row_stat;
 	fprintf(Property::dbdebug, "Calculate row %ld iteration %d\n", row_id, iteration);
 	if (!use_reference) {
-		data->row_full++;
-		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; col_id++) {
+		++data->row_full;
+		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; ++col_id) {
 			seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
 			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 			if (qgramdiff <= Property::resolution) {
@@ -83,12 +82,12 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 		}
 		data->qgram_performed += Property::db_data.sequences - row_id - 1;
 	} else if (use_reference) {
-		data->row_reference++;
+		++data->row_reference;
 		unsigned int max_next = iteration * Property::resolution;
-		for (unsigned int j = 0; j <= max_next; j++) {
-			for (unsigned int k = 0; k < data->next_comparison[j].size(); k++) {
+		for (unsigned int j = 0; j <= max_next; ++j) {
+			for (unsigned int k = 0; k < data->next_comparison[j].size(); ++k) {
 				unsigned long int col_id = data->next_comparison[j][k];
-				if (col_id > row_id && !data->match_statistics[col_id]) {
+				if (col_id > row_id && data->match_statistics.find(col_id) == data->match_statistics.end()) {
 					seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
 					unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 					if (qgramdiff <= Property::resolution) {
@@ -102,7 +101,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 
 	data->scanner.search_do(row_id, &data->targetampliconids);
 
-	for (unsigned long j = 0; j < data->targetampliconids.size(); j++) {
+	for (unsigned long j = 0; j < data->targetampliconids.size(); ++j) {
 		unsigned long int col_id = data->targetampliconids[j];
 		unsigned long int diff = data->scanner.master_result[j].diff;
 		if (diff <= Property::resolution) {
@@ -121,11 +120,10 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 }
 
 void Cluster::find_and_add_singletons() {
-	for (unsigned long int i = 0; i < Property::db_data.sequences; i++) {
+	for (unsigned long int i = 0; i < Property::db_data.sequences; ++i) {
 		if (result.find_member(i) == NULL) {
-			cluster_info * added = result.new_cluster(current_cluster_id);
+			cluster_info * added = result.new_cluster(current_cluster_id++);
 			result.add_member(added, i);
-			current_cluster_id++;
 		}
 	}
 }
@@ -174,13 +172,12 @@ void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first,
 		fprintf(Property::dbdebug, "Add %ld to cluster %ld\n", first, existing_second->cluster_id);
 #endif
 	} else if (existing_first == NULL && existing_second == NULL) {
-		cluster_info * added = result.new_cluster(current_cluster_id);
+		cluster_info * added = result.new_cluster(current_cluster_id++);
 		result.add_member(added, first);
 		result.add_member(added, second);
 #ifdef DEBUG
 		fprintf(Property::dbdebug, "Create cluster %ld for %ld and %ld\n", current_cluster_id, first, second);
 #endif
-		current_cluster_id++;
 	} else if (existing_first != NULL && existing_second != NULL) {
 		if (existing_first->cluster_id != existing_second->cluster_id) {
 #ifdef DEBUG
@@ -196,7 +193,7 @@ void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first,
 #ifdef DEBUG
 	fprintf(Property::dbdebug, "%ld and %ld are connected\n", first, second);
 #endif
+	++data->matches_found;
 	pthread_mutex_unlock(&result_mutex);
-	data->matches_found++;
 }
 
