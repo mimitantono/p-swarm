@@ -24,9 +24,8 @@ public:
 	unsigned long int matches_found;
 	unsigned long int qgram_performed;
 	unsigned long int scan_performed;
-	unsigned long int row_full;
-	unsigned long int row_reference;
 	unsigned long int row_stat;
+	unsigned long int * iteration_stat;
 
 	std::vector<unsigned long int> targetampliconids;
 	std::queue<unsigned long int> next_step;

@@ -15,14 +15,17 @@ cluster_data::cluster_data() {
 	matches_found = 0;
 	qgram_performed = 0;
 	scan_performed = 0;
-	row_full = 0;
-	row_reference = 0;
 	row_stat = 0;
 	scanner.search_begin();
+	iteration_stat = new unsigned long int[Property::depth + 1];
+	for (unsigned int i = 0; i <= Property::depth; i++) {
+		iteration_stat[i] = 0;
+	}
 }
 
 cluster_data::~cluster_data() {
 	delete[] next_comparison;
+	delete[] iteration_stat;
 }
 
 void cluster_data::reset() {

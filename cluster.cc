@@ -51,7 +51,7 @@ void Cluster::run_thread(cluster_data *data, int total_thread) {
 			}
 			data->reset();
 		} else {
-			process_row(false, false, data, row_id, 0);
+			process_row(false, false, data, row_id, 1);
 		}
 		row_id = get_next_row_id();
 	}
@@ -68,8 +68,8 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 	row_sequence->set_visited();
 	++data->row_stat;
 	fprintf(Property::dbdebug, "Calculate row %ld iteration %d\n", row_id, iteration);
+	++data->iteration_stat[iteration];
 	if (!use_reference) {
-		++data->row_full;
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; ++col_id) {
 			seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
 			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
@@ -82,7 +82,6 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 		}
 		data->qgram_performed += Property::db_data.sequences - row_id - 1;
 	} else if (use_reference) {
-		++data->row_reference;
 		unsigned int max_next = iteration * Property::resolution;
 		for (unsigned int j = 0; j <= max_next; ++j) {
 			for (unsigned int k = 0; k < data->next_comparison[j].size(); ++k) {
@@ -140,21 +139,22 @@ void Cluster::print_debug(cluster_data ** data) {
 	unsigned long int matches_found = 0;
 	unsigned long int qgram_performed = 0;
 	unsigned long int scan_performed = 0;
-	unsigned long int row_full = 0;
-	unsigned long int row_reference = 0;
+	unsigned long int * iteration_stat = new unsigned long int[Property::depth];
 	for (int t = 0; t < Property::threads; t++) {
 		fprintf(Property::dbdebug, "Row stat [%d]\t\t: %13ld\n", t, (*data)[t].row_stat);
 		matches_found += (*data)[t].matches_found;
 		qgram_performed += (*data)[t].qgram_performed;
 		scan_performed += (*data)[t].scan_performed;
-		row_full += (*data)[t].row_full;
-		row_reference += (*data)[t].row_reference;
+		for (unsigned int j = 0; j < Property::depth; j++) {
+			iteration_stat[j] += (*data)[t].iteration_stat[j + 1];
+		}
 	}
 	fprintf(Property::dbdebug, "Total match\t\t: %13ld\n", matches_found);
 	fprintf(Property::dbdebug, "Total estimate\t\t: %13ld\n", qgram_performed);
 	fprintf(Property::dbdebug, "Total search\t\t: %13ld\n", scan_performed);
-	fprintf(Property::dbdebug, "Full calculation\t: %13ld\n", row_full);
-	fprintf(Property::dbdebug, "Referenced calculation\t: %13ld\n", row_reference);
+	for (unsigned int j = 0; j < Property::depth; j++) {
+		fprintf(Property::dbdebug, "Iteration[%d]\t: %13ld\n", j + 1, iteration_stat[j]);
+	}
 }
 
 void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first, unsigned long int second) {
