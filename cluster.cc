@@ -77,13 +77,12 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 				data->targetampliconids.push_back(col_id);
 			}
 			if (write_reference && qgramdiff <= Property::max_next) {
-				data->next_comparison[qgramdiff].push_back(col_id);
+				data->next_comparison[Property::max_next_map[qgramdiff]].push_back(col_id);
 			}
 		}
 		data->qgram_performed += Property::db_data.sequences - row_id - 1;
 	} else if (use_reference) {
-		unsigned int max_next = iteration * Property::resolution;
-		for (unsigned int j = 0; j <= max_next; ++j) {
+		for (unsigned int j = 0; j <= iteration; ++j) {
 			for (unsigned int k = 0; k < data->next_comparison[j].size(); ++k) {
 				unsigned long int col_id = data->next_comparison[j][k];
 				if (col_id > row_id && data->match_statistics.find(col_id) == data->match_statistics.end()) {

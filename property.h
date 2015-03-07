@@ -46,6 +46,7 @@ public:
 	static unsigned long bits;
 	static unsigned long diff_saturation;
 	static unsigned long max_next;
+	static std::vector<unsigned long int> max_next_map;
 	static class Db_data db_data;
 	static FILE* outfile;
 	static FILE* debugfile;

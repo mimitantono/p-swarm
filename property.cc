@@ -6,6 +6,7 @@
  */
 
 #include "property.h"
+#include <math.h>
 
 long Property::gapopen;
 long Property::gapextend;
@@ -30,6 +31,7 @@ Db_data Property::db_data;
 BYTE Property::byte_penalty_gapextend;
 BYTE Property::byte_penalty_gapopen_gapextend;
 bool Property::enable_flag;
+std::vector<unsigned long int> Property::max_next_map;
 
 void Property::init() {
 	matchscore = DEFAULT_MATCHSCORE;
@@ -59,6 +61,12 @@ void Property::recalculate() {
 	byte_penalty_gapextend = (BYTE) penalty_gapextend;
 	byte_penalty_gapopen_gapextend = (BYTE) penalty_gapopen + (BYTE) penalty_gapextend;
 	max_next = depth * resolution;
+	if (max_next_map.size() > 0) {
+		std::vector<unsigned long int>().swap(max_next_map);
+	}
+	for (double i = 0; i <= max_next; ++i) {
+		max_next_map.push_back((int) ceil(i / resolution));
+	}
 	if (Property::resolution <= diff_saturation)
 		bits = 8;
 	else

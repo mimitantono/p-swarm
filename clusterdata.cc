@@ -11,7 +11,7 @@
 
 cluster_data::cluster_data() {
 	thread_id = -1;
-	next_comparison = new std::vector<unsigned long int>[Property::max_next + 1];
+	next_comparison = new std::vector<unsigned long int>[Property::depth + 1];
 	matches_found = 0;
 	qgram_performed = 0;
 	scan_performed = 0;
@@ -29,7 +29,7 @@ cluster_data::~cluster_data() {
 }
 
 void cluster_data::reset() {
-	for (unsigned int i = 0; i < Property::max_next + 1; i++) {
+	for (unsigned int i = 0; i <= Property::depth; i++) {
 		std::vector<unsigned long int>().swap(next_comparison[i]);
 	}
 	boost::unordered_map<unsigned long int, bool>().swap(match_statistics);
@@ -37,6 +37,6 @@ void cluster_data::reset() {
 
 void cluster_data::write_next_comparison(unsigned long int col_id, unsigned int distance) {
 	if (distance <= Property::max_next)
-		next_comparison[distance].push_back(col_id);
+		next_comparison[Property::max_next_map[distance]].push_back(col_id);
 }
 
