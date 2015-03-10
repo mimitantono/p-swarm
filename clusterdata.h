@@ -10,7 +10,6 @@
 
 #include "scan.h"
 #include<queue>
-#include<boost/unordered_map.hpp>
 #include<vector>
 
 class cluster_data {
@@ -31,7 +30,6 @@ public:
 	std::queue<unsigned long int> next_step;
 	std::queue<unsigned int> next_step_level;
 	std::vector<unsigned long int> * next_comparison;
-	boost::unordered_map<unsigned long int, bool> match_statistics;
 
 	void write_next_comparison(unsigned long int col, unsigned int distance);
 	void reset();

@@ -13,12 +13,13 @@
 
 cluster_result::cluster_result() {
 	partition_id = -1;
-	member_stat = new unsigned long int [Property::db_data.sequences];
+	member_stat = new unsigned long int[Property::db_data.sequences];
 	memset(member_stat, 0, Property::db_data.sequences * sizeof(unsigned long int));
 }
 
 cluster_result::~cluster_result() {
-	delete[] member_stat;
+	if (member_stat)
+		delete[] member_stat;
 }
 
 cluster_info * cluster_result::new_cluster(unsigned long int cluster_id) {

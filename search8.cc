@@ -632,7 +632,7 @@ inline void domasked8(__m128i * Sm, __m128i * hep, __m128i ** qp, __m128i * Qm, 
 }
 
 unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned long dlen, unsigned long * dirbuffer, unsigned long offset,
-		unsigned long dirbuffersize, unsigned long channel, search_result * sr, long longest) {
+		unsigned long dirbuffersize, unsigned long channel, long longest) {
 	unsigned long maskup = 1UL << (channel + 0);
 	unsigned long maskleft = 1UL << (channel + 16);
 	unsigned long maskextup = 1UL << (channel + 32);
@@ -724,12 +724,12 @@ unsigned long backtrack(char * qseq, char * dseq, unsigned long qlen, unsigned l
 		}
 	}
 	aligned += i + j + 2;
-	sr->alignlength = aligned;
+//	sr->alignlength = aligned;
 	return aligned - matches;
 }
 
-void searcher::search8(struct search_data * sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result,
-		queryinfo_t *query, unsigned long dirbuffersize, long longest) {
+void searcher::search8(struct search_data * sd, std::vector<unsigned long int> * targets, unsigned long **result, queryinfo_t *query,
+		unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
 
@@ -831,19 +831,20 @@ void searcher::search8(struct search_data * sd, std::vector<unsigned long int> *
 						long dbseqlen = d_length[c];
 						long z = (dbseqlen + 3) % 4;
 						long score = ((BYTE*) S)[z * 16 + c];
-						search_result * sr = &(*result)[cand_id];
-						sr->score = score;
+//						search_result * sr = &(*result)[cand_id];
+//						sr->score = score;
 
 						unsigned long diff;
 
 						if (score < 255) {
 							long offset = d_offset[c];
-							diff = backtrack(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c, sr, longest);
+							diff = backtrack(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c, longest);
 						} else {
 							diff = 255;
 						}
 
-						sr->diff = diff;
+						(*result)[cand_id] = diff;
+//						sr->diff = diff;
 
 						done++;
 					}

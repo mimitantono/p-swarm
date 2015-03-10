@@ -22,7 +22,7 @@ unsigned long Property::resolution;
 unsigned long Property::max_next;
 unsigned long Property::diff_saturation;
 unsigned long Property::bits;
-unsigned int Property::depth = 2;
+unsigned int Property::depth = 1;
 FILE * Property::outfile;
 FILE * Property::dbdebug;
 std::string Property::databasename;
@@ -60,6 +60,9 @@ void Property::recalculate() {
 	diff_saturation = MIN(255 / penalty_mismatch, 255 / (penalty_gapopen + penalty_gapextend));
 	byte_penalty_gapextend = (BYTE) penalty_gapextend;
 	byte_penalty_gapopen_gapextend = (BYTE) penalty_gapopen + (BYTE) penalty_gapextend;
+	if (depth == 1 && enable_flag) {
+		depth = 2;
+	}
 	max_next = depth * resolution;
 	if (max_next_map.size() > 0) {
 		std::vector<unsigned long int>().swap(max_next_map);
@@ -85,6 +88,8 @@ void Property::print() {
 	fprintf(stderr, "penalty_mismatch   : %ld\n", Property::penalty_mismatch);
 	fprintf(stderr, "penalty_factor     : %ld\n", penalty_factor);
 	fprintf(stderr, "resolution         : %ld\n", resolution);
+	fprintf(stderr, "depth              : %d\n", depth);
+	fprintf(stderr, "threads            : %d\n", threads);
 }
 
 void Property::set_resolution(long value) {

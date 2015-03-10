@@ -11,7 +11,7 @@
 searcher::searcher() {
 }
 
-searcher::~searcher(){
+searcher::~searcher() {
 }
 
 void dprofile_dump16(WORD * dprofile) {
@@ -387,7 +387,7 @@ inline void domasked16(__m128i * Sm, __m128i * hep, __m128i ** qp, __m128i * Qm,
 }
 
 unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned long dlen, unsigned long * dirbuffer, unsigned long offset,
-		unsigned long dirbuffersize, unsigned long channel, search_result * sr, long longest) {
+		unsigned long dirbuffersize, unsigned long channel, long longest) {
 	unsigned long maskup = 3UL << (2 * channel + 0);
 	unsigned long maskleft = 3UL << (2 * channel + 16);
 	unsigned long maskextup = 3UL << (2 * channel + 32);
@@ -481,11 +481,11 @@ unsigned long backtrack16(char * qseq, char * dseq, unsigned long qlen, unsigned
 		}
 	}
 	aligned += i + j + 2;
-	sr->alignlength = aligned;
+//	sr->alignlength = aligned;
 	return aligned - matches;
 }
 
-void searcher::search16(struct search_data* sd, std::vector<unsigned long int> * targets, std::vector<search_result> *result, queryinfo_t * query,
+void searcher::search16(struct search_data* sd, std::vector<unsigned long int> * targets, unsigned long **result, queryinfo_t * query,
 		unsigned long dirbuffersize, long longest) {
 	__m128i Q, R, T, M, T0, MQ, MR;
 	__m128i *hep, **qp;
@@ -591,20 +591,20 @@ void searcher::search16(struct search_data* sd, std::vector<unsigned long int> *
 						long z = (dbseqlen + 3) % 4;
 						long score = ((WORD*) S)[z * CHANNELS + c];
 
-						search_result * sr = &(*result)[cand_id];
-						sr->score = score;
+//						search_result * sr = &(*result)[cand_id];
+//						sr->score = score;
 						unsigned long diff;
 
 						if (score < 65535) {
 							long offset = d_offset[c];
-							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c, sr,
-									longest);
+							diff = backtrack16(query->seq, dbseq, query->len, dbseqlen, sd->dir_array, offset, dirbuffersize, c, longest);
 						} else {
 							diff = MIN((65535 / Property::penalty_mismatch),
 									(65535 - Property::penalty_gapopen) / Property::penalty_gapextend);
 						}
 
-						sr->diff = diff;
+						(*result)[cand_id] = diff;
+//						sr->diff = diff;
 						done++;
 					}
 

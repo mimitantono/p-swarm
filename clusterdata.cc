@@ -24,15 +24,16 @@ cluster_data::cluster_data() {
 }
 
 cluster_data::~cluster_data() {
-	delete[] next_comparison;
-	delete[] iteration_stat;
+	if (next_comparison)
+		delete[] next_comparison;
+	if (iteration_stat)
+		delete[] iteration_stat;
 }
 
 void cluster_data::reset() {
 	for (unsigned int i = 0; i <= Property::depth; i++) {
 		std::vector<unsigned long int>().swap(next_comparison[i]);
 	}
-	boost::unordered_map<unsigned long int, bool>().swap(match_statistics);
 }
 
 void cluster_data::write_next_comparison(unsigned long int col_id, unsigned int distance) {

@@ -8,6 +8,7 @@
 scanner::scanner() {
 	sd = new struct search_data;
 	dirbufferbytes = 0;
+	master_result = new unsigned long[Property::db_data.sequences];
 }
 
 scanner::~scanner() {
@@ -25,6 +26,8 @@ scanner::~scanner() {
 		delete[] (sd->dir_array);
 	if (sd)
 		delete sd;
+	if (master_result)
+		delete[] master_result;
 }
 
 void scanner::search_init() {
@@ -64,10 +67,5 @@ void scanner::search_begin() {
 
 	memset(sd->hearray, 0, Property::db_data.longest * 32);
 	memset(sd->dir_array, 0, dirbufferbytes);
-
-	for (unsigned long i = 0; i < Property::db_data.sequences; i++) {
-		search_result sr;
-		master_result.push_back(sr);
-	}
 }
 

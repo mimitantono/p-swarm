@@ -17,7 +17,7 @@ public:
 	void search_do(unsigned long query_no, std::vector<unsigned long int>* targets);
 	void search_begin();
 	queryinfo_t query;
-	std::vector<search_result> master_result;
+	unsigned long * master_result;
 	struct search_data * sd;
 private:
 	class searcher searcher;

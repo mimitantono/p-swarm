@@ -75,25 +75,33 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 			unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 			if (qgramdiff <= Property::resolution) {
 				data->targetampliconids.push_back(col_id);
-			}
-			if (write_reference && qgramdiff <= Property::max_next) {
+			} else if (write_reference && qgramdiff <= Property::max_next) {
 				data->next_comparison[Property::max_next_map[qgramdiff]].push_back(col_id);
 			}
 		}
 		data->qgram_performed += Property::db_data.sequences - row_id - 1;
 	} else if (use_reference) {
 		for (unsigned int j = 0; j <= iteration; ++j) {
+			std::vector<unsigned long int> new_comparison;
 			for (unsigned int k = 0; k < data->next_comparison[j].size(); ++k) {
+				bool push = true;
 				unsigned long int col_id = data->next_comparison[j][k];
-				if (col_id > row_id && data->match_statistics.find(col_id) == data->match_statistics.end()) {
+				if (col_id > row_id) {
 					seqinfo_t * col_sequence = Property::db_data.get_seqinfo(col_id);
 					unsigned long qgramdiff = qgram_diff(row_sequence->qgram, col_sequence->qgram);
 					if (qgramdiff <= Property::resolution) {
 						data->targetampliconids.push_back(col_id);
+						push = false;
 					}
 				}
+				if (push) {
+					new_comparison.push_back(col_id);
+				}
 			}
+			new_comparison.swap(data->next_comparison[j]);
+			std::vector<unsigned long int>().swap(new_comparison);
 		}
+
 	}
 	data->scan_performed += data->targetampliconids.size();
 
@@ -101,15 +109,16 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 
 	for (unsigned long j = 0; j < data->targetampliconids.size(); ++j) {
 		unsigned long int col_id = data->targetampliconids[j];
-		unsigned long int diff = data->scanner.master_result[j].diff;
+		unsigned long int diff = data->scanner.master_result[j];
 		if (diff <= Property::resolution) {
 			add_match_to_cluster(data, row_id, col_id);
-			data->match_statistics[col_id] = true;
 			if (Property::enable_flag && !Property::db_data.get_seqinfo(col_id)->is_visited() && iteration < Property::depth) {
 				Property::db_data.get_seqinfo(col_id)->set_visited();
 				data->next_step.push(col_id);
 				data->next_step_level.push(iteration + 1);
 			}
+		} else if (write_reference || use_reference) {
+			data->next_comparison[iteration].push_back(col_id);
 		}
 	}
 	std::vector<unsigned long int>().swap(data->targetampliconids);
@@ -139,8 +148,11 @@ void Cluster::print_debug(cluster_data ** data) {
 	unsigned long int qgram_performed = 0;
 	unsigned long int scan_performed = 0;
 	unsigned long int * iteration_stat = new unsigned long int[Property::depth];
+	for (unsigned int j = 0; j < Property::depth; j++) {
+		iteration_stat[j] = 0;
+	}
 	for (int t = 0; t < Property::threads; t++) {
-		fprintf(Property::dbdebug, "Row stat [%d]\t\t: %13ld\n", t, (*data)[t].row_stat);
+		fprintf(Property::dbdebug, "Row stat [%d]\t\t: %13ld\n", t, ((*data)[t]).row_stat);
 		matches_found += (*data)[t].matches_found;
 		qgram_performed += (*data)[t].qgram_performed;
 		scan_performed += (*data)[t].scan_performed;
