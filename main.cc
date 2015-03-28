@@ -31,7 +31,7 @@ void args_init(int argc, char **argv) {
 	/* Set defaults */
 	opterr = 1;
 
-	char short_options[] = "d:ho:t:y:vm:p:g:e:s:u:braz";
+	char short_options[] = "d:ho:t:y:vm:p:g:e:s:u:bra";
 
 	static struct option long_options[] = {
 											{ "differences", required_argument, NULL, 'd' },
@@ -42,7 +42,6 @@ void args_init(int argc, char **argv) {
 											{ "mismatch-penalty", required_argument, NULL, 'p' },
 											{ "gap-opening-penalty", required_argument, NULL, 'g' },
 											{ "gap-extension-penalty", required_argument, NULL, 'e' },
-											{ "debug", required_argument, NULL, 'z' },
 											{ "depth", required_argument, NULL, 'y' },
 											{ 0, 0, 0, 0 }, };
 
@@ -79,11 +78,9 @@ void args_init(int argc, char **argv) {
 			/* gap extension penalty */
 			Property::set_gapextend(atol(optarg));
 			break;
-		case 'z':
-			Property::enable_flag = true;
-			break;
 		case 'y':
 			Property::depth = atol(optarg);
+			Property::enable_flag = true;
 			break;
 		case 'h':
 			/* help */
@@ -108,7 +105,7 @@ void run() {
 	gettimeofday(&start, NULL);
 	Property::db_data.read_file();
 	class Cluster cluster;
-	cluster_data * cluster_data= new class cluster_data[Property::threads];
+	cluster_data * cluster_data = new class cluster_data[Property::threads];
 	calculate_matrix(&cluster, &cluster_data);
 	gettimeofday(&end, NULL);
 	double dif1 = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
@@ -189,8 +186,7 @@ void args_usage() {
 	fprintf(stderr, "  -p, --mismatch-penalty INTEGER      penalty for nucleotide mismatch (4)\n");
 	fprintf(stderr, "  -g, --gap-opening-penalty INTEGER   gap open penalty (12)\n");
 	fprintf(stderr, "  -e, --gap-extension-penalty INTEGER gap extension penalty (4)\n");
-	fprintf(stderr, "  -z, --debug                         enable alternative algorithms\n");
-	fprintf(stderr, "  -y, --depth                         depth for alternative algorithms\n");
+	fprintf(stderr, "  -y, --depth                         max level for economic search\n");
 	fprintf(stderr, "\n");
 }
 

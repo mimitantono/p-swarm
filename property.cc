@@ -89,7 +89,7 @@ void Property::print() {
 	fprintf(stderr, "penalty_factor     : %ld\n", penalty_factor);
 	fprintf(stderr, "resolution         : %ld\n", resolution);
 	fprintf(stderr, "depth              : %d\n", depth);
-	fprintf(stderr, "threads            : %d\n", threads);
+	fprintf(stderr, "threads            : %ld\n", threads);
 }
 
 void Property::set_resolution(long value) {

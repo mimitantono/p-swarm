@@ -10,7 +10,7 @@
 
 #include<pthread.h>
 
-#define QGRAMLENGTH 4
+#define QGRAMLENGTH 5
 #define QGRAMVECTORBITS (1<<(2*QGRAMLENGTH))
 #define QGRAMVECTORBYTES (QGRAMVECTORBITS/8)
 

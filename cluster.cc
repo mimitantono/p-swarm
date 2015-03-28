@@ -62,7 +62,7 @@ void Cluster::run_thread(cluster_data *data, int total_thread) {
 
 void Cluster::process_row(bool write_reference, bool use_reference, cluster_data * data, unsigned long int row_id, unsigned int iteration) {
 	seqinfo_t * row_sequence = Property::db_data.get_seqinfo(row_id);
-	if (!use_reference && row_sequence->is_visited()) {
+	if (row_sequence->is_visited()) {
 		return;
 	}
 	row_sequence->set_visited();
@@ -113,7 +113,7 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 		if (diff <= Property::resolution) {
 			add_match_to_cluster(data, row_id, col_id);
 			if (Property::enable_flag && !Property::db_data.get_seqinfo(col_id)->is_visited() && iteration < Property::depth) {
-				Property::db_data.get_seqinfo(col_id)->set_visited();
+//				Property::db_data.get_seqinfo(col_id)->set_visited();
 				data->next_step.push(col_id);
 				data->next_step_level.push(iteration + 1);
 			}
