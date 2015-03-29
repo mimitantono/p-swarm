@@ -8,7 +8,7 @@
 #include "seqinfo.h"
 #include <stddef.h>
 
-pthread_mutex_t seqinfo_t::mutex;
+//pthread_mutex_t seqinfo_t::mutex;
 
 seqinfo_t::seqinfo_t() {
 	header = 0;
