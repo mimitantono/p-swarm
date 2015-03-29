@@ -27,15 +27,15 @@ seqinfo_t::~seqinfo_t() {
 
 bool seqinfo_t::is_visited() {
 	bool result;
-	pthread_mutex_lock(&mutex);
+//	pthread_mutex_lock(&mutex);
 	result = visited;
-	pthread_mutex_unlock(&mutex);
+//	pthread_mutex_unlock(&mutex);
 	return result;
 }
 
 void seqinfo_t::set_visited() {
-	pthread_mutex_lock(&mutex);
+//	pthread_mutex_lock(&mutex);
 	visited = true;
-	pthread_mutex_unlock(&mutex);
+//	pthread_mutex_unlock(&mutex);
 }
 

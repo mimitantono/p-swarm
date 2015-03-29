@@ -163,6 +163,8 @@ void Cluster::print_debug(cluster_data ** data) {
 	fprintf(Property::dbdebug, "Total match\t\t: %13ld\n", matches_found);
 	fprintf(Property::dbdebug, "Total estimate\t\t: %13ld\n", qgram_performed);
 	fprintf(Property::dbdebug, "Total search\t\t: %13ld\n", scan_performed);
+	fprintf(stderr, "Total estimate     : %ld\n", qgram_performed);
+	fprintf(stderr, "Total search       : %ld\n", scan_performed);
 	for (unsigned int j = 0; j < Property::depth; j++) {
 		fprintf(Property::dbdebug, "Iteration[%d]\t: %13ld\n", j + 1, iteration_stat[j]);
 	}
