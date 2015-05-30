@@ -67,7 +67,6 @@ void Cluster::process_row(bool write_reference, bool use_reference, cluster_data
 	}
 	row_sequence->set_visited();
 	++data->row_stat;
-	fprintf(Property::dbdebug, "Calculate row %ld iteration %d\n", row_id, iteration);
 	++data->iteration_stat[iteration];
 	if (!use_reference) {
 		for (unsigned long col_id = row_id + 1; col_id < Property::db_data.sequences; ++col_id) {

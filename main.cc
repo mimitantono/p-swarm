@@ -180,13 +180,13 @@ void args_usage() {
 	fprintf(stderr, "Usage: main [OPTIONS] [filename]\n");
 	fprintf(stderr, "  -d, --differences INTEGER           resolution (1)\n");
 	fprintf(stderr, "  -h, --help                          display this help and exit\n");
-	fprintf(stderr, "  -o, --output-file FILENAME          output result filename (stdout)\n");
+	fprintf(stderr, "  -o, --output-file FILENAME          output result filename (result.log)\n");
 	fprintf(stderr, "  -t, --threads INTEGER               number of threads to use (1)\n");
 	fprintf(stderr, "  -m, --match-reward INTEGER          reward for nucleotide match (5)\n");
 	fprintf(stderr, "  -p, --mismatch-penalty INTEGER      penalty for nucleotide mismatch (4)\n");
 	fprintf(stderr, "  -g, --gap-opening-penalty INTEGER   gap open penalty (12)\n");
 	fprintf(stderr, "  -e, --gap-extension-penalty INTEGER gap extension penalty (4)\n");
-	fprintf(stderr, "  -y, --depth                         max level for economic search\n");
+	fprintf(stderr, "  -y, --depth INTEGER                 max level for economic search\n");
 	fprintf(stderr, "\n");
 }
 
