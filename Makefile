@@ -33,5 +33,4 @@ test :  $(OBJS_TEST)
 
 clean :
 	rm -f *.o *.s *~ $(PROG) gmon.out 
-	rm main
-	rm test
+	rm -f main test
