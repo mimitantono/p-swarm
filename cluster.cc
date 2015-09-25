@@ -167,6 +167,7 @@ void Cluster::print_debug(cluster_data ** data) {
 	for (unsigned int j = 0; j < Property::depth; j++) {
 		fprintf(Property::dbdebug, "Iteration[%d]\t: %13ld\n", j + 1, iteration_stat[j]);
 	}
+        delete [] (iteration_stat);
 }
 
 void Cluster::add_match_to_cluster(cluster_data * data, unsigned long int first, unsigned long int second) {

@@ -23,8 +23,7 @@ cluster_result::~cluster_result() {
 }
 
 cluster_info * cluster_result::new_cluster(unsigned long int cluster_id) {
-	cluster_info info;
-	info.cluster_id = cluster_id;
+	cluster_info info = {cluster_id, std::vector<unsigned long int>()};
 	clusters[cluster_id] = info;
 	return &clusters[cluster_id];
 }
